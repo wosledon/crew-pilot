@@ -5,4 +5,8 @@
     <Project Path="src/CrewPilot.Core/CrewPilot.Core.csproj" />
     <Project Path="src/CrewPilot.Infrastructure/CrewPilot.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CrewPilot.IntegrationTests/CrewPilot.IntegrationTests.csproj" />
+    <Project Path="tests/CrewPilot.UnitTests/CrewPilot.UnitTests.csproj" />
+  </Folder>
 </Solution>
