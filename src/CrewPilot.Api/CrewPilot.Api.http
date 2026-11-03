@@ -1,0 +1,6 @@
+@CrewPilot.Api_HostAddress = http://localhost:5283
+
+GET {{CrewPilot.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
