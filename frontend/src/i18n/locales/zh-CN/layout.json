@@ -1,0 +1,13 @@
+{
+  "nav": {
+    "projects": "项目",
+    "prototype": "原型工坊"
+  },
+  "theme": {
+    "toggle": "切换深浅色主题"
+  },
+  "sidebar": {
+    "title": "Crew Pilot",
+    "subtitle": "一个人的驾驶舱"
+  }
+}

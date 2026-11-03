@@ -1,0 +1,30 @@
+{
+  "title": "Projects",
+  "description": "Cockpit for all projects and work items",
+  "create": "New project",
+  "createTitle": "New project",
+  "key": "Project key",
+  "keyPlaceholder": "e.g. CP",
+  "name": "Project name",
+  "namePlaceholder": "Enter project name",
+  "repoUrl": "Git repository URL",
+  "repoUrlPlaceholder": "https://github.com/…",
+  "descriptionLabel": "Description",
+  "workItemCount": "Work items",
+  "createdAt": "Created at",
+  "deleteConfirm": {
+    "title": "Delete project?",
+    "description": "All work items, prototypes and records under this project will be removed permanently."
+  },
+  "created": "Project created",
+  "deleted": "Project deleted",
+  "empty": "No projects yet — click \"New project\" to get started",
+  "detail": {
+    "back": "Back to projects",
+    "workItems": "Work items",
+    "filterType": "Type",
+    "filterStatus": "Status",
+    "all": "All",
+    "notFound": "Project not found"
+  }
+}

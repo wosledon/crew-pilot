@@ -1,0 +1,30 @@
+{
+  "title": "项目",
+  "description": "所有项目与工作项的驾驶舱",
+  "create": "新建项目",
+  "createTitle": "新建项目",
+  "key": "项目 Key",
+  "keyPlaceholder": "如 CP",
+  "name": "项目名称",
+  "namePlaceholder": "请输入项目名称",
+  "repoUrl": "Git 仓库地址",
+  "repoUrlPlaceholder": "https://github.com/…",
+  "descriptionLabel": "项目描述",
+  "workItemCount": "工作项",
+  "createdAt": "创建于",
+  "deleteConfirm": {
+    "title": "删除项目？",
+    "description": "删除后该项目下的全部工作项、原型与记录将一并移除，且不可恢复。"
+  },
+  "created": "项目已创建",
+  "deleted": "项目已删除",
+  "empty": "还没有项目，点击右上角「新建项目」开始",
+  "detail": {
+    "back": "返回项目列表",
+    "workItems": "工作项",
+    "filterType": "类型",
+    "filterStatus": "状态",
+    "all": "全部",
+    "notFound": "项目不存在"
+  }
+}

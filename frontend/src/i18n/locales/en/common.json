@@ -1,0 +1,16 @@
+{
+  "appName": "Crew Pilot",
+  "loading": "Loading…",
+  "error": "Something went wrong",
+  "retry": "Retry",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "save": "Save",
+  "delete": "Delete",
+  "create": "Create",
+  "language": "Language",
+  "empty": "No data",
+  "estimatedHours": "Estimated hours",
+  "loggedHours": "Logged hours",
+  "remainingHours": "Remaining hours"
+}

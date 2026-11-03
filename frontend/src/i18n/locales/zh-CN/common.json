@@ -1,0 +1,16 @@
+{
+  "appName": "Crew Pilot",
+  "loading": "加载中…",
+  "error": "出错了",
+  "retry": "重试",
+  "cancel": "取消",
+  "confirm": "确认",
+  "save": "保存",
+  "delete": "删除",
+  "create": "创建",
+  "language": "语言",
+  "empty": "暂无数据",
+  "estimatedHours": "预估工时",
+  "loggedHours": "已耗工时",
+  "remainingHours": "剩余工时"
+}

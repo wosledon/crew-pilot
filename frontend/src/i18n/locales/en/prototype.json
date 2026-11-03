@@ -1,0 +1,30 @@
+{
+  "title": "Prototype Studio",
+  "description": "Sketch HTML and run it live, or reference URL / image / design MCP",
+  "project": "Project",
+  "selectProject": "Select project",
+  "name": "Prototype name",
+  "namePlaceholder": "e.g. Homepage cards",
+  "type": "Type",
+  "types": {
+    "html": "HTML",
+    "url": "URL",
+    "image": "Image",
+    "mcp": "Design MCP"
+  },
+  "editor": "HTML editor",
+  "editorPlaceholder": "Write HTML/CSS/JS here, preview updates live on the right",
+  "preview": "Live preview",
+  "save": "Save prototype",
+  "saved": "Prototype saved",
+  "savedList": "Saved prototypes",
+  "empty": "No saved prototypes",
+  "load": "Load",
+  "deleteConfirm": {
+    "title": "Delete prototype?",
+    "description": "This cannot be undone."
+  },
+  "deleted": "Prototype deleted",
+  "runHint": "Prototypes run directly in a sandboxed iframe",
+  "selectProjectFirst": "Please select a project first"
+}

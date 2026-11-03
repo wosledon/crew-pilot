@@ -1,0 +1,13 @@
+{
+  "nav": {
+    "projects": "Projects",
+    "prototype": "Prototype Studio"
+  },
+  "theme": {
+    "toggle": "Toggle light/dark theme"
+  },
+  "sidebar": {
+    "title": "Crew Pilot",
+    "subtitle": "Solo cockpit"
+  }
+}

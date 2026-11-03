@@ -1,0 +1,30 @@
+{
+  "title": "原型工坊",
+  "description": "自己画 HTML 直接运行，也可以引用 URL / 图片 / 设计 MCP",
+  "project": "所属项目",
+  "selectProject": "选择项目",
+  "name": "原型名称",
+  "namePlaceholder": "如：首页卡片",
+  "type": "类型",
+  "types": {
+    "html": "HTML",
+    "url": "URL",
+    "image": "图片",
+    "mcp": "设计 MCP"
+  },
+  "editor": "HTML 编辑器",
+  "editorPlaceholder": "在此编写 HTML/CSS/JS，右侧实时预览",
+  "preview": "实时预览",
+  "save": "保存原型",
+  "saved": "原型已保存",
+  "savedList": "已保存的原型",
+  "empty": "还没有保存的原型",
+  "load": "加载",
+  "deleteConfirm": {
+    "title": "删除原型？",
+    "description": "删除后不可恢复。"
+  },
+  "deleted": "原型已删除",
+  "runHint": "原型在沙箱 iframe 中直接运行",
+  "selectProjectFirst": "请先选择项目"
+}
