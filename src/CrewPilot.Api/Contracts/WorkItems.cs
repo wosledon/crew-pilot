@@ -47,6 +47,7 @@ public sealed record CreateWorkItemRequest(
     decimal? EstimatedHours,
     decimal? RemainingHours,
     DateOnly? DueDate,
+    Guid? IterationId,
     string? AssigneeName,
     string? Severity,
     string? ReproSteps,
@@ -60,7 +61,8 @@ public sealed record UpdateWorkItemRequest(
     int? StoryPoints,
     decimal? EstimatedHours,
     decimal? RemainingHours,
-    DateOnly? DueDate);
+    DateOnly? DueDate,
+    Guid? IterationId);
 
 public sealed record TransitionRequest(string ToStatus);
 

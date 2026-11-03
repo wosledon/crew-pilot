@@ -204,4 +204,60 @@ public sealed class IterationsController(CrewPilotDbContext db) : ControllerBase
             iteration.Id, iteration.ProjectId, iteration.Name, iteration.Goal,
             iteration.StartDate, iteration.EndDate, "completed", count);
     }
+
+    /// <summary>迭代燃尽图：按工时的剩余量 vs 理想线（1:1 折算，不加权）。</summary>
+    [HttpGet("api/iterations/{id:guid}/burndown")]
+    public async Task<ActionResult<BurndownDto>> Burndown(Guid id, CancellationToken ct)
+    {
+        var iteration = await db.Iterations
+            .AsNoTracking()
+            .FirstOrDefaultAsync(i => i.Id == id, ct);
+        if (iteration is null)
+        {
+            return Problem(detail: "迭代不存在", statusCode: 404);
+        }
+
+        var items = await db.WorkItems
+            .AsNoTracking()
+            .Where(w => w.IterationId == id)
+            .Select(w => new { w.Id, w.EstimatedHours })
+            .ToListAsync(ct);
+        var ids = items.Select(i => i.Id).ToList();
+
+        var logs = ids.Count == 0
+            ? []
+            : await db.WorkLogs
+                .AsNoTracking()
+                .Where(l => ids.Contains(l.WorkItemId))
+                .Select(l => new { l.Date, l.Hours })
+                .ToListAsync(ct);
+
+        var totalEstimate = items.Sum(i => i.EstimatedHours) ?? 0m;
+        var byDate = logs
+            .GroupBy(l => l.Date)
+            .ToDictionary(g => g.Key, g => g.Sum(l => l.Hours));
+
+        var points = new List<BurndownPointDto>();
+        decimal cumulative = 0m;
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var span = Math.Max(1, iteration.EndDate.DayNumber - iteration.StartDate.DayNumber);
+        for (var date = iteration.StartDate;
+             date <= iteration.EndDate && date <= today;
+             date = date.AddDays(1))
+        {
+            if (byDate.TryGetValue(date, out var hours))
+            {
+                cumulative += hours;
+            }
+
+            var elapsed = date.DayNumber - iteration.StartDate.DayNumber;
+            var ideal = totalEstimate * (1m - (decimal)elapsed / span);
+            points.Add(new BurndownPointDto(
+                date,
+                Math.Max(0m, totalEstimate - cumulative),
+                Math.Max(0m, ideal)));
+        }
+
+        return new BurndownDto(iteration.Id, totalEstimate, points);
+    }
 }

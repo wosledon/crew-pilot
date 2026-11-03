@@ -91,6 +91,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
         workItem.EstimatedHours = request.EstimatedHours;
         workItem.RemainingHours = request.RemainingHours;
         workItem.DueDate = request.DueDate;
+        workItem.IterationId = await ResolveIterationAsync(projectId, request.IterationId, ct);
         workItem.Assignee = await ResolveAssigneeAsync(projectId, request.AssigneeName, ct);
 
         db.WorkItems.Add(workItem);
@@ -124,6 +125,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
         workItem.EstimatedHours = request.EstimatedHours;
         workItem.RemainingHours = request.RemainingHours;
         workItem.DueDate = request.DueDate;
+        workItem.IterationId = await ResolveIterationAsync(workItem.ProjectId, request.IterationId, ct);
         workItem.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
 
@@ -520,6 +522,19 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
             .Select(g => new { Id = g.Key, Total = g.Sum(l => l.Hours) })
             .ToListAsync(ct);
         return rows.ToDictionary(x => x.Id, x => x.Total);
+    }
+
+    /// <summary>校验并解析迭代归属：迭代必须存在且属于同一项目。</summary>
+    private async Task<Guid?> ResolveIterationAsync(Guid projectId, Guid? iterationId, CancellationToken ct)
+    {
+        if (iterationId is null || iterationId == Guid.Empty)
+        {
+            return null;
+        }
+
+        var exists = await db.Iterations.AnyAsync(
+            i => i.Id == iterationId && i.ProjectId == projectId, ct);
+        return exists ? iterationId : null;
     }
 
     private async Task<ProjectMember?> ResolveAssigneeAsync(Guid projectId, string? name, CancellationToken ct)
