@@ -9,8 +9,8 @@ import { supportedLanguages } from "@/i18n";
 import { cn } from "@/lib/cn";
 
 const navItems = [
-  { to: "/projects", icon: FolderKanban, labelKey: "layout.nav.projects" },
-  { to: "/prototypes", icon: LayoutTemplate, labelKey: "layout.nav.prototype" },
+  { to: "/projects", icon: FolderKanban, labelKey: "layout:nav.projects" },
+  { to: "/prototypes", icon: LayoutTemplate, labelKey: "layout:nav.prototype" },
 ];
 
 /** 应用骨架：左侧固定导航 + 主内容区（卡片风格见 tokens.css） */
@@ -34,9 +34,9 @@ export function AppLayout() {
             🧭
           </span>
           <div className="leading-tight">
-            <div className="text-sm font-semibold">{t("layout.sidebar.title")}</div>
+            <div className="text-sm font-semibold">{t("layout:sidebar.title")}</div>
             <div className="text-xs text-muted-foreground">
-              {t("layout.sidebar.subtitle")}
+              {t("layout:sidebar.subtitle")}
             </div>
           </div>
         </div>
@@ -63,20 +63,20 @@ export function AppLayout() {
 
       <div className="ml-56 flex min-h-screen flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-card/80 px-6 backdrop-blur">
-          <span className="text-sm text-muted-foreground">{t("common.appName")}</span>
+          <span className="text-sm text-muted-foreground">{t("common:appName")}</span>
           <div className="flex items-center gap-2">
             <Select
               value={currentLanguage}
               onValueChange={(value) => void i18n.changeLanguage(value)}
               options={supportedLanguages}
-              ariaLabel={t("common.language")}
+              ariaLabel={t("common:language")}
               className="w-36"
             />
-            <Tooltip content={t("layout.theme.toggle")}>
+            <Tooltip content={t("layout:theme.toggle")}>
               <Button
                 variant="outline"
                 size="icon"
-                aria-label={t("layout.theme.toggle")}
+                aria-label={t("layout:theme.toggle")}
                 onClick={() => setDark((value) => !value)}
               >
                 {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

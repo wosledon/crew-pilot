@@ -1,4 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { forwardRef } from "react";
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 
@@ -29,12 +30,16 @@ export interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {}
 
-export function Button({ className, variant, size, ...props }: ButtonProps) {
-  return (
+/** forwardRef：供 Radix asChild（AlertDialog Cancel/Action 等）传递 ref */
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, ...props }, ref) => (
     <button
       type="button"
+      ref={ref}
       className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     />
-  );
-}
+  ),
+);
+
+Button.displayName = "Button";
