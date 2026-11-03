@@ -354,6 +354,9 @@ namespace CrewPilot.Infrastructure.Migrations
                         .HasMaxLength(16000)
                         .HasColumnType("TEXT");
 
+                    b.Property<DateOnly?>("DueDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal?>("EstimatedHours")
                         .HasPrecision(9, 2)
                         .HasColumnType("TEXT");

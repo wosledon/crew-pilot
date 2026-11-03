@@ -97,6 +97,25 @@ public sealed class WorkItemsApiTests(CrewPilotApiFactory factory) : IClassFixtu
     }
 
     [Fact]
+    public async Task CreateRequirement_WithDueDate_ReturnsDueDate()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var due = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(7));
+
+        var response = await client.PostAsJsonAsync($"/api/projects/{project.Id}/workitems", new
+        {
+            type = "requirement",
+            title = "带截止日期的需求",
+            dueDate = due,
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var item = await response.Content.ReadFromJsonAsync<WorkItemDetailDto>();
+        item!.DueDate.Should().Be(due);
+    }
+
+    [Fact]
     public async Task CreateDefect_HasSeverityAndReproSteps()
     {
         var client = factory.CreateClient();

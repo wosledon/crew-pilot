@@ -36,7 +36,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 r.Priority.ToString().ToLowerInvariant(), r.AssigneeName,
                 r.EstimatedHours,
                 loggedHours.TryGetValue(r.Id, out var hours) ? hours : 0m,
-                r.RemainingHours, r.PrUrl, r.UpdatedAt))
+                r.RemainingHours, r.DueDate, r.PrUrl, r.UpdatedAt))
             .ToList();
         return Ok(items);
     }
@@ -90,6 +90,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
         workItem.StoryPoints = request.StoryPoints;
         workItem.EstimatedHours = request.EstimatedHours;
         workItem.RemainingHours = request.RemainingHours;
+        workItem.DueDate = request.DueDate;
         workItem.Assignee = await ResolveAssigneeAsync(projectId, request.AssigneeName, ct);
 
         db.WorkItems.Add(workItem);
@@ -122,6 +123,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
         workItem.StoryPoints = request.StoryPoints;
         workItem.EstimatedHours = request.EstimatedHours;
         workItem.RemainingHours = request.RemainingHours;
+        workItem.DueDate = request.DueDate;
         workItem.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
 
@@ -260,7 +262,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
             row.Severity, row.ReproSteps, row.Environment,
             row.StoryPoints, row.EstimatedHours,
             loggedHours.TryGetValue(row.Id, out var hours) ? hours : 0m,
-            row.RemainingHours, row.AssigneeName, row.IterationId, row.BranchUrl, row.PrUrl,
+            row.RemainingHours, row.AssigneeName, row.IterationId, row.DueDate, row.BranchUrl, row.PrUrl,
             row.CreatedAt, row.UpdatedAt);
     }
 
@@ -281,6 +283,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
         decimal? RemainingHours,
         string? AssigneeName,
         Guid? IterationId,
+        DateOnly? DueDate,
         string? BranchUrl,
         string? PrUrl,
         DateTimeOffset CreatedAt,
@@ -312,6 +315,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                     w.RemainingHours,
                     AssigneeName = w.Assignee != null ? w.Assignee.DisplayName : null,
                     w.IterationId,
+                    w.DueDate,
                     w.BranchUrl,
                     w.PrUrl,
                     w.CreatedAt,
@@ -322,7 +326,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 x.Id, "requirement", x.Title, x.Status.ToString().ToLowerInvariant(), x.Priority,
                 x.Description, x.AcceptanceCriteria, null, null, null,
                 x.StoryPoints, x.EstimatedHours, x.RemainingHours, x.AssigneeName,
-                x.IterationId, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt)));
+                x.IterationId, x.DueDate, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt)));
         }
 
         if (wantAll || type == "defect")
@@ -347,6 +351,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                     w.RemainingHours,
                     AssigneeName = w.Assignee != null ? w.Assignee.DisplayName : null,
                     w.IterationId,
+                    w.DueDate,
                     w.BranchUrl,
                     w.PrUrl,
                     w.CreatedAt,
@@ -358,7 +363,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 x.Description, x.AcceptanceCriteria, x.Severity.ToString().ToLowerInvariant(),
                 x.ReproSteps, x.Environment,
                 x.StoryPoints, x.EstimatedHours, x.RemainingHours, x.AssigneeName,
-                x.IterationId, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt)));
+                x.IterationId, x.DueDate, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt)));
         }
 
         if (wantAll || type == "task")
@@ -379,6 +384,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                     w.RemainingHours,
                     AssigneeName = w.Assignee != null ? w.Assignee.DisplayName : null,
                     w.IterationId,
+                    w.DueDate,
                     w.BranchUrl,
                     w.PrUrl,
                     w.CreatedAt,
@@ -389,7 +395,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 x.Id, "task", x.Title, "todo", x.Priority,
                 x.Description, x.AcceptanceCriteria, null, null, null,
                 x.StoryPoints, x.EstimatedHours, x.RemainingHours, x.AssigneeName,
-                x.IterationId, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt)));
+                x.IterationId, x.DueDate, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt)));
         }
 
         return rows;
@@ -414,6 +420,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 w.RemainingHours,
                 AssigneeName = w.Assignee != null ? w.Assignee.DisplayName : null,
                 w.IterationId,
+                w.DueDate,
                 w.BranchUrl,
                 w.PrUrl,
                 w.CreatedAt,
@@ -426,7 +433,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 req.Id, "requirement", req.Title, req.Status.ToString().ToLowerInvariant(), req.Priority,
                 req.Description, req.AcceptanceCriteria, null, null, null,
                 req.StoryPoints, req.EstimatedHours, req.RemainingHours, req.AssigneeName,
-                req.IterationId, req.BranchUrl, req.PrUrl, req.CreatedAt, req.UpdatedAt);
+                req.IterationId, req.DueDate, req.BranchUrl, req.PrUrl, req.CreatedAt, req.UpdatedAt);
         }
 
         var defect = await db.WorkItems
@@ -449,6 +456,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 w.RemainingHours,
                 AssigneeName = w.Assignee != null ? w.Assignee.DisplayName : null,
                 w.IterationId,
+                w.DueDate,
                 w.BranchUrl,
                 w.PrUrl,
                 w.CreatedAt,
@@ -462,7 +470,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 defect.Description, defect.AcceptanceCriteria, defect.Severity.ToString().ToLowerInvariant(),
                 defect.ReproSteps, defect.Environment,
                 defect.StoryPoints, defect.EstimatedHours, defect.RemainingHours, defect.AssigneeName,
-                defect.IterationId, defect.BranchUrl, defect.PrUrl, defect.CreatedAt, defect.UpdatedAt);
+                defect.IterationId, defect.DueDate, defect.BranchUrl, defect.PrUrl, defect.CreatedAt, defect.UpdatedAt);
         }
 
         var task = await db.WorkItems
@@ -481,6 +489,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 w.RemainingHours,
                 AssigneeName = w.Assignee != null ? w.Assignee.DisplayName : null,
                 w.IterationId,
+                w.DueDate,
                 w.BranchUrl,
                 w.PrUrl,
                 w.CreatedAt,
@@ -494,7 +503,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 task.Id, "task", task.Title, "todo", task.Priority,
                 task.Description, task.AcceptanceCriteria, null, null, null,
                 task.StoryPoints, task.EstimatedHours, task.RemainingHours, task.AssigneeName,
-                task.IterationId, task.BranchUrl, task.PrUrl, task.CreatedAt, task.UpdatedAt);
+                task.IterationId, task.DueDate, task.BranchUrl, task.PrUrl, task.CreatedAt, task.UpdatedAt);
     }
 
     private async Task<Dictionary<Guid, decimal>> GetLoggedHoursAsync(IEnumerable<Guid> ids, CancellationToken ct)

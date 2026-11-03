@@ -10,6 +10,7 @@ public sealed record WorkItemListItemDto(
     decimal? EstimatedHours,
     decimal LoggedHours,
     decimal? RemainingHours,
+    DateOnly? DueDate,
     string? PrUrl,
     DateTimeOffset UpdatedAt);
 
@@ -30,6 +31,7 @@ public sealed record WorkItemDetailDto(
     decimal? RemainingHours,
     string? AssigneeName,
     Guid? IterationId,
+    DateOnly? DueDate,
     string? BranchUrl,
     string? PrUrl,
     DateTimeOffset CreatedAt,
@@ -44,6 +46,7 @@ public sealed record CreateWorkItemRequest(
     int? StoryPoints,
     decimal? EstimatedHours,
     decimal? RemainingHours,
+    DateOnly? DueDate,
     string? AssigneeName,
     string? Severity,
     string? ReproSteps,
@@ -56,7 +59,8 @@ public sealed record UpdateWorkItemRequest(
     string? Priority,
     int? StoryPoints,
     decimal? EstimatedHours,
-    decimal? RemainingHours);
+    decimal? RemainingHours,
+    DateOnly? DueDate);
 
 public sealed record TransitionRequest(string ToStatus);
 

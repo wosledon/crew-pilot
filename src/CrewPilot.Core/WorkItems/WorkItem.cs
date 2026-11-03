@@ -47,6 +47,9 @@ public abstract class WorkItem : Entity
 
     public string? PrUrl { get; set; }
 
+    /// <summary>截止日期（甘特图时间线与逾期标红）。</summary>
+    public DateOnly? DueDate { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
