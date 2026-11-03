@@ -58,13 +58,17 @@ tests/
 docs/PRD.md                 # 产品需求（事实来源）
 ```
 
-## 当前进度（M0 已完成）
+## 当前进度（M0 + M1 已完成）
 
 - [x] 解决方案分层（Api / Core / Infrastructure / Agents / Tests）
 - [x] 项目 / 需求 / 缺陷 CRUD + 状态机 + 工时登记（1:1）
 - [x] 原型工坊 v0：HTML 编辑 + 沙箱 iframe 实时运行
 - [x] 前端骨架：i18n（zh-CN/en）、卡片风格、Radix 组件封装（禁原生控件）
-- [ ] M1：迭代、看板拖拽、甘特图（工时维度）、燃尽图
+- [x] 看板：dnd-kit 拖拽流转（前端状态表 + 后端状态机双重拦截）
+- [x] 迭代管理：CRUD + 开始/完成 + 按工时燃尽图
+- [x] 甘特图：迭代时间线 + 工作项截止日 + 逾期标红
+- [x] 工时报表：按类型/指派人统计预估与已耗
+- [x] 测试：31 项全绿（单测 + WebApplicationFactory 集成测试）
 - [ ] M2：模型供应商（models.dev）、AgentEngine、Agent 认领闭环
 - [ ] M3：工作流编排、卡点机制、审批策略
 - [ ] M4：gh/glab CI/CD 集成
