@@ -1,0 +1,18 @@
+{
+  "title": "工时报表",
+  "description": "按类型与指派人统计预估 / 已耗工时",
+  "totalEstimated": "总预估工时",
+  "totalLogged": "总已耗工时",
+  "byType": "按类型",
+  "byAssignee": "按指派人",
+  "empty": "暂无工时数据",
+  "unassigned": "未指派",
+  "group": "分组",
+  "typeLabels": {
+    "requirement": "需求",
+    "defect": "缺陷",
+    "task": "任务"
+  },
+  "hours": "小时",
+  "loggedOfEstimated": "{{logged}} / {{estimated}} h"
+}

@@ -6,6 +6,9 @@ import { Toaster } from "@/components/ui/Toast";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ProjectsPage } from "@/features/projects/ProjectsPage";
 import { ProjectDetailPage } from "@/features/projects/ProjectDetailPage";
+import { BoardPage } from "@/features/projects/BoardPage";
+import { IterationsPage } from "@/features/projects/IterationsPage";
+import { GanttPage } from "@/features/projects/GanttPage";
 import { PrototypeStudioPage } from "@/features/prototype/PrototypeStudioPage";
 
 const queryClient = new QueryClient({
@@ -29,6 +32,9 @@ export default function App() {
                 <Route index element={<Navigate to="/projects" replace />} />
                 <Route path="projects" element={<ProjectsPage />} />
                 <Route path="projects/:projectId" element={<ProjectDetailPage />} />
+                <Route path="projects/:projectId/board" element={<BoardPage />} />
+                <Route path="projects/:projectId/iterations" element={<IterationsPage />} />
+                <Route path="projects/:projectId/gantt" element={<GanttPage />} />
                 <Route path="prototypes" element={<PrototypeStudioPage />} />
               </Route>
             </Routes>

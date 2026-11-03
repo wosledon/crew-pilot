@@ -1,0 +1,14 @@
+{
+  "title": "看板",
+  "filterType": "类型",
+  "types": {
+    "requirement": "需求",
+    "defect": "缺陷"
+  },
+  "emptyColumn": "拖拽工作项到这里",
+  "invalidTransition": "非法的状态流转",
+  "dragging": "正在拖动",
+  "dropHint": "松手放入「{{status}}」",
+  "taskNotSupported": "任务类型暂不支持看板流转",
+  "noItems": "暂无工作项，先去创建工作项"
+}

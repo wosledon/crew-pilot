@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { ProjectSubNav } from "@/components/layout/ProjectSubNav";
 import { Select } from "@/components/ui/Select";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
@@ -90,6 +91,8 @@ export function ProjectDetailPage() {
           </p>
         </div>
       </div>
+
+      <ProjectSubNav projectId={projectId} />
 
       <div className="flex flex-wrap items-center gap-3">
         <Select

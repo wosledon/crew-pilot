@@ -1,0 +1,37 @@
+{
+  "title": "迭代",
+  "description": "迭代周期与按工时的燃尽图",
+  "create": "新建迭代",
+  "createTitle": "新建迭代",
+  "name": "迭代名称",
+  "namePlaceholder": "如 M1",
+  "goal": "迭代目标",
+  "goalPlaceholder": "这个迭代要达成什么",
+  "startDate": "开始日期",
+  "endDate": "结束日期",
+  "start": "开始迭代",
+  "complete": "完成迭代",
+  "started": "迭代已开始",
+  "completed": "迭代已完成",
+  "created": "迭代已创建",
+  "deleted": "迭代已删除",
+  "deleteConfirm": {
+    "title": "删除迭代？",
+    "description": "迭代下的工作项将回到未规划状态。"
+  },
+  "empty": "还没有迭代",
+  "statuses": {
+    "planned": "计划中",
+    "active": "进行中",
+    "completed": "已完成"
+  },
+  "workItemCount": "工作项",
+  "hours": "{{logged}} / {{estimated}} 小时",
+  "burndown": "燃尽图（按工时）",
+  "burndownRemaining": "剩余工时",
+  "burndownIdeal": "理想线",
+  "burndownEmpty": "暂无燃尽数据",
+  "selectActive": "选择进行中的迭代查看燃尽图",
+  "invalidDates": "结束日期不能早于开始日期",
+  "noActive": "暂无进行中的迭代"
+}

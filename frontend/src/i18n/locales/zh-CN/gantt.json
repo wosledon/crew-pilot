@@ -1,0 +1,14 @@
+{
+  "title": "甘特图",
+  "description": "迭代与工作项时间线（含工时维度）",
+  "iterations": "迭代",
+  "workItems": "工作项",
+  "today": "今天",
+  "overdue": "已逾期",
+  "empty": "暂无排期数据",
+  "due": "截止",
+  "progress": "进度",
+  "loggedOfEstimated": "{{logged}}/{{estimated}}h",
+  "undated": "未排期",
+  "milestoneHint": "里程碑与版本计划联动将在 M2 提供"
+}

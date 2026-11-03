@@ -1,0 +1,14 @@
+{
+  "title": "Kanban",
+  "filterType": "Type",
+  "types": {
+    "requirement": "Requirement",
+    "defect": "Defect"
+  },
+  "emptyColumn": "Drag work items here",
+  "invalidTransition": "Invalid transition",
+  "dragging": "Dragging",
+  "dropHint": "Drop into \"{{status}}\"",
+  "taskNotSupported": "Task type does not support kanban transitions",
+  "noItems": "No work items yet — create one first"
+}

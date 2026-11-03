@@ -36,6 +36,7 @@ export interface WorkItemListItem {
   estimatedHours: number | null;
   loggedHours: number;
   remainingHours: number | null;
+  dueDate: string | null;
   prUrl: string | null;
   updatedAt: string;
 }
@@ -57,6 +58,7 @@ export interface WorkItemDetail {
   remainingHours: number | null;
   assigneeName: string | null;
   iterationId: string | null;
+  dueDate: string | null;
   branchUrl: string | null;
   prUrl: string | null;
   createdAt: string;
@@ -73,7 +75,6 @@ export interface WorkLog {
 }
 
 export type PrototypeType = "html" | "url" | "image" | "mcp";
-
 export interface Prototype {
   id: string;
   projectId: string;
@@ -84,6 +85,67 @@ export interface Prototype {
   version: number;
   createdByName: string | null;
   updatedAt: string;
+}
+
+export type IterationStatus = "planned" | "active" | "completed";
+
+export interface IterationListItem {
+  id: string;
+  name: string;
+  goal: string | null;
+  startDate: string;
+  endDate: string;
+  status: IterationStatus;
+  workItemCount: number;
+  estimatedHours: number;
+  loggedHours: number;
+}
+
+export interface IterationDetail {
+  id: string;
+  projectId: string;
+  name: string;
+  goal: string | null;
+  startDate: string;
+  endDate: string;
+  status: IterationStatus;
+  workItemCount: number;
+}
+
+export interface BurndownPoint {
+  date: string;
+  remainingHours: number;
+  idealHours: number;
+}
+
+export interface Burndown {
+  iterationId: string;
+  totalEstimatedHours: number;
+  points: BurndownPoint[];
+}
+
+export interface HoursByGroup {
+  key: string;
+  label: string;
+  estimatedHours: number;
+  loggedHours: number;
+}
+
+export interface HoursReport {
+  totalEstimatedHours: number;
+  totalLoggedHours: number;
+  byType: HoursByGroup[];
+  byAssignee: HoursByGroup[];
+}
+
+export interface Activity {
+  id: string;
+  eventType: string;
+  payload: string;
+  actorName: string | null;
+  actorKind: string | null;
+  workItemId: string | null;
+  createdAt: string;
 }
 
 /** API 错误（携带 ProblemDetails 状态码） */

@@ -1,0 +1,18 @@
+{
+  "title": "Hours report",
+  "description": "Estimated vs logged hours by type and assignee",
+  "totalEstimated": "Total estimated hours",
+  "totalLogged": "Total logged hours",
+  "byType": "By type",
+  "byAssignee": "By assignee",
+  "empty": "No hours data",
+  "unassigned": "Unassigned",
+  "group": "Group",
+  "typeLabels": {
+    "requirement": "Requirement",
+    "defect": "Defect",
+    "task": "Task"
+  },
+  "hours": "h",
+  "loggedOfEstimated": "{{logged}} / {{estimated}} h"
+}

@@ -1,0 +1,37 @@
+{
+  "title": "Iterations",
+  "description": "Iteration cycles and hours-based burndown",
+  "create": "New iteration",
+  "createTitle": "New iteration",
+  "name": "Iteration name",
+  "namePlaceholder": "e.g. M1",
+  "goal": "Iteration goal",
+  "goalPlaceholder": "What this iteration should achieve",
+  "startDate": "Start date",
+  "endDate": "End date",
+  "start": "Start iteration",
+  "complete": "Complete iteration",
+  "started": "Iteration started",
+  "completed": "Iteration completed",
+  "created": "Iteration created",
+  "deleted": "Iteration deleted",
+  "deleteConfirm": {
+    "title": "Delete iteration?",
+    "description": "Work items in this iteration will become unplanned."
+  },
+  "empty": "No iterations yet",
+  "statuses": {
+    "planned": "Planned",
+    "active": "Active",
+    "completed": "Completed"
+  },
+  "workItemCount": "Work items",
+  "hours": "{{logged}} / {{estimated}} h",
+  "burndown": "Burndown (hours)",
+  "burndownRemaining": "Remaining hours",
+  "burndownIdeal": "Ideal line",
+  "burndownEmpty": "No burndown data",
+  "selectActive": "Select an active iteration to view its burndown",
+  "invalidDates": "End date cannot be earlier than start date",
+  "noActive": "No active iteration"
+}

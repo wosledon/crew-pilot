@@ -1,0 +1,14 @@
+{
+  "title": "Gantt",
+  "description": "Iteration and work item timeline (with hours)",
+  "iterations": "Iterations",
+  "workItems": "Work items",
+  "today": "Today",
+  "overdue": "Overdue",
+  "empty": "No schedule data",
+  "due": "Due",
+  "progress": "Progress",
+  "loggedOfEstimated": "{{logged}}/{{estimated}}h",
+  "undated": "Unscheduled",
+  "milestoneHint": "Milestone and release planning arrives in M2"
+}
