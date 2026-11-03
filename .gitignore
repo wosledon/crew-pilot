@@ -480,3 +480,17 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Crew Pilot 项目特定
+# SQLite 数据库（含 WAL/SHM 附属文件）——含本地数据，禁止入库
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+# 前端构建产物与本地配置
+dist/
+*.log
+appsettings.*.local.json
+
