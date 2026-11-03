@@ -4,12 +4,12 @@
 
 ## 技术栈
 
-| 领域 | 选型 |
-| --- | --- |
-| 后端 | .NET 10 ASP.NET Core Web API（EF Core + SQLite，可切 PostgreSQL） |
-| 前端 | React 18 + TypeScript + Vite + Tailwind CSS v4 + Radix/shadcn 模式 |
+| 领域         | 选型                                                                |
+| ------------ | ------------------------------------------------------------------- |
+| 后端         | .NET 10 ASP.NET Core Web API（EF Core + SQLite，可切 PostgreSQL）   |
+| 前端         | React 18 + TypeScript + Vite + Tailwind CSS v4 + Radix/shadcn 模式  |
 | Agent 运行时 | Microsoft Agent Framework（收敛在 `AgentEngine` 抽象之后，M2 落地） |
-| 测试 | xUnit + FluentAssertions + `WebApplicationFactory`（内存 SQLite） |
+| 测试         | xUnit + FluentAssertions + `WebApplicationFactory`（内存 SQLite）   |
 
 ## 快速开始
 
