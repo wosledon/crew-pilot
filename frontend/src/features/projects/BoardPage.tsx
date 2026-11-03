@@ -84,7 +84,7 @@ function Column({
     >
       <div className="flex items-center justify-between px-1">
         <span className="text-sm font-medium">
-          {t(`workitems:statuses.${status}`)}
+          {t(`workitems:statuses.${status.toLowerCase()}`)}
         </span>
         <span className="text-xs text-muted-foreground">{items.length}</span>
       </div>

@@ -181,7 +181,7 @@ function WorkItemRow({
           {t(`workitems:priorities.${item.priority}`)}
         </Badge>
         <Badge tone={statusTone(item.status) as BadgeTone}>
-          {t(`workitems:statuses.${item.status}`)}
+          {t(`workitems:statuses.${item.status.toLowerCase()}`)}
         </Badge>
       </div>
     </div>

@@ -29,7 +29,7 @@ export function WorkItemCard({
           <div className="flex flex-wrap items-center gap-2">
             <Badge tone="neutral">{t(`workitems:types.${item.type}`)}</Badge>
             <Badge tone={statusTone(item.status)}>
-              {t(`workitems:statuses.${item.status}`)}
+              {t(`workitems:statuses.${item.status.toLowerCase()}`)}
             </Badge>
             <Badge tone={priorityTone(item.priority)}>
               {t(`workitems:priorities.${item.priority}`)}
@@ -53,7 +53,7 @@ export function WorkItemCard({
               onValueChange={(value) => onTransition(item.id, value)}
               options={options.map((status) => ({
                 value: status,
-                label: t(`workitems:statuses.${status}`),
+                label: t(`workitems:statuses.${status.toLowerCase()}`),
               }))}
               placeholder={t("workitems:nextStatus")}
               ariaLabel={t("workitems:nextStatus")}
