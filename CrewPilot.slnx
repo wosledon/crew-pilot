@@ -1,6 +1,8 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/CrewPilot.Agents/CrewPilot.Agents.csproj" />
     <Project Path="src/CrewPilot.Api/CrewPilot.Api.csproj" />
     <Project Path="src/CrewPilot.Core/CrewPilot.Core.csproj" />
+    <Project Path="src/CrewPilot.Infrastructure/CrewPilot.Infrastructure.csproj" />
   </Folder>
 </Solution>

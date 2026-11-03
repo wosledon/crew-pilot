@@ -8,6 +8,16 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CrewPilot.Agents\CrewPilot.Agents.csproj" />
+    <ProjectReference Include="..\CrewPilot.Core\CrewPilot.Core.csproj" />
+    <ProjectReference Include="..\CrewPilot.Infrastructure\CrewPilot.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

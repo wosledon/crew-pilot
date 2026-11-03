@@ -1,0 +1,561 @@
+using System.Text.Json;
+using CrewPilot.Api.Contracts;
+using CrewPilot.Core.Collaboration;
+using CrewPilot.Core.Projects;
+using CrewPilot.Core.Services;
+using CrewPilot.Core.WorkItems;
+using CrewPilot.Core.WorkLogs;
+using CrewPilot.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace CrewPilot.Api.Controllers;
+
+[ApiController]
+public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
+{
+    /// <summary>工作项列表，支持 type（requirement/defect/task）与 status 过滤。</summary>
+    [HttpGet("api/projects/{projectId:guid}/workitems")]
+    public async Task<ActionResult<IReadOnlyList<WorkItemListItemDto>>> List(
+        Guid projectId, [FromQuery] string? type, [FromQuery] string? status, CancellationToken ct)
+    {
+        var rows = await QueryRowsAsync(projectId, type, ct);
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            rows = rows
+                .Where(r => string.Equals(r.Status, status.Trim(), StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        var loggedHours = await GetLoggedHoursAsync(rows.Select(r => r.Id), ct);
+        var items = rows
+            .OrderByDescending(r => r.UpdatedAt)
+            .Select(r => new WorkItemListItemDto(
+                r.Id, r.Type, r.Title, r.Status,
+                r.Priority.ToString().ToLowerInvariant(), r.AssigneeName,
+                r.EstimatedHours,
+                loggedHours.TryGetValue(r.Id, out var hours) ? hours : 0m,
+                r.RemainingHours, r.PrUrl, r.UpdatedAt))
+            .ToList();
+        return Ok(items);
+    }
+
+    [HttpGet("api/workitems/{id:guid}")]
+    public async Task<ActionResult<WorkItemDetailDto>> Get(Guid id, CancellationToken ct)
+    {
+        var dto = await GetDetailAsync(id, ct);
+        return dto is null ? Problem(detail: "工作项不存在", statusCode: 404) : Ok(dto);
+    }
+
+    [HttpPost("api/projects/{projectId:guid}/workitems")]
+    public async Task<ActionResult<WorkItemDetailDto>> Create(
+        Guid projectId, [FromBody] CreateWorkItemRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.Title))
+        {
+            return Problem(detail: "标题必填", statusCode: 400);
+        }
+
+        var type = (request.Type ?? string.Empty).Trim().ToLowerInvariant();
+        WorkItem? workItem = type switch
+        {
+            "requirement" => new Requirement { Status = RequirementStatus.Backlog },
+            "defect" => new Defect
+            {
+                Status = DefectStatus.New,
+                Severity = ParseSeverity(request.Severity),
+                ReproSteps = request.ReproSteps,
+                Environment = request.Environment,
+            },
+            "task" => new TaskItem(),
+            _ => null,
+        };
+        if (workItem is null)
+        {
+            return Problem(detail: $"不支持的工作项类型 {request.Type}（requirement/defect/task）", statusCode: 400);
+        }
+
+        var projectExists = await db.Projects.AnyAsync(p => p.Id == projectId, ct);
+        if (!projectExists)
+        {
+            return Problem(detail: "项目不存在", statusCode: 404);
+        }
+
+        workItem.ProjectId = projectId;
+        workItem.Title = request.Title.Trim();
+        workItem.Description = request.Description;
+        workItem.AcceptanceCriteria = request.AcceptanceCriteria;
+        workItem.Priority = ParsePriority(request.Priority);
+        workItem.StoryPoints = request.StoryPoints;
+        workItem.EstimatedHours = request.EstimatedHours;
+        workItem.RemainingHours = request.RemainingHours;
+        workItem.Assignee = await ResolveAssigneeAsync(projectId, request.AssigneeName, ct);
+
+        db.WorkItems.Add(workItem);
+        await AddActivityAsync(projectId, workItem.Id, "workitem.created", new { type, workItem.Title }, ct);
+        await db.SaveChangesAsync(ct);
+
+        var dto = await GetDetailAsync(workItem.Id, ct);
+        return Created($"/api/workitems/{workItem.Id}", dto);
+    }
+
+    [HttpPut("api/workitems/{id:guid}")]
+    public async Task<ActionResult<WorkItemDetailDto>> Update(
+        Guid id, [FromBody] UpdateWorkItemRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.Title))
+        {
+            return Problem(detail: "标题必填", statusCode: 400);
+        }
+
+        var workItem = await db.WorkItems.FirstOrDefaultAsync(w => w.Id == id, ct);
+        if (workItem is null)
+        {
+            return Problem(detail: "工作项不存在", statusCode: 404);
+        }
+
+        workItem.Title = request.Title.Trim();
+        workItem.Description = request.Description;
+        workItem.AcceptanceCriteria = request.AcceptanceCriteria;
+        workItem.Priority = ParsePriority(request.Priority);
+        workItem.StoryPoints = request.StoryPoints;
+        workItem.EstimatedHours = request.EstimatedHours;
+        workItem.RemainingHours = request.RemainingHours;
+        workItem.UpdatedAt = DateTimeOffset.UtcNow;
+        await db.SaveChangesAsync(ct);
+
+        var dto = await GetDetailAsync(id, ct);
+        return Ok(dto);
+    }
+
+    /// <summary>状态流转：必须走领域状态机，非法流转返回 400。</summary>
+    [HttpPost("api/workitems/{id:guid}/status")]
+    public async Task<ActionResult<WorkItemDetailDto>> Transition(
+        Guid id, [FromBody] TransitionRequest request, CancellationToken ct)
+    {
+        var workItem = await db.WorkItems.FirstOrDefaultAsync(w => w.Id == id, ct);
+        if (workItem is null)
+        {
+            return Problem(detail: "工作项不存在", statusCode: 404);
+        }
+
+        var to = (request.ToStatus ?? string.Empty).Trim();
+        string from;
+        string toStatus;
+        try
+        {
+            switch (workItem)
+            {
+                case Requirement requirement:
+                    if (!Enum.TryParse<RequirementStatus>(to, ignoreCase: true, out var rTarget))
+                    {
+                        return Problem(detail: $"无效的需求状态 {to}", statusCode: 400);
+                    }
+
+                    from = requirement.Status.ToString();
+                    WorkItemStateMachine.Transition(requirement, rTarget);
+                    toStatus = requirement.Status.ToString();
+                    break;
+
+                case Defect defect:
+                    if (!Enum.TryParse<DefectStatus>(to, ignoreCase: true, out var dTarget))
+                    {
+                        return Problem(detail: $"无效的缺陷状态 {to}", statusCode: 400);
+                    }
+
+                    from = defect.Status.ToString();
+                    WorkItemStateMachine.Transition(defect, dTarget);
+                    toStatus = defect.Status.ToString();
+                    break;
+
+                default:
+                    return Problem(detail: "任务类型暂不支持状态流转", statusCode: 400);
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Problem(detail: ex.Message, statusCode: 400);
+        }
+
+        workItem.UpdatedAt = DateTimeOffset.UtcNow;
+        await AddActivityAsync(workItem.ProjectId, workItem.Id, "workitem.status.changed", new { from, to = toStatus }, ct);
+        await db.SaveChangesAsync(ct);
+
+        var dto = await GetDetailAsync(id, ct);
+        return Ok(dto);
+    }
+
+    [HttpDelete("api/workitems/{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    {
+        var workItem = await db.WorkItems.FirstOrDefaultAsync(w => w.Id == id, ct);
+        if (workItem is null)
+        {
+            return Problem(detail: "工作项不存在", statusCode: 404);
+        }
+
+        db.WorkItems.Remove(workItem);
+        await db.SaveChangesAsync(ct);
+        return NoContent();
+    }
+
+    [HttpGet("api/workitems/{id:guid}/worklogs")]
+    public async Task<ActionResult<IReadOnlyList<WorkLogDto>>> ListWorkLogs(Guid id, CancellationToken ct)
+    {
+        var logs = await db.WorkLogs
+            .AsNoTracking()
+            .Where(l => l.WorkItemId == id)
+            .OrderByDescending(l => l.Date)
+            .Select(l => new WorkLogDto(
+                l.Id, l.Hours, l.Date, l.Note,
+                l.Member != null ? l.Member.DisplayName : null, l.CreatedAt))
+            .ToListAsync(ct);
+        return Ok(logs);
+    }
+
+    /// <summary>登记工时（1:1，不加权）。</summary>
+    [HttpPost("api/workitems/{id:guid}/worklogs")]
+    public async Task<ActionResult<WorkLogDto>> AddWorkLog(
+        Guid id, [FromBody] CreateWorkLogRequest request, CancellationToken ct)
+    {
+        if (request.Hours <= 0 || request.Hours > 24)
+        {
+            return Problem(detail: "工时必须大于 0 且不超过 24 小时", statusCode: 400);
+        }
+
+        var workItem = await db.WorkItems.FirstOrDefaultAsync(w => w.Id == id, ct);
+        if (workItem is null)
+        {
+            return Problem(detail: "工作项不存在", statusCode: 404);
+        }
+
+        var log = new WorkLog
+        {
+            WorkItemId = id,
+            Hours = request.Hours,
+            Date = request.Date ?? DateOnly.FromDateTime(DateTime.UtcNow),
+            Note = request.Note,
+        };
+        db.WorkLogs.Add(log);
+        await AddActivityAsync(workItem.ProjectId, id, "worklog.added", new { log.Hours }, ct);
+        await db.SaveChangesAsync(ct);
+
+        return Created($"/api/workitems/{id}/worklogs/{log.Id}",
+            new WorkLogDto(log.Id, log.Hours, log.Date, log.Note, null, log.CreatedAt));
+    }
+
+    private async Task<WorkItemDetailDto?> GetDetailAsync(Guid id, CancellationToken ct)
+    {
+        var row = await QueryRowAsync(id, ct);
+        if (row is null)
+        {
+            return null;
+        }
+
+        var loggedHours = await GetLoggedHoursAsync([row.Id], ct);
+        return new WorkItemDetailDto(
+            row.Id, row.Type, row.Title, row.Status,
+            row.Priority.ToString().ToLowerInvariant(), row.Description, row.AcceptanceCriteria,
+            row.Severity, row.ReproSteps, row.Environment,
+            row.StoryPoints, row.EstimatedHours,
+            loggedHours.TryGetValue(row.Id, out var hours) ? hours : 0m,
+            row.RemainingHours, row.AssigneeName, row.IterationId, row.BranchUrl, row.PrUrl,
+            row.CreatedAt, row.UpdatedAt);
+    }
+
+    /// <summary>工作项查询行（跨 TPH 三类统一视图）。</summary>
+    private sealed record WorkItemRow(
+        Guid Id,
+        string Type,
+        string Title,
+        string Status,
+        Priority Priority,
+        string? Description,
+        string? AcceptanceCriteria,
+        string? Severity,
+        string? ReproSteps,
+        string? Environment,
+        int? StoryPoints,
+        decimal? EstimatedHours,
+        decimal? RemainingHours,
+        string? AssigneeName,
+        Guid? IterationId,
+        string? BranchUrl,
+        string? PrUrl,
+        DateTimeOffset CreatedAt,
+        DateTimeOffset UpdatedAt);
+
+    /// <summary>跨 TPH 三类工作项查询（需求/缺陷各自带状态列，任务无状态）。</summary>
+    private async Task<List<WorkItemRow>> QueryRowsAsync(Guid projectId, string? typeFilter, CancellationToken ct)
+    {
+        var rows = new List<WorkItemRow>();
+        var wantAll = string.IsNullOrWhiteSpace(typeFilter);
+        var type = typeFilter?.Trim().ToLowerInvariant();
+
+        if (wantAll || type == "requirement")
+        {
+            var reqs = await db.WorkItems
+                .OfType<Requirement>()
+                .AsNoTracking()
+                .Where(w => w.ProjectId == projectId)
+                .Select(w => new
+                {
+                    w.Id,
+                    w.Title,
+                    w.Status,
+                    w.Priority,
+                    w.Description,
+                    w.AcceptanceCriteria,
+                    w.StoryPoints,
+                    w.EstimatedHours,
+                    w.RemainingHours,
+                    AssigneeName = w.Assignee != null ? w.Assignee.DisplayName : null,
+                    w.IterationId,
+                    w.BranchUrl,
+                    w.PrUrl,
+                    w.CreatedAt,
+                    w.UpdatedAt,
+                })
+                .ToListAsync(ct);
+            rows.AddRange(reqs.Select(x => new WorkItemRow(
+                x.Id, "requirement", x.Title, x.Status.ToString().ToLowerInvariant(), x.Priority,
+                x.Description, x.AcceptanceCriteria, null, null, null,
+                x.StoryPoints, x.EstimatedHours, x.RemainingHours, x.AssigneeName,
+                x.IterationId, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt)));
+        }
+
+        if (wantAll || type == "defect")
+        {
+            var defects = await db.WorkItems
+                .OfType<Defect>()
+                .AsNoTracking()
+                .Where(w => w.ProjectId == projectId)
+                .Select(w => new
+                {
+                    w.Id,
+                    w.Title,
+                    w.Status,
+                    w.Severity,
+                    w.Priority,
+                    w.Description,
+                    w.AcceptanceCriteria,
+                    w.ReproSteps,
+                    w.Environment,
+                    w.StoryPoints,
+                    w.EstimatedHours,
+                    w.RemainingHours,
+                    AssigneeName = w.Assignee != null ? w.Assignee.DisplayName : null,
+                    w.IterationId,
+                    w.BranchUrl,
+                    w.PrUrl,
+                    w.CreatedAt,
+                    w.UpdatedAt,
+                })
+                .ToListAsync(ct);
+            rows.AddRange(defects.Select(x => new WorkItemRow(
+                x.Id, "defect", x.Title, x.Status.ToString().ToLowerInvariant(), x.Priority,
+                x.Description, x.AcceptanceCriteria, x.Severity.ToString().ToLowerInvariant(),
+                x.ReproSteps, x.Environment,
+                x.StoryPoints, x.EstimatedHours, x.RemainingHours, x.AssigneeName,
+                x.IterationId, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt)));
+        }
+
+        if (wantAll || type == "task")
+        {
+            var tasks = await db.WorkItems
+                .OfType<TaskItem>()
+                .AsNoTracking()
+                .Where(w => w.ProjectId == projectId)
+                .Select(w => new
+                {
+                    w.Id,
+                    w.Title,
+                    w.Priority,
+                    w.Description,
+                    w.AcceptanceCriteria,
+                    w.StoryPoints,
+                    w.EstimatedHours,
+                    w.RemainingHours,
+                    AssigneeName = w.Assignee != null ? w.Assignee.DisplayName : null,
+                    w.IterationId,
+                    w.BranchUrl,
+                    w.PrUrl,
+                    w.CreatedAt,
+                    w.UpdatedAt,
+                })
+                .ToListAsync(ct);
+            rows.AddRange(tasks.Select(x => new WorkItemRow(
+                x.Id, "task", x.Title, "todo", x.Priority,
+                x.Description, x.AcceptanceCriteria, null, null, null,
+                x.StoryPoints, x.EstimatedHours, x.RemainingHours, x.AssigneeName,
+                x.IterationId, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt)));
+        }
+
+        return rows;
+    }
+
+    private async Task<WorkItemRow?> QueryRowAsync(Guid id, CancellationToken ct)
+    {
+        var req = await db.WorkItems
+            .OfType<Requirement>()
+            .AsNoTracking()
+            .Where(w => w.Id == id)
+            .Select(w => new
+            {
+                w.Id,
+                w.Title,
+                w.Status,
+                w.Priority,
+                w.Description,
+                w.AcceptanceCriteria,
+                w.StoryPoints,
+                w.EstimatedHours,
+                w.RemainingHours,
+                AssigneeName = w.Assignee != null ? w.Assignee.DisplayName : null,
+                w.IterationId,
+                w.BranchUrl,
+                w.PrUrl,
+                w.CreatedAt,
+                w.UpdatedAt,
+            })
+            .FirstOrDefaultAsync(ct);
+        if (req is not null)
+        {
+            return new WorkItemRow(
+                req.Id, "requirement", req.Title, req.Status.ToString().ToLowerInvariant(), req.Priority,
+                req.Description, req.AcceptanceCriteria, null, null, null,
+                req.StoryPoints, req.EstimatedHours, req.RemainingHours, req.AssigneeName,
+                req.IterationId, req.BranchUrl, req.PrUrl, req.CreatedAt, req.UpdatedAt);
+        }
+
+        var defect = await db.WorkItems
+            .OfType<Defect>()
+            .AsNoTracking()
+            .Where(w => w.Id == id)
+            .Select(w => new
+            {
+                w.Id,
+                w.Title,
+                w.Status,
+                w.Severity,
+                w.Priority,
+                w.Description,
+                w.AcceptanceCriteria,
+                w.ReproSteps,
+                w.Environment,
+                w.StoryPoints,
+                w.EstimatedHours,
+                w.RemainingHours,
+                AssigneeName = w.Assignee != null ? w.Assignee.DisplayName : null,
+                w.IterationId,
+                w.BranchUrl,
+                w.PrUrl,
+                w.CreatedAt,
+                w.UpdatedAt,
+            })
+            .FirstOrDefaultAsync(ct);
+        if (defect is not null)
+        {
+            return new WorkItemRow(
+                defect.Id, "defect", defect.Title, defect.Status.ToString().ToLowerInvariant(), defect.Priority,
+                defect.Description, defect.AcceptanceCriteria, defect.Severity.ToString().ToLowerInvariant(),
+                defect.ReproSteps, defect.Environment,
+                defect.StoryPoints, defect.EstimatedHours, defect.RemainingHours, defect.AssigneeName,
+                defect.IterationId, defect.BranchUrl, defect.PrUrl, defect.CreatedAt, defect.UpdatedAt);
+        }
+
+        var task = await db.WorkItems
+            .OfType<TaskItem>()
+            .AsNoTracking()
+            .Where(w => w.Id == id)
+            .Select(w => new
+            {
+                w.Id,
+                w.Title,
+                w.Priority,
+                w.Description,
+                w.AcceptanceCriteria,
+                w.StoryPoints,
+                w.EstimatedHours,
+                w.RemainingHours,
+                AssigneeName = w.Assignee != null ? w.Assignee.DisplayName : null,
+                w.IterationId,
+                w.BranchUrl,
+                w.PrUrl,
+                w.CreatedAt,
+                w.UpdatedAt,
+            })
+            .FirstOrDefaultAsync(ct);
+
+        return task is null
+            ? null
+            : new WorkItemRow(
+                task.Id, "task", task.Title, "todo", task.Priority,
+                task.Description, task.AcceptanceCriteria, null, null, null,
+                task.StoryPoints, task.EstimatedHours, task.RemainingHours, task.AssigneeName,
+                task.IterationId, task.BranchUrl, task.PrUrl, task.CreatedAt, task.UpdatedAt);
+    }
+
+    private async Task<Dictionary<Guid, decimal>> GetLoggedHoursAsync(IEnumerable<Guid> ids, CancellationToken ct)
+    {
+        var idList = ids.Distinct().ToList();
+        if (idList.Count == 0)
+        {
+            return [];
+        }
+
+        var rows = await db.WorkLogs
+            .Where(l => idList.Contains(l.WorkItemId))
+            .GroupBy(l => l.WorkItemId)
+            .Select(g => new { Id = g.Key, Total = g.Sum(l => l.Hours) })
+            .ToListAsync(ct);
+        return rows.ToDictionary(x => x.Id, x => x.Total);
+    }
+
+    private async Task<ProjectMember?> ResolveAssigneeAsync(Guid projectId, string? name, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return null;
+        }
+
+        var trimmed = name.Trim();
+        var member = await db.Members
+            .FirstOrDefaultAsync(m => m.ProjectId == projectId && m.DisplayName == trimmed, ct);
+        if (member is not null)
+        {
+            return member;
+        }
+
+        member = new ProjectMember
+        {
+            ProjectId = projectId,
+            Kind = MemberKind.User,
+            Role = ProjectRole.Developer,
+            DisplayName = trimmed,
+        };
+        db.Members.Add(member);
+        return member;
+    }
+
+    private async Task AddActivityAsync(
+        Guid projectId, Guid? workItemId, string eventType, object payload, CancellationToken ct)
+    {
+        db.Activities.Add(new Activity
+        {
+            ProjectId = projectId,
+            WorkItemId = workItemId,
+            EventType = eventType,
+            Payload = JsonSerializer.Serialize(payload),
+            ActorKind = MemberKind.User,
+        });
+        await Task.CompletedTask;
+    }
+
+    private static Priority ParsePriority(string? value) =>
+        Enum.TryParse<Priority>(value, ignoreCase: true, out var priority) ? priority : Priority.P2;
+
+    private static Severity ParseSeverity(string? value) =>
+        Enum.TryParse<Severity>(value, ignoreCase: true, out var severity) ? severity : Severity.Normal;
+}

@@ -1,23 +1,54 @@
+using CrewPilot.Core.Abstractions;
+using CrewPilot.Infrastructure.Persistence;
+using CrewPilot.Infrastructure.Security;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// 数据访问：开发期 SQLite，连接串可切换 PostgreSQL
+var connectionString = builder.Configuration.GetConnectionString("CrewPilot")
+    ?? "Data Source=crewpilot.db";
+builder.Services.AddDbContext<CrewPilotDbContext>(options =>
+    options.UseSqlite(connectionString));
+
+// 领域与基础设施服务
+// DPAPI 为 Windows 专用实现（单用户自托管当前面向 Windows）；跨平台时替换实现即可
+#pragma warning disable CA1416
+builder.Services.AddSingleton<ISecretProtector, DpapiSecretProtector>();
+#pragma warning restore CA1416
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
+
+// CORS：开发期前端 dev server（Vite 默认 5173 / 预览 4173）
+builder.Services.AddCors(options =>
+    options.AddPolicy("FrontendDev", policy => policy
+        .WithOrigins("http://localhost:5173", "http://localhost:4173")
+        .AllowAnyHeader()
+        .AllowAnyMethod()));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 开发环境自动应用迁移，保证开箱即用
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<CrewPilotDbContext>();
+    await db.Database.MigrateAsync();
+}
+
+app.UseExceptionHandler();
+app.UseCors("FrontendDev");
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
+
+// 供集成测试（WebApplicationFactory<Program>）引用
+public partial class Program;
