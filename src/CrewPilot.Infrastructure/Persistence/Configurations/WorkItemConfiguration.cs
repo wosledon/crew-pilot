@@ -41,7 +41,8 @@ public class RequirementConfiguration : IEntityTypeConfiguration<Requirement>
 {
     public void Configure(EntityTypeBuilder<Requirement> builder)
     {
-        builder.Property(r => r.Status).HasConversion<string>().HasMaxLength(32);
+        // 与 Defect.Status 区分列名，避免 TPH 列冲突
+        builder.Property(r => r.Status).HasColumnName("RequirementStatus").HasConversion<string>().HasMaxLength(32);
     }
 }
 
@@ -49,7 +50,8 @@ public class DefectConfiguration : IEntityTypeConfiguration<Defect>
 {
     public void Configure(EntityTypeBuilder<Defect> builder)
     {
-        builder.Property(d => d.Status).HasConversion<string>().HasMaxLength(32);
+        // 与 Requirement.Status 区分列名，避免 TPH 列冲突
+        builder.Property(d => d.Status).HasColumnName("DefectStatus").HasConversion<string>().HasMaxLength(32);
         builder.Property(d => d.Severity).HasConversion<string>().HasMaxLength(16);
         builder.Property(d => d.ReproSteps).HasMaxLength(8000);
         builder.Property(d => d.Environment).HasMaxLength(1000);
