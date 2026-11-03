@@ -1,3 +1,6 @@
+using CrewPilot.Agents.Abstractions;
+using CrewPilot.Agents.Engine;
+using CrewPilot.Agents.Execution;
 using CrewPilot.Core.Abstractions;
 using CrewPilot.Infrastructure.Persistence;
 using CrewPilot.Infrastructure.Security;
@@ -16,6 +19,13 @@ builder.Services.AddDbContext<CrewPilotDbContext>(options =>
 #pragma warning disable CA1416
 builder.Services.AddSingleton<ISecretProtector, DpapiSecretProtector>();
 #pragma warning restore CA1416
+
+// Agent 平台：MAF 引擎 + 后台执行队列（认领闭环）
+builder.Services.AddSingleton<IAgentEngine, MafAgentEngine>();
+builder.Services.AddSingleton<AgentRunQueue>();
+builder.Services.AddHostedService<AgentRunWorker>();
+builder.Services.AddScoped<AgentRunExecutor>();
+builder.Services.AddHttpClient("models.dev");
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();

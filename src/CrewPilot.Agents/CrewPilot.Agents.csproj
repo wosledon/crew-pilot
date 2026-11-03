@@ -1,13 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\CrewPilot.Core\CrewPilot.Core.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Agents.AI" Version="1.27.0" />
+    <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.27.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CrewPilot.Core\CrewPilot.Core.csproj" />
+    <ProjectReference Include="..\CrewPilot.Infrastructure\CrewPilot.Infrastructure.csproj" />
+  </ItemGroup>
 
 </Project>

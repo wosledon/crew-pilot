@@ -213,7 +213,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
             .OrderByDescending(l => l.Date)
             .Select(l => new WorkLogDto(
                 l.Id, l.Hours, l.Date, l.Note,
-                l.Member != null ? l.Member.DisplayName : null, l.CreatedAt))
+                l.Member != null ? l.Member.DisplayName : null, l.AgentRunId, l.CreatedAt))
             .ToListAsync(ct);
         return Ok(logs);
     }
@@ -246,7 +246,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
         await db.SaveChangesAsync(ct);
 
         return Created($"/api/workitems/{id}/worklogs/{log.Id}",
-            new WorkLogDto(log.Id, log.Hours, log.Date, log.Note, null, log.CreatedAt));
+            new WorkLogDto(log.Id, log.Hours, log.Date, log.Note, null, log.AgentRunId, log.CreatedAt));
     }
 
     private async Task<WorkItemDetailDto?> GetDetailAsync(Guid id, CancellationToken ct)

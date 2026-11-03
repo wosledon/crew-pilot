@@ -1,14 +1,17 @@
+using CrewPilot.Agents.Abstractions;
 using CrewPilot.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace CrewPilot.IntegrationTests;
 
 /// <summary>
 /// 集成测试工厂：共享内存 SQLite + 自动迁移，不依赖真实文件数据库。
+/// 用 FakeAgentEngine 替换 MAF 引擎，避免真实模型调用。
 /// </summary>
 public sealed class CrewPilotApiFactory : WebApplicationFactory<Program>
 {
@@ -33,6 +36,10 @@ public sealed class CrewPilotApiFactory : WebApplicationFactory<Program>
             services.Remove(descriptor);
             services.AddDbContext<CrewPilotDbContext>(options =>
                 options.UseSqlite(_connection));
+
+            // 替换 Agent 引擎为 Fake（不发起真实模型调用）
+            services.RemoveAll<IAgentEngine>();
+            services.AddSingleton<IAgentEngine, FakeAgentEngine>();
         });
     }
 

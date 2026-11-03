@@ -14,8 +14,16 @@ public interface IAgentEngine
 public sealed record AgentRunRequest(
     string AgentName,
     string Prompt,
+    string? SystemPrompt = null,
+    string? Model = null,
+    string? BaseUrl = null,
+    string? ApiKey = null,
     string? WorkingDirectory = null,
-    IReadOnlyDictionary<string, string>? Variables = null);
+    IReadOnlyList<string>? Tools = null,
+    IReadOnlyList<string>? CommandWhitelist = null);
+
+/// <summary>执行过程中的一个步骤（工具调用 / 助手输出 / 错误）。</summary>
+public sealed record AgentRunStep(int Sequence, string Kind, string Content);
 
 /// <summary>
 /// 一次 Agent 执行结果：输出、耗时与 token 成本（工时 1:1 折算与成本统计的数据来源）。
@@ -26,4 +34,5 @@ public sealed record AgentRunResult(
     string? Error = null,
     TimeSpan Duration = default,
     int? PromptTokens = null,
-    int? CompletionTokens = null);
+    int? CompletionTokens = null,
+    IReadOnlyList<AgentRunStep>? Steps = null);

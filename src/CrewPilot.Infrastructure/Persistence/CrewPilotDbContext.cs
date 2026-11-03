@@ -1,7 +1,9 @@
+using CrewPilot.Core.Agents;
 using CrewPilot.Core.Collaboration;
 using CrewPilot.Core.Iterations;
 using CrewPilot.Core.Projects;
 using CrewPilot.Core.Prototypes;
+using CrewPilot.Core.Providers;
 using CrewPilot.Core.WorkItems;
 using CrewPilot.Core.WorkLogs;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +38,16 @@ public class CrewPilotDbContext(DbContextOptions<CrewPilotDbContext> options) : 
     public DbSet<WorkLog> WorkLogs => Set<WorkLog>();
 
     public DbSet<Prototype> Prototypes => Set<Prototype>();
+
+    public DbSet<ModelProvider> ModelProviders => Set<ModelProvider>();
+
+    public DbSet<ModelCatalogEntry> ModelCatalogEntries => Set<ModelCatalogEntry>();
+
+    public DbSet<Agent> Agents => Set<Agent>();
+
+    public DbSet<AgentRun> AgentRuns => Set<AgentRun>();
+
+    public DbSet<RunLog> RunLogs => Set<RunLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

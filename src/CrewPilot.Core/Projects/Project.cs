@@ -15,6 +15,9 @@ public class Project : Entity
     /// <summary>绑定的 Git 仓库地址（GitHub / GitLab）。</summary>
     public string? RepoUrl { get; set; }
 
+    /// <summary>本地工作目录（项目目录隔离 + 开发沙箱的根）。</summary>
+    public string? LocalPath { get; set; }
+
     public ProjectStatus Status { get; set; } = ProjectStatus.Active;
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;

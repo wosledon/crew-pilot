@@ -72,6 +72,7 @@ public sealed record WorkLogDto(
     DateOnly Date,
     string? Note,
     string? MemberName,
+    Guid? AgentRunId,
     DateTimeOffset CreatedAt);
 
 public sealed record CreateWorkLogRequest(decimal Hours, DateOnly? Date, string? Note);
