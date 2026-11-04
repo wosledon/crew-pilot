@@ -1,7 +1,9 @@
 namespace CrewPilot.Core.Agents;
 
 using CrewPilot.Core.Common;
+using CrewPilot.Core.Mcp;
 using CrewPilot.Core.Providers;
+using CrewPilot.Core.Skills;
 
 /// <summary>Agent 数字员工：岗位 + 模型 + 系统提示词 + 工具权限。</summary>
 public class Agent : Entity
@@ -33,4 +35,10 @@ public class Agent : Entity
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     public ICollection<AgentRun> Runs { get; set; } = new List<AgentRun>();
+
+    /// <summary>装配的 Skills。</summary>
+    public ICollection<AgentSkill> Skills { get; set; } = new List<AgentSkill>();
+
+    /// <summary>授权的 MCP Server。</summary>
+    public ICollection<AgentMcpServer> McpServers { get; set; } = new List<AgentMcpServer>();
 }

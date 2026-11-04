@@ -1,6 +1,7 @@
 using CrewPilot.Api.Contracts;
 using CrewPilot.Core.Collaboration;
 using CrewPilot.Core.Projects;
+using CrewPilot.Infrastructure.Audit;
 using CrewPilot.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,9 @@ namespace CrewPilot.Api.Controllers;
 
 [ApiController]
 [Route("api/projects")]
-public sealed class ProjectsController(CrewPilotDbContext db) : ControllerBase
+public sealed class ProjectsController(
+    CrewPilotDbContext db,
+    AuditLogger audit) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<ProjectSummaryDto>>> List(CancellationToken ct)
@@ -131,6 +134,7 @@ public sealed class ProjectsController(CrewPilotDbContext db) : ControllerBase
 
         db.Projects.Remove(project);
         await db.SaveChangesAsync(ct);
+        await audit.LogAsync("project.delete", "project", id.ToString(), id, project.Key, ct);
         return NoContent();
     }
 

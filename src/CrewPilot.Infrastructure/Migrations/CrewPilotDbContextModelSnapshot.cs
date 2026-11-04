@@ -232,6 +232,50 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.ToTable("RunLogs", (string)null);
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.Audit.AuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Actor")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Detail")
+                        .HasMaxLength(8000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TargetId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TargetType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("ProjectId", "CreatedAt");
+
+                    b.ToTable("AuditLogs", (string)null);
+                });
+
             modelBuilder.Entity("CrewPilot.Core.Collaboration.Activity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -450,6 +494,67 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Milestones", (string)null);
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Mcp.AgentMcpServer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AgentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("McpServerId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("McpServerId");
+
+                    b.HasIndex("AgentId", "McpServerId")
+                        .IsUnique();
+
+                    b.ToTable("AgentMcpServers", (string)null);
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Mcp.McpServer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AuthTokenProtected")
+                        .HasMaxLength(4000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Transport")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("McpServers", (string)null);
                 });
 
             modelBuilder.Entity("CrewPilot.Core.Projects.Project", b =>
@@ -679,6 +784,70 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ModelProviders", (string)null);
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Skills.AgentSkill", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AgentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("SkillId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SkillId");
+
+                    b.HasIndex("AgentId", "SkillId")
+                        .IsUnique();
+
+                    b.ToTable("AgentSkills", (string)null);
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Skills.Skill", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PromptContent")
+                        .IsRequired()
+                        .HasMaxLength(16000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ScriptPath")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Tools")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Skills", (string)null);
                 });
 
             modelBuilder.Entity("CrewPilot.Core.WorkItems.WorkItem", b =>
@@ -1240,6 +1409,25 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.Mcp.AgentMcpServer", b =>
+                {
+                    b.HasOne("CrewPilot.Core.Agents.Agent", "Agent")
+                        .WithMany("McpServers")
+                        .HasForeignKey("AgentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CrewPilot.Core.Mcp.McpServer", "McpServer")
+                        .WithMany("Agents")
+                        .HasForeignKey("McpServerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Agent");
+
+                    b.Navigation("McpServer");
+                });
+
             modelBuilder.Entity("CrewPilot.Core.Projects.ProjectMember", b =>
                 {
                     b.HasOne("CrewPilot.Core.Projects.Project", "Project")
@@ -1278,6 +1466,25 @@ namespace CrewPilot.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Provider");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Skills.AgentSkill", b =>
+                {
+                    b.HasOne("CrewPilot.Core.Agents.Agent", "Agent")
+                        .WithMany("Skills")
+                        .HasForeignKey("AgentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CrewPilot.Core.Skills.Skill", "Skill")
+                        .WithMany("Agents")
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Agent");
+
+                    b.Navigation("Skill");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.WorkItems.WorkItem", b =>
@@ -1397,7 +1604,11 @@ namespace CrewPilot.Infrastructure.Migrations
 
             modelBuilder.Entity("CrewPilot.Core.Agents.Agent", b =>
                 {
+                    b.Navigation("McpServers");
+
                     b.Navigation("Runs");
+
+                    b.Navigation("Skills");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.Agents.AgentRun", b =>
@@ -1420,6 +1631,11 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Navigation("Iterations");
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.Mcp.McpServer", b =>
+                {
+                    b.Navigation("Agents");
+                });
+
             modelBuilder.Entity("CrewPilot.Core.Projects.Project", b =>
                 {
                     b.Navigation("Iterations");
@@ -1436,6 +1652,11 @@ namespace CrewPilot.Infrastructure.Migrations
             modelBuilder.Entity("CrewPilot.Core.Providers.ModelProvider", b =>
                 {
                     b.Navigation("Models");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Skills.Skill", b =>
+                {
+                    b.Navigation("Agents");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.WorkItems.WorkItem", b =>

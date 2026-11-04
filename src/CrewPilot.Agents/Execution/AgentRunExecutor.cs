@@ -81,6 +81,9 @@ public sealed class AgentRunExecutor
         var run = await _db.AgentRuns
             .Include(r => r.Agent)
             .ThenInclude(a => a.Provider)
+            .Include(r => r.Agent)
+            .ThenInclude(a => a.Skills)
+            .ThenInclude(s => s.Skill)
             .Include(r => r.WorkItem)
             .FirstOrDefaultAsync(r => r.Id == runId, ct);
         if (run is null || run.Status != AgentRunStatus.Queued)
@@ -135,7 +138,7 @@ public sealed class AgentRunExecutor
             var request = new AgentRunRequest(
                 AgentName: run.Agent.Name,
                 Prompt: run.Prompt,
-                SystemPrompt: run.Agent.SystemPrompt,
+                SystemPrompt: ComposeSystemPrompt(run.Agent),
                 Model: run.Agent.Model,
                 BaseUrl: run.Agent.Provider.BaseUrl,
                 ApiKey: apiKey,
@@ -229,6 +232,33 @@ public sealed class AgentRunExecutor
 
         await _db.SaveChangesAsync(ct);
         return true;
+    }
+
+    /// <summary>系统提示词 = Agent 基础提示词 + 已装配且启用的 Skills 内容。</summary>
+    private static string ComposeSystemPrompt(Agent agent)
+    {
+        var skills = agent.Skills
+            .Select(link => link.Skill)
+            .Where(skill => skill.Enabled)
+            .OrderBy(skill => skill.Name, StringComparer.Ordinal)
+            .ToList();
+        if (skills.Count == 0)
+        {
+            return agent.SystemPrompt;
+        }
+
+        var builder = new System.Text.StringBuilder(agent.SystemPrompt);
+        builder.AppendLine();
+        builder.AppendLine();
+        builder.AppendLine("## 已装配技能");
+        foreach (var skill in skills)
+        {
+            builder.AppendLine($"### {skill.Name}");
+            builder.AppendLine(skill.PromptContent);
+            builder.AppendLine();
+        }
+
+        return builder.ToString();
     }
 
     /// <summary>AgentRun 结束后推进工作流（仅工作流触发的运行）。</summary>

@@ -4,6 +4,7 @@ using CrewPilot.Core.Abstractions;
 using CrewPilot.Core.Collaboration;
 using CrewPilot.Core.Integrations;
 using CrewPilot.Core.Projects;
+using CrewPilot.Infrastructure.Audit;
 using CrewPilot.Infrastructure.Cicd;
 using CrewPilot.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,8 @@ namespace CrewPilot.Api.Controllers;
 public sealed class ProjectIntegrationsController(
     CrewPilotDbContext db,
     ISecretProtector secrets,
-    IGitCliService gitCli) : ControllerBase
+    IGitCliService gitCli,
+    AuditLogger audit) : ControllerBase
 {
     [HttpGet("api/projects/{projectId:guid}/integration")]
     public async Task<ActionResult<ProjectIntegrationDto>> Get(Guid projectId, CancellationToken ct)
@@ -78,6 +80,9 @@ public sealed class ProjectIntegrationsController(
             : request.Repository.Trim();
 
         await db.SaveChangesAsync(ct);
+        await audit.LogAsync(
+            "integration.upsert", "project", projectId.ToString(), projectId,
+            $"platform={platform}", ct);
         return Ok(ToDto(integration));
     }
 
@@ -93,6 +98,7 @@ public sealed class ProjectIntegrationsController(
 
         db.ProjectIntegrations.Remove(integration);
         await db.SaveChangesAsync(ct);
+        await audit.LogAsync("integration.delete", "project", projectId.ToString(), projectId, ct: ct);
         return NoContent();
     }
 
@@ -150,6 +156,9 @@ public sealed class ProjectIntegrationsController(
             ActorKind = MemberKind.User,
         });
         await db.SaveChangesAsync(ct);
+        await audit.LogAsync(
+            "release.create", "release", request.Tag, projectId,
+            $"url={url}", ct);
 
         return Ok(new ReleaseDto(request.Tag.Trim(), url, message));
     }

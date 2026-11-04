@@ -41,6 +41,10 @@ public sealed class CrewPilotApiFactory : WebApplicationFactory<Program>
     public FakeGitCliService GitCli =>
         (FakeGitCliService)Services.GetRequiredService<IGitCliService>();
 
+    /// <summary>测试可直接读取 Fake Agent 引擎（例如断言提示词注入）。</summary>
+    public FakeAgentEngine Engine =>
+        (FakeAgentEngine)Services.GetRequiredService<IAgentEngine>();
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");

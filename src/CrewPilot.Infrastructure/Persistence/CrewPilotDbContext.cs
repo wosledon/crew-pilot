@@ -1,10 +1,13 @@
 using CrewPilot.Core.Agents;
+using CrewPilot.Core.Audit;
 using CrewPilot.Core.Collaboration;
 using CrewPilot.Core.Integrations;
 using CrewPilot.Core.Iterations;
+using CrewPilot.Core.Mcp;
 using CrewPilot.Core.Projects;
 using CrewPilot.Core.Prototypes;
 using CrewPilot.Core.Providers;
+using CrewPilot.Core.Skills;
 using CrewPilot.Core.WorkItems;
 using CrewPilot.Core.WorkLogs;
 using CrewPilot.Core.Workflows;
@@ -64,6 +67,16 @@ public class CrewPilotDbContext(DbContextOptions<CrewPilotDbContext> options) : 
     public DbSet<Blocker> Blockers => Set<Blocker>();
 
     public DbSet<ProjectIntegration> ProjectIntegrations => Set<ProjectIntegration>();
+
+    public DbSet<Skill> Skills => Set<Skill>();
+
+    public DbSet<AgentSkill> AgentSkills => Set<AgentSkill>();
+
+    public DbSet<McpServer> McpServers => Set<McpServer>();
+
+    public DbSet<AgentMcpServer> AgentMcpServers => Set<AgentMcpServer>();
+
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

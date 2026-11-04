@@ -5,6 +5,7 @@ using CrewPilot.Core.Projects;
 using CrewPilot.Core.Services;
 using CrewPilot.Core.WorkItems;
 using CrewPilot.Core.WorkLogs;
+using CrewPilot.Infrastructure.Audit;
 using CrewPilot.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,9 @@ using Microsoft.EntityFrameworkCore;
 namespace CrewPilot.Api.Controllers;
 
 [ApiController]
-public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
+public sealed class WorkItemsController(
+    CrewPilotDbContext db,
+    AuditLogger audit) : ControllerBase
 {
     /// <summary>工作项列表，支持 type（requirement/defect/task）与 status 过滤。</summary>
     [HttpGet("api/projects/{projectId:guid}/workitems")]
@@ -262,6 +265,9 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
 
         db.WorkItems.Remove(workItem);
         await db.SaveChangesAsync(ct);
+        await audit.LogAsync(
+            "workitem.delete", "workitem", id.ToString(), workItem.ProjectId,
+            workItem.Title, ct);
         return NoContent();
     }
 

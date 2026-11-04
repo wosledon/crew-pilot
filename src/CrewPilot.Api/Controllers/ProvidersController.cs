@@ -216,6 +216,96 @@ public sealed class ProvidersController(
         }
     }
 
+    /// <summary>手动添加模型目录条目（覆盖 models.dev 同步结果）。</summary>
+    [HttpPost("api/providers/{id:guid}/models")]
+    public async Task<ActionResult<ModelDto>> AddModel(
+        Guid id, [FromBody] UpsertModelRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.ModelId))
+        {
+            return Problem(detail: "模型标识必填", statusCode: 400);
+        }
+
+        if (request.InputPricePerMillion < 0 || request.OutputPricePerMillion < 0)
+        {
+            return Problem(detail: "价格不能为负", statusCode: 400);
+        }
+
+        var provider = await db.ModelProviders.FirstOrDefaultAsync(p => p.Id == id, ct);
+        if (provider is null)
+        {
+            return Problem(detail: "供应商不存在", statusCode: 404);
+        }
+
+        var modelId = request.ModelId.Trim();
+        if (await db.ModelCatalogEntries.AnyAsync(
+                m => m.ProviderId == id && m.ModelId == modelId, ct))
+        {
+            return Problem(detail: $"模型 {modelId} 已存在", statusCode: 409);
+        }
+
+        var entry = new ModelCatalogEntry
+        {
+            ProviderId = id,
+            ModelId = modelId,
+            DisplayName = request.DisplayName?.Trim() ?? modelId,
+            ContextLength = request.ContextLength,
+            Capabilities = request.Capabilities,
+            InputPricePerMillion = request.InputPricePerMillion,
+            OutputPricePerMillion = request.OutputPricePerMillion,
+            Enabled = request.Enabled ?? true,
+        };
+        db.ModelCatalogEntries.Add(entry);
+        await db.SaveChangesAsync(ct);
+        return Created($"/api/providers/models/{entry.Id}", ToModelDto(entry));
+    }
+
+    [HttpPut("api/providers/models/{modelId:guid}")]
+    public async Task<ActionResult<ModelDto>> UpdateModel(
+        Guid modelId, [FromBody] UpsertModelRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.ModelId))
+        {
+            return Problem(detail: "模型标识必填", statusCode: 400);
+        }
+
+        if (request.InputPricePerMillion < 0 || request.OutputPricePerMillion < 0)
+        {
+            return Problem(detail: "价格不能为负", statusCode: 400);
+        }
+
+        var entry = await db.ModelCatalogEntries.FirstOrDefaultAsync(m => m.Id == modelId, ct);
+        if (entry is null)
+        {
+            return Problem(detail: "模型不存在", statusCode: 404);
+        }
+
+        entry.ModelId = request.ModelId.Trim();
+        entry.DisplayName = request.DisplayName?.Trim() ?? entry.ModelId;
+        entry.ContextLength = request.ContextLength;
+        entry.Capabilities = request.Capabilities;
+        entry.InputPricePerMillion = request.InputPricePerMillion;
+        entry.OutputPricePerMillion = request.OutputPricePerMillion;
+        entry.Enabled = request.Enabled ?? true;
+        entry.UpdatedAt = DateTimeOffset.UtcNow;
+        await db.SaveChangesAsync(ct);
+        return Ok(ToModelDto(entry));
+    }
+
+    [HttpDelete("api/providers/models/{modelId:guid}")]
+    public async Task<IActionResult> DeleteModel(Guid modelId, CancellationToken ct)
+    {
+        var entry = await db.ModelCatalogEntries.FirstOrDefaultAsync(m => m.Id == modelId, ct);
+        if (entry is null)
+        {
+            return Problem(detail: "模型不存在", statusCode: 404);
+        }
+
+        db.ModelCatalogEntries.Remove(entry);
+        await db.SaveChangesAsync(ct);
+        return NoContent();
+    }
+
     private static ProviderDetailDto ToDto(ModelProvider provider) => new(
         provider.Id,
         provider.Name,
@@ -225,8 +315,10 @@ public sealed class ProvidersController(
         provider.IsDefault,
         provider.Models
             .OrderBy(m => m.ModelId)
-            .Select(m => new ModelDto(
-                m.Id, m.ModelId, m.DisplayName, m.ContextLength, m.Capabilities,
-                m.InputPricePerMillion, m.OutputPricePerMillion, m.Enabled))
+            .Select(ToModelDto)
             .ToList());
+
+    private static ModelDto ToModelDto(ModelCatalogEntry model) => new(
+        model.Id, model.ModelId, model.DisplayName, model.ContextLength, model.Capabilities,
+        model.InputPricePerMillion, model.OutputPricePerMillion, model.Enabled);
 }

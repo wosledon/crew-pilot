@@ -33,3 +33,12 @@ public sealed record CreateProviderRequest(string Name, string BaseUrl, string A
 public sealed record UpdateProviderRequest(string Name, string BaseUrl, string? ApiKey, bool Enabled);
 
 public sealed record TestConnectionDto(bool Ok, string Message, int ModelCount);
+
+public sealed record UpsertModelRequest(
+    string ModelId,
+    string? DisplayName,
+    int? ContextLength,
+    string? Capabilities,
+    decimal? InputPricePerMillion,
+    decimal? OutputPricePerMillion,
+    bool? Enabled = null);

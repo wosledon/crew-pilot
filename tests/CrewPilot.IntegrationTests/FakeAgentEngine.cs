@@ -16,6 +16,9 @@ public sealed class FakeAgentEngine : IAgentEngine
 
     public TimeSpan Duration { get; init; } = TimeSpan.FromMinutes(90);
 
+    /// <summary>最近一次执行请求（用于断言提示词/Skill 注入）。</summary>
+    public AgentRunRequest? LastRequest { get; private set; }
+
     public string DefaultOutput { get; set; } = $"已完成工作，PR：{FakePrUrl}";
 
     public int FailNextRuns
@@ -34,6 +37,7 @@ public sealed class FakeAgentEngine : IAgentEngine
     public Task<AgentRunResult> RunAsync(
         AgentRunRequest request, CancellationToken cancellationToken = default)
     {
+        LastRequest = request;
         IReadOnlyList<AgentRunStep> steps =
         [
             new AgentRunStep(1, "info", $"Fake engine 启动：{request.AgentName}"),

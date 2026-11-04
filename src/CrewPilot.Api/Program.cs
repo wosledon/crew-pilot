@@ -3,6 +3,7 @@ using CrewPilot.Agents.Engine;
 using CrewPilot.Agents.Execution;
 using CrewPilot.Agents.Workflows;
 using CrewPilot.Core.Abstractions;
+using CrewPilot.Infrastructure.Audit;
 using CrewPilot.Infrastructure.Cicd;
 using CrewPilot.Infrastructure.Persistence;
 using CrewPilot.Infrastructure.Security;
@@ -30,7 +31,9 @@ builder.Services.AddSingleton<AgentRunCancellationRegistry>();
 builder.Services.AddHostedService<AgentRunWorker>();
 builder.Services.AddScoped<AgentRunExecutor>();
 builder.Services.AddScoped<WorkflowRunner>();
+builder.Services.AddScoped<AuditLogger>();
 builder.Services.AddHttpClient("models.dev");
+builder.Services.AddHttpClient("mcp");
 
 // 附件存储：本地目录（可用 Attachments:RootPath 覆盖）
 var attachmentRoot = builder.Configuration["Attachments:RootPath"];

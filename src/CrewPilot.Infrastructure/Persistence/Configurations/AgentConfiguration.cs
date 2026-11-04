@@ -24,6 +24,14 @@ public class AgentConfiguration : IEntityTypeConfiguration<Agent>
             .WithOne(r => r.Agent)
             .HasForeignKey(r => r.AgentId)
             .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(a => a.Skills)
+            .WithOne(s => s.Agent)
+            .HasForeignKey(s => s.AgentId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(a => a.McpServers)
+            .WithOne(m => m.Agent)
+            .HasForeignKey(m => m.AgentId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
