@@ -9,7 +9,7 @@
 | 项 | 命令 | 结果 |
 | --- | --- | --- |
 | 后端构建 | `dotnet build CrewPilot.slnx` | 0 警告 / 0 错误 |
-| 后端测试 | `dotnet test CrewPilot.slnx` | **165 项通过**（50 单测 + 115 集成） |
+| 后端测试 | `dotnet test CrewPilot.slnx` | **167 项通过**（50 单测 + 117 集成） |
 | 前端静态检查 | `npm run lint` / `npm run format:check` | 0 error，格式通过 |
 | 前端单测 | `npm run test:run` | **13 项通过** |
 | 前端构建 | `npm run build` | 通过（tsc + vite） |
@@ -129,7 +129,7 @@ CI：`.github/workflows/ci.yml` 含 backend / frontend / e2e 三个 job。
 - [x] 项目目录隔离 + git worktree 生命周期
 - [x] 沙箱加固（路径逃逸/命令注入/超时/输出截断）与沙箱策略
 - [x] 每次运行留痕：模型、token、耗时、日志步骤、工时、成本
-- [~] 流式 token 输出、多 Agent 并行协作：P2（顺序交接/评审由工作流覆盖）
+- [x] 运行状态/日志 SSE 流式推送（Round 38）`n- [~] 逐 token 流式输出、多 Agent 并行协作：P2
 
 ### 5.7 MCP 接入（P1）
 
@@ -181,7 +181,7 @@ PRD 第 4 节：P2 = 后续演进，不阻塞 v1 验收。
 
 
 
-| 流式 token 输出（当前为一次性输出 + 中间步骤日志） | 引擎能力增强，P2 |
+| 逐 token 流式输出（已支持运行状态/日志 SSE 推送） | 引擎能力增强，P2 |
 | 多 Agent 并行协作（顺序交接/评审已支持） | P2 |
 
 | CI webhook 自动推送（当前动作触发） | P2 |
@@ -193,7 +193,7 @@ PRD 第 4 节：P2 = 后续演进，不阻塞 v1 验收。
 
 1. **真实 MAF 联调**：自动化测试使用 Fake 引擎（不调用真实模型）；真实模型需配置供应商 API Key 后手工冒烟。
 2. **Docker/PostgreSQL 实机验证**：本机无 Docker/PostgreSQL 服务，compose 与 Npgsql 接线通过构建、配置与 `/health` 验证；需在具备环境的主机执行 `docker compose up` 复核。
-3. **流式输出**：当前 AgentRun 返回完整输出与步骤日志，未做逐 token 流式渲染。
+3. **流式输出**：已支持运行状态/日志 SSE 流式推送；逐 token 渲染需引擎流式接口，尚未实现。
 4. **P2 清单**：见 §3，均为 PRD 明确后续演进项。
 
 ## 5. 结论

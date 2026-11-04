@@ -9,7 +9,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 165 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 167 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -227,7 +227,7 @@
 - [x] 内置工具：文件读写/列目录/白名单命令
 - [x] 项目目录隔离 + git worktree（Round 1 打通 LocalPath）
 - [~] worktree 清理/合并/PR：失败/取消已清理，成功保留待 M4 接 PR
-- [~] 运行详情：日志/工具调用时间线、实时刷新（Round 22）；流式 token 输出待做
+- [x] 运行详情：日志/工具调用时间线、实时刷新（Round 22）+ SSE 流式日志（Round 38）；逐 token 输出待引擎支持
 - [~] 多 Agent 协作（顺序交接/评审已由工作流支持；并行协作 P2）
 - [x] 沙箱加固（路径逃逸/命令注入/超时，Round 1）
 
@@ -295,6 +295,12 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 38（2026-11-05，P2 演进 Round 7）
+
+- 流式运行日志（PRD 5.6 流式输出的一部分）：`GET /api/agent-runs/{id}/stream` SSE（status → log... → done），每秒增量推送运行状态与 RunLog，终止态自动关闭
+- 前端 AgentRun 详情接入 EventSource：打开即订阅，实时追加日志面板，done 后刷新完整详情
+- 测试：165 → 167（SSE 事件序列/中文内容、未知运行 404），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 37（2026-11-05，P2 演进 Round 6）
 
