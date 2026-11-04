@@ -23,6 +23,7 @@ import { IntegrationCard } from "@/features/integrations/IntegrationCard";
 import { ReleasePanel } from "@/features/integrations/ReleasePanel";
 import { WorkflowPanel } from "@/features/workflows/WorkflowPanel";
 import { AssignAgentDialog, AgentRunPanel } from "@/features/agents/components/AgentRunPanel";
+import { AgentTeamCard } from "@/features/agents/components/AgentTeamCard";
 import {
   useAddWorkLog,
   useBatchWorkItems,
@@ -464,6 +465,7 @@ export function ProjectDetailPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <ProjectMembersCard projectId={projectId} />
+        <AgentTeamCard projectId={projectId} defaultTeamId={project.data.defaultTeamId} />
         <ActivityFeed projectId={projectId} />
       </div>
 

@@ -5,6 +5,7 @@ import type {
   AgentListItem,
   AgentRunDetail,
   AgentRunListItem,
+  AgentTeam,
   ModelDto,
   ProviderDetail,
   ProviderListItem,
@@ -136,6 +137,34 @@ export function useAgents() {
   return useQuery({
     queryKey: agentKeys.agents,
     queryFn: () => api.get<AgentListItem[]>("/agents"),
+  });
+}
+
+export function useAgentTeams(projectId: string | undefined) {
+  return useQuery({
+    queryKey: ["agent-teams", projectId ?? ""] as const,
+    queryFn: () => api.get<AgentTeam[]>(`/projects/${projectId}/agent-teams`),
+    enabled: projectId !== undefined,
+  });
+}
+
+export function useCreateAgentTeam(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { name: string; goal?: string; agentIds: string[] }) =>
+      api.post<AgentTeam>(`/projects/${projectId}/agent-teams`, body),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["agent-teams", projectId] }),
+  });
+}
+
+export function useDeleteAgentTeam(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/agent-teams/${id}`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["agent-teams", projectId] });
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
   });
 }
 

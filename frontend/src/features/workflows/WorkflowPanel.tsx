@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Trash2, Workflow as WorkflowIcon } from "lucide-react";
+import { Pencil, Trash2, Workflow as WorkflowIcon } from "lucide-react";
 import { Badge, type BadgeTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -22,6 +22,7 @@ import {
   useWorkflows,
 } from "./api";
 import { WorkflowRunDialog } from "./WorkflowRunDialog";
+import { WorkflowEditorDialog } from "./WorkflowEditorDialog";
 
 const runStatusTones: Record<WorkflowRunStatus, BadgeTone> = {
   running: "info",
@@ -48,6 +49,8 @@ export function WorkflowPanel({ projectId }: WorkflowPanelProps) {
   const confirm = useConfirm();
 
   const [templateOpen, setTemplateOpen] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorWorkflowId, setEditorWorkflowId] = useState<string | null>(null);
   const [templateKey, setTemplateKey] = useState("");
   const [workflowName, setWorkflowName] = useState("");
   const [startWorkflowId, setStartWorkflowId] = useState("");
@@ -122,9 +125,21 @@ export function WorkflowPanel({ projectId }: WorkflowPanelProps) {
           <WorkflowIcon className="h-4 w-4" />
           {t("workflows:title")}
         </CardTitle>
-        <Button size="sm" variant="outline" onClick={() => setTemplateOpen(true)}>
-          {t("workflows:createFromTemplate")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setEditorWorkflowId(null);
+              setEditorOpen(true);
+            }}
+          >
+            {t("workflows:createCustom")}
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setTemplateOpen(true)}>
+            {t("workflows:createFromTemplate")}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {workflows.isPending ? (
@@ -150,6 +165,17 @@ export function WorkflowPanel({ projectId }: WorkflowPanelProps) {
                   <Badge tone="neutral">
                     {workflow.steps.length} {t("workflows:steps")}
                   </Badge>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={t("workflows:edit")}
+                    onClick={() => {
+                      setEditorWorkflowId(workflow.id);
+                      setEditorOpen(true);
+                    }}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -265,6 +291,13 @@ export function WorkflowPanel({ projectId }: WorkflowPanelProps) {
           </div>
         </div>
       </Dialog>
+
+      <WorkflowEditorDialog
+        projectId={projectId}
+        workflowId={editorWorkflowId}
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+      />
 
       {openRunId !== null ? (
         <WorkflowRunDialog

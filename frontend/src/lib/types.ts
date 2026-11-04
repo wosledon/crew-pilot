@@ -23,6 +23,7 @@ export interface ProjectDetail {
   workItemCount: number;
   createdAt: string;
   updatedAt: string;
+  defaultTeamId: string | null;
 }
 
 export type WorkItemType = "requirement" | "defect" | "task";

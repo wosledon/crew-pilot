@@ -46,6 +46,59 @@ export function useCreateWorkflowFromTemplate(projectId: string) {
   });
 }
 
+export interface WorkflowStepBody {
+  name: string;
+  order: number;
+  agentId?: string;
+  requiredJob?: string;
+  instruction?: string;
+  approvalPolicy?: string;
+  maxRetries?: number;
+  inputContract?: string;
+  outputContract?: string;
+}
+
+export function useCreateWorkflow(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { name: string; description?: string; steps: WorkflowStepBody[] }) =>
+      api.post<Workflow>(`/projects/${projectId}/workflows`, body),
+    onSuccess: () =>
+      void queryClient.invalidateQueries({
+        queryKey: workflowKeys.workflows(projectId),
+      }),
+  });
+}
+
+export function useUpdateWorkflow(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: {
+      id: string;
+      name: string;
+      description?: string;
+      steps: WorkflowStepBody[];
+    }) =>
+      api.put<Workflow>(`/workflows/${variables.id}`, {
+        name: variables.name,
+        description: variables.description,
+        steps: variables.steps,
+      }),
+    onSuccess: () =>
+      void queryClient.invalidateQueries({
+        queryKey: workflowKeys.workflows(projectId),
+      }),
+  });
+}
+
+export function useWorkflow(workflowId: string | undefined) {
+  return useQuery({
+    queryKey: ["workflows", workflowId ?? ""] as const,
+    queryFn: () => api.get<Workflow>(`/workflows/${workflowId}`),
+    enabled: workflowId !== undefined,
+  });
+}
+
 export function useDeleteWorkflow(projectId: string) {
   const queryClient = useQueryClient();
   return useMutation({

@@ -49,6 +49,18 @@ export function useProject(projectId: string | undefined) {
   });
 }
 
+export function useSetDefaultTeam(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (teamId: string | null) =>
+      api.put<ProjectDetail>(`/projects/${projectId}/default-team`, { teamId }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+      void queryClient.invalidateQueries({ queryKey: ["agent-teams", projectId] });
+    },
+  });
+}
+
 export function useWorkItems(projectId: string | undefined, type?: string, tag?: string) {
   const search = new URLSearchParams();
   if (type) {
