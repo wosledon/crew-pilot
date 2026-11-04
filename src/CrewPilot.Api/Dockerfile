@@ -7,6 +7,7 @@ WORKDIR /src
 COPY CrewPilot.slnx ./
 COPY src/CrewPilot.Core/CrewPilot.Core.csproj src/CrewPilot.Core/
 COPY src/CrewPilot.Infrastructure/CrewPilot.Infrastructure.csproj src/CrewPilot.Infrastructure/
+COPY src/CrewPilot.Infrastructure.PostgreSql/CrewPilot.Infrastructure.PostgreSql.csproj src/CrewPilot.Infrastructure.PostgreSql/
 COPY src/CrewPilot.Agents/CrewPilot.Agents.csproj src/CrewPilot.Agents/
 COPY src/CrewPilot.Api/CrewPilot.Api.csproj src/CrewPilot.Api/
 RUN dotnet restore src/CrewPilot.Api/CrewPilot.Api.csproj

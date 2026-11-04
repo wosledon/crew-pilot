@@ -15,17 +15,46 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 数据访问：开发期 SQLite，连接串可切换 PostgreSQL
+// 数据访问：开发默认 SQLite；Database:Provider=PostgreSql 切换 PostgreSQL（独立迁移程序集）
+var databaseProvider = builder.Configuration["Database:Provider"] ?? "Sqlite";
+var usePostgreSql = databaseProvider.Equals("PostgreSql", StringComparison.OrdinalIgnoreCase) ||
+                    databaseProvider.Equals("Postgres", StringComparison.OrdinalIgnoreCase);
 var connectionString = builder.Configuration.GetConnectionString("CrewPilot")
-    ?? "Data Source=crewpilot.db";
+    ?? (usePostgreSql
+        ? "Host=localhost;Port=5432;Database=crewpilot;Username=crewpilot;Password=crewpilot"
+        : "Data Source=crewpilot.db");
 builder.Services.AddDbContext<CrewPilotDbContext>(options =>
-    options.UseSqlite(connectionString));
+{
+    if (usePostgreSql)
+    {
+        options.UseNpgsql(connectionString, npgsql => npgsql.MigrationsAssembly(
+            "CrewPilot.Infrastructure.PostgreSql"));
+    }
+    else
+    {
+        options.UseSqlite(connectionString);
+    }
+});
 
 // 领域与基础设施服务
-// DPAPI 为 Windows 专用实现（单用户自托管当前面向 Windows）；跨平台时替换实现即可
-#pragma warning disable CA1416
-builder.Services.AddSingleton<ISecretProtector, DpapiSecretProtector>();
-#pragma warning restore CA1416
+// 机密保护：Windows 用 DPAPI；非 Windows（Docker/Linux）用 AES-GCM + 本地密钥文件
+if (OperatingSystem.IsWindows())
+{
+    #pragma warning disable CA1416
+    builder.Services.AddSingleton<ISecretProtector, DpapiSecretProtector>();
+    #pragma warning restore CA1416
+}
+else
+{
+    var secretKeyPath = builder.Configuration["Secrets:KeyPath"];
+    if (string.IsNullOrWhiteSpace(secretKeyPath))
+    {
+        secretKeyPath = Path.Combine(
+            builder.Environment.ContentRootPath, "App_Data", "secrets.key");
+    }
+
+    builder.Services.AddSingleton<ISecretProtector>(new AesGcmSecretProtector(secretKeyPath));
+}
 
 // Agent 平台：MAF 引擎 + 后台执行队列（认领闭环）
 builder.Services.AddSingleton<IAgentEngine, MafAgentEngine>();
@@ -89,6 +118,13 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 app.MapHub<RealtimeHub>("/hubs/realtime");
+
+// 存活探针：容器 / 反向代理健康检查（不访问数据库，避免抖动）
+app.MapGet("/health", (IConfiguration configuration) => Results.Ok(new
+{
+    status = "ok",
+    database = configuration["Database:Provider"] ?? "Sqlite",
+}));
 
 app.Run();
 

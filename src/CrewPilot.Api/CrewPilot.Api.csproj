@@ -18,6 +18,7 @@
     <ProjectReference Include="..\CrewPilot.Agents\CrewPilot.Agents.csproj" />
     <ProjectReference Include="..\CrewPilot.Core\CrewPilot.Core.csproj" />
     <ProjectReference Include="..\CrewPilot.Infrastructure\CrewPilot.Infrastructure.csproj" />
+    <ProjectReference Include="..\CrewPilot.Infrastructure.PostgreSql\CrewPilot.Infrastructure.PostgreSql.csproj" />
   </ItemGroup>
 
 </Project>

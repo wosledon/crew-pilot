@@ -4,6 +4,7 @@
     <Project Path="src/CrewPilot.Api/CrewPilot.Api.csproj" />
     <Project Path="src/CrewPilot.Core/CrewPilot.Core.csproj" />
     <Project Path="src/CrewPilot.Infrastructure/CrewPilot.Infrastructure.csproj" />
+    <Project Path="src/CrewPilot.Infrastructure.PostgreSql/CrewPilot.Infrastructure.PostgreSql.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CrewPilot.IntegrationTests/CrewPilot.IntegrationTests.csproj" />
