@@ -5,13 +5,14 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { Dialog } from "@/components/ui/Dialog";
-import { Textarea } from "@/components/ui/Input";
+import { Input, Textarea } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { useAgents } from "@/features/agents/api";
+import { useCreatePullRequest, useSyncPullRequest } from "@/features/integrations/api";
 import { formatDateTime } from "@/lib/format";
-import type { WorkItemDetail } from "@/lib/types";
+import type { PullRequestStatus, WorkItemDetail } from "@/lib/types";
 import { priorityTone, statusTone } from "../statusFlow";
 import {
   useAddComment,
@@ -39,7 +40,7 @@ export function WorkItemDetailDialog({
   onOpenChange,
   onEdit,
 }: WorkItemDetailDialogProps) {
-  const { t } = useTranslation(["workitems", "collaboration", "common"]);
+  const { t } = useTranslation(["workitems", "collaboration", "integrations", "common"]);
   const item = useWorkItem(workItemId);
   const workLogs = useWorkLogs(workItemId);
   const comments = useComments(workItemId);
@@ -50,11 +51,16 @@ export function WorkItemDetailDialog({
   const uploadAttachment = useUploadAttachment();
   const deleteAttachment = useDeleteAttachment();
   const deleteWorkItem = useDeleteWorkItem();
+  const createPullRequest = useCreatePullRequest(workItemId);
+  const syncPullRequest = useSyncPullRequest(workItemId);
   const confirm = useConfirm();
   const fileInput = useRef<HTMLInputElement>(null);
 
   const [content, setContent] = useState("");
   const [mentionAgentId, setMentionAgentId] = useState("");
+  const [branch, setBranch] = useState("");
+  const [prTitle, setPrTitle] = useState("");
+  const [prStatus, setPrStatus] = useState<PullRequestStatus | null>(null);
 
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
@@ -147,6 +153,33 @@ export function WorkItemDetailDialog({
       await deleteWorkItem.mutateAsync(workItemId);
       toast.success(t("workitems:deleted"));
       onOpenChange(false);
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
+  const handleCreatePullRequest = async () => {
+    if (branch.trim() === "" || prTitle.trim() === "") {
+      return;
+    }
+    try {
+      await createPullRequest.mutateAsync({
+        branch: branch.trim(),
+        title: prTitle.trim(),
+      });
+      toast.success(t("integrations:created"));
+      await item.refetch();
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
+  const handleSyncPullRequest = async () => {
+    try {
+      const status = await syncPullRequest.mutateAsync();
+      setPrStatus(status);
+      toast.success(t("integrations:synced"));
+      await item.refetch();
     } catch (error) {
       toast.error(errorMessage(error));
     }
@@ -363,6 +396,97 @@ export function WorkItemDetailDialog({
                   </li>
                 ))}
               </ul>
+            )}
+          </section>
+
+          <section>
+            <h4 className="text-sm font-medium">{t("integrations:pullRequest")}</h4>
+            {detail.prUrl ? (
+              <div className="mt-2 space-y-2">
+                <a
+                  href={detail.prUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block truncate text-sm text-primary hover:underline"
+                >
+                  {detail.prUrl}
+                </a>
+                <div className="flex flex-wrap items-center gap-2">
+                  {prStatus ? (
+                    <>
+                      <Badge
+                        tone={
+                          prStatus.state === "merged"
+                            ? "success"
+                            : prStatus.state === "open"
+                              ? "info"
+                              : "neutral"
+                        }
+                      >
+                        {t(`integrations:prStates.${prStatus.state}`)}
+                      </Badge>
+                      <Badge
+                        tone={
+                          prStatus.ciStatus === "success"
+                            ? "success"
+                            : prStatus.ciStatus === "failure"
+                              ? "danger"
+                              : prStatus.ciStatus === "pending"
+                                ? "warning"
+                                : "neutral"
+                        }
+                      >
+                        {t("integrations:ciStatus")}：
+                        {t(`integrations:ciStatuses.${prStatus.ciStatus}`)}
+                      </Badge>
+                    </>
+                  ) : null}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void handleSyncPullRequest()}
+                    disabled={syncPullRequest.isPending}
+                  >
+                    {t("integrations:sync")}
+                  </Button>
+                </div>
+                {prStatus !== null && prStatus.checks.length > 0 ? (
+                  <ul className="space-y-1 text-xs text-muted-foreground">
+                    {prStatus.checks.map((check) => (
+                      <li key={`${check.name}-${check.status}`}>
+                        {check.name} · {check.conclusion ?? check.status}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ) : (
+              <div className="mt-2 space-y-2">
+                <p className="text-sm text-muted-foreground">{t("integrations:noPr")}</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <Input
+                    value={branch}
+                    onChange={(event) => setBranch(event.target.value)}
+                    placeholder={t("integrations:branchPlaceholder")}
+                    aria-label={t("integrations:branch")}
+                  />
+                  <Input
+                    value={prTitle}
+                    onChange={(event) => setPrTitle(event.target.value)}
+                    placeholder={t("integrations:prTitle")}
+                    aria-label={t("integrations:prTitle")}
+                  />
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => void handleCreatePullRequest()}
+                  disabled={
+                    createPullRequest.isPending || branch.trim() === "" || prTitle.trim() === ""
+                  }
+                >
+                  {t("integrations:createPr")}
+                </Button>
+              </div>
             )}
           </section>
         </div>

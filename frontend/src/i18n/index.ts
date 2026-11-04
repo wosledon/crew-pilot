@@ -16,6 +16,7 @@ import agentsZh from "./locales/zh-CN/agents.json";
 import agentrunsZh from "./locales/zh-CN/agentruns.json";
 import collaborationZh from "./locales/zh-CN/collaboration.json";
 import workflowsZh from "./locales/zh-CN/workflows.json";
+import integrationsZh from "./locales/zh-CN/integrations.json";
 import commonEn from "./locales/en/common.json";
 import layoutEn from "./locales/en/layout.json";
 import projectsEn from "./locales/en/projects.json";
@@ -30,6 +31,7 @@ import agentsEn from "./locales/en/agents.json";
 import agentrunsEn from "./locales/en/agentruns.json";
 import collaborationEn from "./locales/en/collaboration.json";
 import workflowsEn from "./locales/en/workflows.json";
+import integrationsEn from "./locales/en/integrations.json";
 
 /** 默认语言：简体中文 */
 export const defaultLanguage = "zh-CN";
@@ -59,6 +61,7 @@ void i18n
         agentruns: agentrunsZh,
         collaboration: collaborationZh,
         workflows: workflowsZh,
+        integrations: integrationsZh,
       },
       en: {
         common: commonEn,
@@ -75,6 +78,7 @@ void i18n
         agentruns: agentrunsEn,
         collaboration: collaborationEn,
         workflows: workflowsEn,
+        integrations: integrationsEn,
       },
     },
     fallbackLng: defaultLanguage,

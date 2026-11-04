@@ -391,6 +391,40 @@ export interface AgentTeam {
   members: AgentTeamMember[];
 }
 
+/** CI/CD（M4） */
+export interface ProjectIntegration {
+  id: string;
+  projectId: string;
+  platform: "github" | "gitlab";
+  hasToken: boolean;
+  repository: string | null;
+  updatedAt: string;
+}
+
+export interface CiCheck {
+  name: string;
+  status: string;
+  conclusion: string | null;
+  url: string | null;
+}
+
+export type PullRequestState = "open" | "merged" | "closed" | "unknown";
+export type CiStatus = "success" | "failure" | "pending" | "none";
+
+export interface PullRequestStatus {
+  state: PullRequestState;
+  ciStatus: CiStatus;
+  mergeable: boolean | null;
+  url: string | null;
+  checks: CiCheck[];
+}
+
+export interface ReleaseResult {
+  tag: string;
+  url: string | null;
+  message: string;
+}
+
 /** API 错误（携带 ProblemDetails 状态码） */
 export class ApiError extends Error {
   constructor(

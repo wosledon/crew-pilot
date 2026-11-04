@@ -15,6 +15,8 @@ import { ProjectOverview } from "./components/ProjectOverview";
 import { WorkItemCard } from "./components/WorkItemCard";
 import { WorkItemDetailDialog } from "./components/WorkItemDetailDialog";
 import { ActivityFeed } from "./ActivityFeed";
+import { IntegrationCard } from "@/features/integrations/IntegrationCard";
+import { ReleasePanel } from "@/features/integrations/ReleasePanel";
 import { WorkflowPanel } from "@/features/workflows/WorkflowPanel";
 import { AssignAgentDialog, AgentRunPanel } from "@/features/agents/components/AgentRunPanel";
 import {
@@ -215,6 +217,11 @@ export function ProjectDetailPage() {
       </div>
 
       <WorkflowPanel projectId={projectId} />
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <IntegrationCard projectId={projectId} />
+        <ReleasePanel projectId={projectId} />
+      </div>
 
       <section className="space-y-3">
         <h2 className="text-base font-semibold">{t("agentruns:title")}</h2>
