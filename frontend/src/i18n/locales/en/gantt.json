@@ -19,5 +19,11 @@
   "milestoneCreated": "Milestone created",
   "milestoneDeleted": "Milestone deleted",
   "deleteMilestoneConfirm": "Iterations will lose the association with this milestone.",
-  "iterationCount": "{{count}} iterations"
+  "iterationCount": "{{count}} iterations",
+  "reportFilters": "Report filters",
+  "iteration": "Iteration",
+  "allIterations": "All iterations",
+  "fromDate": "From",
+  "toDate": "To",
+  "clearFilters": "Clear filters"
 }

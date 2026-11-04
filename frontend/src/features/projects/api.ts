@@ -31,7 +31,15 @@ export const projectKeys = {
   prototypes: (projectId: string) => ["projects", projectId, "prototypes"] as const,
   activities: (projectId: string) => ["projects", projectId, "activities"] as const,
   burndown: (iterationId: string) => ["iterations", iterationId, "burndown"] as const,
-  hoursReport: (projectId: string) => ["projects", projectId, "hours-report"] as const,
+  hoursReport: (projectId: string, filters?: ReportFilters) =>
+    [
+      "projects",
+      projectId,
+      "hours-report",
+      filters?.iterationId ?? "all",
+      filters?.from ?? "",
+      filters?.to ?? "",
+    ] as const,
 };
 
 export function useProjects() {
@@ -260,10 +268,32 @@ export function useActivities(projectId: string | undefined) {
   });
 }
 
-export function useHoursReport(projectId: string | undefined) {
+export interface ReportFilters {
+  iterationId?: string;
+  from?: string;
+  to?: string;
+}
+
+function reportQuery(filters?: ReportFilters): string {
+  const search = new URLSearchParams();
+  if (filters?.iterationId) {
+    search.set("iterationId", filters.iterationId);
+  }
+  if (filters?.from) {
+    search.set("from", filters.from);
+  }
+  if (filters?.to) {
+    search.set("to", filters.to);
+  }
+  const suffix = search.toString();
+  return suffix === "" ? "" : `?${suffix}`;
+}
+
+export function useHoursReport(projectId: string | undefined, filters?: ReportFilters) {
   return useQuery({
-    queryKey: projectKeys.hoursReport(projectId ?? ""),
-    queryFn: () => api.get<HoursReport>(`/projects/${projectId}/hours-report`),
+    queryKey: projectKeys.hoursReport(projectId ?? "", filters),
+    queryFn: () =>
+      api.get<HoursReport>(`/projects/${projectId}/hours-report${reportQuery(filters)}`),
     enabled: projectId !== undefined,
   });
 }

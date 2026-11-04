@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { Dialog } from "@/components/ui/Dialog";
 import { Input, Textarea } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import {
@@ -29,7 +30,15 @@ export function GanttPage() {
   const { t } = useTranslation(["gantt", "workitems", "report", "common"]);
   const iterations = useIterations(projectId);
   const workItems = useWorkItems(projectId);
-  const report = useHoursReport(projectId);
+  const [iterationFilter, setIterationFilter] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const reportFilters = {
+    iterationId: iterationFilter === "" ? undefined : iterationFilter,
+    from: fromDate === "" ? undefined : fromDate,
+    to: toDate === "" ? undefined : toDate,
+  };
+  const report = useHoursReport(projectId, reportFilters);
   const milestones = useMilestones(projectId);
   const createMilestone = useCreateMilestone(projectId);
   const deleteMilestone = useDeleteMilestone(projectId);
@@ -262,6 +271,58 @@ export function GanttPage() {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("gantt:reportFilters")}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-end gap-2">
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("gantt:iteration")}</span>
+            <Select
+              value={iterationFilter}
+              onValueChange={setIterationFilter}
+              options={[
+                { value: "", label: t("gantt:allIterations") },
+                ...iterationList.map((iteration) => ({
+                  value: iteration.id,
+                  label: iteration.name,
+                })),
+              ]}
+              ariaLabel={t("gantt:iteration")}
+              className="w-44"
+            />
+          </label>
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("gantt:fromDate")}</span>
+            <Input
+              type="date"
+              value={fromDate}
+              onChange={(event) => setFromDate(event.target.value)}
+              className="w-40"
+            />
+          </label>
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("gantt:toDate")}</span>
+            <Input
+              type="date"
+              value={toDate}
+              onChange={(event) => setToDate(event.target.value)}
+              className="w-40"
+            />
+          </label>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIterationFilter("");
+              setFromDate("");
+              setToDate("");
+            }}
+          >
+            {t("gantt:clearFilters")}
+          </Button>
+        </CardContent>
+      </Card>
+
       <HoursReportSection
         isLoading={report.isPending}
         isError={report.isError}
@@ -269,7 +330,7 @@ export function GanttPage() {
         onRetry={() => void report.refetch()}
       />
 
-      <CostCard projectId={projectId} />
+      <CostCard projectId={projectId} filters={reportFilters} />
 
       <Dialog
         open={milestoneOpen}

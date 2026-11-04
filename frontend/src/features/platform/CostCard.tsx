@@ -2,16 +2,18 @@ import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ErrorState, LoadingState } from "@/components/ui/States";
+import type { ReportFilters } from "@/features/projects/api";
 import { useCostReport } from "./api";
 
 export interface CostCardProps {
   projectId: string;
+  filters?: ReportFilters;
 }
 
 /** Token 成本卡：AgentRun token × 模型单价（USD）。 */
-export function CostCard({ projectId }: CostCardProps) {
+export function CostCard({ projectId, filters }: CostCardProps) {
   const { t } = useTranslation(["report", "common"]);
-  const cost = useCostReport(projectId);
+  const cost = useCostReport(projectId, filters);
 
   return (
     <Card>

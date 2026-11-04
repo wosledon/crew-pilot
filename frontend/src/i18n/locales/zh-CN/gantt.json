@@ -19,5 +19,11 @@
   "milestoneCreated": "里程碑已创建",
   "milestoneDeleted": "里程碑已删除",
   "deleteMilestoneConfirm": "删除后迭代将解除与该里程碑的关联。",
-  "iterationCount": "{{count}} 个迭代"
+  "iterationCount": "{{count}} 个迭代",
+  "reportFilters": "报表过滤",
+  "iteration": "迭代",
+  "allIterations": "全部迭代",
+  "fromDate": "开始日期",
+  "toDate": "结束日期",
+  "clearFilters": "清除过滤"
 }

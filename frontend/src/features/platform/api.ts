@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import type { ReportFilters } from "@/features/projects/api";
 import type { AuditLogEntry, CostReport, McpServer, Skill } from "@/lib/types";
 
 export const platformKeys = {
@@ -7,7 +8,15 @@ export const platformKeys = {
   skill: (id: string) => ["skills", id] as const,
   mcpServers: ["mcp-servers"] as const,
   audit: (projectId?: string) => ["audit", projectId ?? "all"] as const,
-  cost: (projectId: string) => ["projects", projectId, "cost-report"] as const,
+  cost: (projectId: string, filters?: ReportFilters) =>
+    [
+      "projects",
+      projectId,
+      "cost-report",
+      filters?.iterationId ?? "all",
+      filters?.from ?? "",
+      filters?.to ?? "",
+    ] as const,
 };
 
 export function useSkills() {
@@ -126,10 +135,23 @@ export function useAuditLogs(projectId?: string) {
   });
 }
 
-export function useCostReport(projectId: string | undefined) {
+export function useCostReport(projectId: string | undefined, filters?: ReportFilters) {
+  const search = new URLSearchParams();
+  if (filters?.iterationId) {
+    search.set("iterationId", filters.iterationId);
+  }
+  if (filters?.from) {
+    search.set("from", filters.from);
+  }
+  if (filters?.to) {
+    search.set("to", filters.to);
+  }
+  const suffix = search.toString();
+
   return useQuery({
-    queryKey: platformKeys.cost(projectId ?? ""),
-    queryFn: () => api.get<CostReport>(`/projects/${projectId}/cost-report`),
+    queryKey: platformKeys.cost(projectId ?? "", filters),
+    queryFn: () =>
+      api.get<CostReport>(`/projects/${projectId}/cost-report${suffix === "" ? "" : `?${suffix}`}`),
     enabled: projectId !== undefined,
   });
 }
