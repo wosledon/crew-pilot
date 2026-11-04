@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（仅 SQLite）/ 98 项测试全绿 |
+| 后端 | .NET 10 + EF Core（仅 SQLite）/ 105 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 10 项 Vitest 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -69,7 +69,8 @@
 - [x] Skills：实体 + CRUD + Agent 装配 + 运行时注入系统提示词
 - [ ] Skills 收尾：SKILL.md 目录/脚本/资源、导入导出、脚本执行
 - [x] MCP：Server 配置、认证加密、启停、连通性测试、按 Agent 授权
-- [ ] MCP 收尾：运行时 MCP 客户端（工具加载与调用）
+- [x] MCP 运行时：Streamable HTTP 客户端（initialize / tools/list / tools/call，Round 9）
+- [ ] MCP 收尾：stdio / 旧版 SSE 双通道传输、工具级审计
 - [x] 成本统计：token × 模型单价 → 项目级费用，按供应商/模型汇总
 - [x] 审计日志：敏感操作留痕 + 查询 API/页面
 - [ ] 结构化日志与可观测
@@ -187,7 +188,7 @@
 
 - [x] CRUD、岗位、模型、系统提示词、工具/命令白名单字段
 - [x] 工具权限真正生效（Round 1）
-- [ ] 提示词模板变量替换
+- [x] 提示词模板变量替换（{{title}}/{{requirement}}/{{acceptanceCriteria}}/{{type}}/{{status}}/{{priority}}，Round 9）
 - [ ] 沙箱策略字段
 - [ ] 试运行可选需求并注入上下文
 
@@ -226,7 +227,8 @@
 
 - [x] Server 配置、认证加密、启停、连通性测试
 - [x] 按 Agent 授权（AgentMcpServer）
-- [ ] 运行时 MCP 客户端（握手/工具发现/调用）
+- [x] 运行时 MCP 客户端（Streamable HTTP：initialize/tools/list/tools/call，工具注入 AgentEngine；Round 9）
+- [ ] stdio / 旧版 SSE 双通道传输
 - [ ] 设计 MCP 链路（原型 ↔ MCP）
 
 ### 5.8 单用户协同（P0）
@@ -285,6 +287,16 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 审计 ✅ Round 6；认证 P5 |
 
 ## 4. 每轮工作日志
+
+### Round 9（2026-11-04）
+
+- MCP 运行时（PRD 5.7）：
+  - `Infrastructure.Mcp.McpClient`：Streamable HTTP JSON-RPC（initialize / notifications/initialized / tools/list / tools/call），支持 JSON 与 SSE 响应、Bearer 认证、Mcp-Session-Id
+  - `McpToolSession`：按 Agent 绑定的 Server 建连、工具名清洗去重（`mcp_{server}_{tool}`）、失败降级；运行结束释放连接
+  - AgentEngine：MCP 工具包装为 AIFunction 注入 MAF；`AgentRunRequest` 增加 McpTools/McpInvoker
+- 提示词模板（PRD 5.2）：`PromptTemplate` 支持 `{{title}}/{{requirement}}/{{description}}/{{acceptanceCriteria}}/{{type}}/{{status}}/{{priority}}/{{workItemId}}`，系统提示词与 Skills 内容均渲染
+- 测试：98 → 105（MCP 客户端协议/参数校验/认证头、模板渲染、模板变量端到端），`dotnet test` 全绿；前端 10 项仍绿
+- 验证：`dotnet test`、前端 `lint` / `format:check` / `test:run` / `build` 全绿
 
 ### Round 8（2026-11-04）
 
