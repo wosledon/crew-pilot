@@ -8,14 +8,14 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（仅 SQLite）/ 86 项测试全绿 |
+| 后端 | .NET 10 + EF Core（仅 SQLite）/ 96 项测试全绿 |
 | 前端 | React 18 + TS + Vite；`npm run lint` / `format:check` / `build` 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
 | M2 | 完成并硬化（取消/沙箱/工具权限/LocalPath 已修） |
 | M3 | 核心闭环完成（工作流/审批/卡点队列/模板/团队实体） |
 | M4 | 主体完成（Token 加密、gh/glab、PR/CI 同步、发布） |
-| M5 | 未开工 |
+| M5 | 主体完成（Skills/MCP 配置/成本/审计），剩余 MCP 运行时与部署 |
 | 工程化 | 无 CI、无 Docker、无 PostgreSQL、API 类型手写、无前端测试 |
 
 ## 1. 分阶段实施计划
@@ -64,13 +64,16 @@
 - [x] 前端：集成配置卡、PR/CI 状态展示与同步、发布面板
 - [ ] CI 状态实时推送（当前手动同步 / 轮询；SignalR 阶段补齐）
 
-### P4 M5 打磨
+### P4 M5 打磨（Round 6 完成主体）
 
-- [ ] Skills：目录结构（SKILL.md + 脚本 + 资源）、CRUD/导入导出、Agent 装配、运行时加载
-- [ ] MCP 客户端：Server 配置、认证、启停、连通性测试、按 Agent 授权、设计 MCP 链路
-- [ ] 成本统计：token × 单价 → 费用；按项目/迭代/供应商/模型汇总
-- [ ] 可观测：结构化日志、审计日志
-- [ ] 安全加固：原型 CSP、密钥最小权限、发布审批
+- [x] Skills：实体 + CRUD + Agent 装配 + 运行时注入系统提示词
+- [ ] Skills 收尾：SKILL.md 目录/脚本/资源、导入导出、脚本执行
+- [x] MCP：Server 配置、认证加密、启停、连通性测试、按 Agent 授权
+- [ ] MCP 收尾：运行时 MCP 客户端（工具加载与调用）
+- [x] 成本统计：token × 模型单价 → 项目级费用，按供应商/模型汇总
+- [x] 审计日志：敏感操作留痕 + 查询 API/页面
+- [ ] 结构化日志与可观测
+- [ ] 安全加固：原型 CSP、密钥轮换界面、发布审批
 - [ ] 部署文档 + `docker compose`
 
 ### P5 基建与质量
@@ -167,7 +170,7 @@
 ### 4.9 权限与审计（P0/P1）
 
 - [ ] 唯一 Owner 账号 / 认证
-- [ ] 敏感操作审计日志
+- [x] 敏感操作审计日志（Round 6：删除/集成/发布等留痕 + 查询页）
 - [x] 机密加密存储且不出现在响应（DPAPI）
 - [ ] 密钥查看/轮换界面
 
@@ -176,9 +179,10 @@
 - [x] 自定义 OpenAI 兼容端点 + DPAPI 加密 + 连通性测试
 - [x] models.dev 目录同步（手动）
 - [ ] 定时刷新/失败降级缓存
-- [ ] 默认供应商切换
-- [ ] 模型手动增删改/启停
-- [ ] token 用量与费用汇总
+- [x] 默认供应商切换（API 已支持；UI 待补）
+- [x] 模型手动增删改/启停（Round 6）
+- [x] token 用量与费用汇总（Round 6：项目成本报表）
+- [ ] 成本按迭代/日期维度过滤
 
 ### 5.2 Agent 定义（P0）
 
@@ -204,7 +208,10 @@
 
 ### 5.5 Skills（P1）
 
-- [ ] 全部
+- [x] 实体与 CRUD（名称/描述/提示词/工具白名单/脚本目录）
+- [x] Agent 装配（AgentSkill）与运行时注入系统提示词
+- [x] 前端管理页与 Agent 能力装配 UI
+- [ ] SKILL.md 目录结构、脚本/资源、导入导出
 
 ### 5.6 运行引擎（P0）
 
@@ -218,7 +225,10 @@
 
 ### 5.7 MCP（P1）
 
-- [ ] 全部（`PrototypeType.Mcp` 仅为枚举占位）
+- [x] Server 配置、认证加密、启停、连通性测试
+- [x] 按 Agent 授权（AgentMcpServer）
+- [ ] 运行时 MCP 客户端（握手/工具发现/调用）
+- [ ] 设计 MCP 链路（原型 ↔ MCP）
 
 ### 5.8 单用户协同（P0）
 
@@ -251,7 +261,7 @@
 - [x] ProblemDetails 错误处理
 - [ ] SignalR
 - [ ] PostgreSQL
-- [ ] 审计日志
+- [x] 审计日志（Round 6）
 - [ ] 认证
 - [ ] CSP（原型）
 
@@ -273,9 +283,20 @@
 | 12 | Task 状态流转 400、父子关系无法设置 | `WorkItemsController` | ✅ Round 3 |
 | 13 | 前端手写 API 类型，未用 OpenAPI 生成 | `frontend/src/lib/types.ts` | P5 |
 | 14 | 无 PostgreSQL provider，连接串切换无效 | `Program.cs` | P5 |
-| 15 | 无认证 / 无审计日志 | 全局 | P4/P5 |
+| 15 | 无认证 / 审计日志缺失 | 全局 | 审计 ✅ Round 6；认证 P5 |
 
 ## 4. 每轮工作日志
+
+### Round 6（2026-11-04）
+
+- M5 打磨：
+  - Skills：`Skill` + `AgentSkill` 实体/迁移、CRUD API、Agent 装配、运行时把启用技能注入系统提示词；前端 Skills 管理页 + Agent 能力装配弹窗
+  - MCP：`McpServer` + `AgentMcpServer` 实体/迁移、认证 DPAPI 加密、CRUD/测试 API、按 Agent 授权；前端 MCP 管理页
+  - 成本：AgentRun token × 模型单价的项目成本报表，按供应商/模型汇总；前端成本卡（甘特页）
+  - 审计：`AuditLog` 实体/迁移、删除/集成/发布等敏感操作留痕、查询 API + 审计页
+  - 供应商：模型目录手动增删改/启停 API + 集成测试
+- 测试：90 → 96（Skills CRUD/注入、MCP 脱敏/测试/授权校验、成本报表、审计、模型 CRUD），`dotnet test` 全绿
+- 验证：`npm run lint` 0 error、`format:check` 通过、`npm run build` 通过；i18n key 中英一致
 
 ### Round 5（2026-11-04）
 
