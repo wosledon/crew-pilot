@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:5100/"
+      "url": "http://127.0.0.1:5101/"
     }
   ],
   "paths": {
@@ -2351,6 +2351,56 @@
         }
       }
     },
+    "/api/projects/{projectId}/integrations/webhook": {
+      "post": {
+        "tags": [
+          "ProjectIntegrations"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "X-CrewPilot-Webhook-Token",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntegrationWebhookRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntegrationWebhookRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntegrationWebhookRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/projects/{projectId}/members": {
       "get": {
         "tags": [
@@ -3329,6 +3379,46 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PrototypeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/prototypes/{id}/draft-requirement": {
+      "post": {
+        "tags": [
+          "Prototypes"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequirementDraftDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequirementDraftDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequirementDraftDto"
                 }
               }
             }
@@ -7999,6 +8089,34 @@
           }
         }
       },
+      "IntegrationWebhookRequest": {
+        "required": [
+          "prUrl",
+          "state",
+          "ciStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "prUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "state": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ciStatus": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "IterationDetailDto": {
         "required": [
           "id",
@@ -8853,6 +8971,29 @@
           },
           "message": {
             "type": "string"
+          }
+        }
+      },
+      "RequirementDraftDto": {
+        "required": [
+          "id",
+          "title",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

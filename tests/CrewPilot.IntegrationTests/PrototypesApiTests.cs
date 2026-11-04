@@ -242,6 +242,37 @@ public sealed class PrototypesApiTests(CrewPilotApiFactory factory) : IClassFixt
         (await preview.Content.ReadAsStringAsync()).Should().Contain("single");
     }
 
+    [Fact]
+    public async Task Prototype_CanDraftRequirement()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var created = await client.PostAsJsonAsync($"/api/projects/{project.Id}/prototypes", new
+        {
+            name = "设计稿 A",
+            type = "html",
+            content = "<h1>登录页原型</h1>",
+        });
+        var prototype = await created.Content.ReadFromJsonAsync<PrototypeDto>();
+
+        var draft = await client.PostAsync(
+            $"/api/prototypes/{prototype!.Id}/draft-requirement", null);
+
+        draft.StatusCode.Should().Be(HttpStatusCode.Created);
+        var requirement = await draft.Content.ReadFromJsonAsync<RequirementDraftDto>();
+        requirement!.Title.Should().Contain("原型需求");
+        requirement.Description.Should().Contain("来源原型");
+
+        var fetched = await client.GetFromJsonAsync<PrototypeDto>(
+            $"/api/prototypes/{prototype.Id}");
+        fetched!.RequirementId.Should().Be(requirement.Id);
+
+        var item = await client.GetFromJsonAsync<WorkItemDetailDto>(
+            $"/api/workitems/{requirement.Id}");
+        item!.Type.Should().Be("requirement");
+        item.Status.Should().Be("backlog");
+    }
+
     private static async Task<ProjectDetailDto> CreateProjectAsync(HttpClient client)
     {
         var key = "P" + Guid.NewGuid().ToString("N")[..6].ToUpperInvariant();

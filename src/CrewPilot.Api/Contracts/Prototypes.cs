@@ -9,6 +9,9 @@ public sealed record PrototypeFileDto(
 
 public sealed record UpsertPrototypeFileRequest(string Path, string Content);
 
+/// <summary>原型生成的需求草稿。</summary>
+public sealed record RequirementDraftDto(Guid Id, string Title, string? Description);
+
 public sealed record PrototypeDto(
     Guid Id,
     Guid ProjectId,

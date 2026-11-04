@@ -217,6 +217,54 @@ public sealed class PrototypesController(
         return ToDto(prototype);
     }
 
+    /// <summary>从原型生成需求草稿：把原型名称/类型/内容摘要落为 Backlog 需求并回链。</summary>
+    [HttpPost("api/prototypes/{id:guid}/draft-requirement")]
+    public async Task<ActionResult<RequirementDraftDto>> DraftRequirement(
+        Guid id, CancellationToken ct)
+    {
+        var prototype = await db.Prototypes.FirstOrDefaultAsync(p => p.Id == id, ct);
+        if (prototype is null)
+        {
+            return Problem(detail: "原型不存在", statusCode: 404);
+        }
+
+        var title = prototype.Name.Length > 150
+            ? prototype.Name[..150]
+            : prototype.Name;
+        var snippet = prototype.Content.Length > 2000
+            ? prototype.Content[..2000]
+            : prototype.Content;
+        var requirement = new Core.WorkItems.Requirement
+        {
+            ProjectId = prototype.ProjectId,
+            Title = $"{title}（原型需求）",
+            Status = Core.WorkItems.RequirementStatus.Backlog,
+            Description =
+                $"来源原型：{prototype.Name}（{prototype.Type}）\n\n" +
+                $"请基于以下原型内容完善需求描述与验收标准：\n\n{snippet}",
+            AcceptanceCriteria = "- [ ] 原型关键路径可交互\n- [ ] 与设计稿/原型一致",
+        };
+        db.WorkItems.Add(requirement);
+        prototype.RequirementId ??= requirement.Id;
+        prototype.UpdatedAt = DateTimeOffset.UtcNow;
+        db.Activities.Add(new Core.Collaboration.Activity
+        {
+            ProjectId = prototype.ProjectId,
+            WorkItemId = requirement.Id,
+            EventType = "prototype.requirementDrafted",
+            Payload = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                prototypeId = prototype.Id,
+                prototypeName = prototype.Name,
+            }),
+            ActorKind = Core.Projects.MemberKind.User,
+        });
+        await db.SaveChangesAsync(ct);
+
+        return Created($"/api/workitems/{requirement.Id}", new RequirementDraftDto(
+            requirement.Id, requirement.Title, requirement.Description));
+    }
+
     /// <summary>原型多文件列表（不含二进制，仅文本资源）。</summary>
     [HttpGet("api/prototypes/{id:guid}/files")]
     public async Task<ActionResult<IReadOnlyList<PrototypeFileDto>>> ListFiles(
