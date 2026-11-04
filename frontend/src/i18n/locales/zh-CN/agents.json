@@ -60,5 +60,11 @@
   "previewContextWorkItem": "关联工作项（注入上下文）",
   "previewContextNone": "不关联工作项",
   "empty": "还没有 Agent，先创建供应商再新建 Agent",
-  "noProviders": "还没有模型供应商，请先到「供应商」页创建"
+  "noProviders": "还没有模型供应商，请先到「供应商」页创建",
+  "typeTeams": "按工作项类型默认团队",
+  "requirementTeam": "需求",
+  "defectTeam": "缺陷",
+  "taskTeam": "任务",
+  "inheritDefaultTeam": "跟随项目默认",
+  "typeTeamSet": "类型团队已更新"
 }

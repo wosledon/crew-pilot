@@ -9,22 +9,33 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
 import { EmptyState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
-import { useSetDefaultTeam } from "@/features/projects/api";
+import { Select } from "@/components/ui/Select";
+import { useSetDefaultTeam, useSetTypeTeams } from "@/features/projects/api";
 import { useAgentTeams, useAgents, useCreateAgentTeam, useDeleteAgentTeam } from "../api";
 
 export interface AgentTeamCardProps {
   projectId: string;
   defaultTeamId: string | null;
+  requirementTeamId: string | null;
+  defectTeamId: string | null;
+  taskTeamId: string | null;
 }
 
-/** 项目 Agent 团队：建队 / 成员装配 / 设为默认团队（工作流按岗位解析 Agent）。 */
-export function AgentTeamCard({ projectId, defaultTeamId }: AgentTeamCardProps) {
+/** 项目 Agent 团队：建队 / 成员装配 / 项目与工作项类型默认团队（工作流按岗位解析 Agent）。 */
+export function AgentTeamCard({
+  projectId,
+  defaultTeamId,
+  requirementTeamId,
+  defectTeamId,
+  taskTeamId,
+}: AgentTeamCardProps) {
   const { t } = useTranslation(["agents", "common"]);
   const teams = useAgentTeams(projectId);
   const agents = useAgents();
   const createTeam = useCreateAgentTeam(projectId);
   const deleteTeam = useDeleteAgentTeam(projectId);
   const setDefault = useSetDefaultTeam(projectId);
+  const setTypeTeams = useSetTypeTeams(projectId);
   const confirm = useConfirm();
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -75,6 +86,29 @@ export function AgentTeamCard({ projectId, defaultTeamId }: AgentTeamCardProps) 
       toast.error(error instanceof Error ? error.message : t("common:error"));
     }
   };
+
+  const handleSetTypeTeams = async (patch: {
+    requirementTeamId?: string | null;
+    defectTeamId?: string | null;
+    taskTeamId?: string | null;
+  }) => {
+    try {
+      await setTypeTeams.mutateAsync({
+        requirementTeamId:
+          patch.requirementTeamId !== undefined ? patch.requirementTeamId : requirementTeamId,
+        defectTeamId: patch.defectTeamId !== undefined ? patch.defectTeamId : defectTeamId,
+        taskTeamId: patch.taskTeamId !== undefined ? patch.taskTeamId : taskTeamId,
+      });
+      toast.success(t("agents:typeTeamSet"));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("common:error"));
+    }
+  };
+
+  const teamOptions = (teams.data ?? []).map((team) => ({
+    value: team.id,
+    label: team.name,
+  }));
 
   return (
     <Card>
@@ -141,6 +175,41 @@ export function AgentTeamCard({ projectId, defaultTeamId }: AgentTeamCardProps) 
             })}
           </ul>
         )}
+
+        <div className="space-y-2 border-t border-border pt-3">
+          <p className="text-sm font-medium">{t("agents:typeTeams")}</p>
+          <div className="grid gap-2 sm:grid-cols-3">
+            <label className="block space-y-1 text-xs">
+              <span className="text-muted-foreground">{t("agents:requirementTeam")}</span>
+              <Select
+                value={requirementTeamId ?? ""}
+                onValueChange={(value) =>
+                  void handleSetTypeTeams({ requirementTeamId: value || null })
+                }
+                options={[{ value: "", label: t("agents:inheritDefaultTeam") }, ...teamOptions]}
+                ariaLabel={t("agents:requirementTeam")}
+              />
+            </label>
+            <label className="block space-y-1 text-xs">
+              <span className="text-muted-foreground">{t("agents:defectTeam")}</span>
+              <Select
+                value={defectTeamId ?? ""}
+                onValueChange={(value) => void handleSetTypeTeams({ defectTeamId: value || null })}
+                options={[{ value: "", label: t("agents:inheritDefaultTeam") }, ...teamOptions]}
+                ariaLabel={t("agents:defectTeam")}
+              />
+            </label>
+            <label className="block space-y-1 text-xs">
+              <span className="text-muted-foreground">{t("agents:taskTeam")}</span>
+              <Select
+                value={taskTeamId ?? ""}
+                onValueChange={(value) => void handleSetTypeTeams({ taskTeamId: value || null })}
+                options={[{ value: "", label: t("agents:inheritDefaultTeam") }, ...teamOptions]}
+                ariaLabel={t("agents:taskTeam")}
+              />
+            </label>
+          </div>
+        </div>
       </CardContent>
 
       <Dialog

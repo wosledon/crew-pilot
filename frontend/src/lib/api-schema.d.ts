@@ -47,6 +47,8 @@ export interface paths {
     get: {
       parameters: {
         query?: {
+          workItemId?: string;
+          eventType?: string;
           take?: number;
         };
         header?: never;
@@ -238,6 +240,45 @@ export interface paths {
     };
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/agent-runs/{id}/retry": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["AgentRunListItemDto"];
+            "application/json": components["schemas"]["AgentRunListItemDto"];
+            "text/json": components["schemas"]["AgentRunListItemDto"];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -2143,6 +2184,51 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/projects/{id}/type-teams": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["SetProjectTypeTeamsRequest"];
+          "text/json": components["schemas"]["SetProjectTypeTeamsRequest"];
+          "application/*+json": components["schemas"]["SetProjectTypeTeamsRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["ProjectDetailDto"];
+            "application/json": components["schemas"]["ProjectDetailDto"];
+            "text/json": components["schemas"]["ProjectDetailDto"];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/projects/{id}/default-team": {
     parameters: {
       query?: never;
@@ -3064,6 +3150,45 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/workitems/{workItemId}/pull-request/merge": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          workItemId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["PullRequestStatusDto"];
+            "application/json": components["schemas"]["PullRequestStatusDto"];
+            "text/json": components["schemas"]["PullRequestStatusDto"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/projects/{projectId}/hours-report": {
     parameters: {
       query?: never;
@@ -3374,6 +3499,84 @@ export interface paths {
         };
       };
     };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/skills/{id}/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/skills/import": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["ImportSkillRequest"];
+          "text/json": components["schemas"]["ImportSkillRequest"];
+          "application/*+json": components["schemas"]["ImportSkillRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["SkillDto"];
+            "application/json": components["schemas"]["SkillDto"];
+            "text/json": components["schemas"]["SkillDto"];
+          };
+        };
+      };
+    };
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -3789,6 +3992,7 @@ export interface paths {
           type?: string;
           status?: string;
           tag?: string;
+          relatedRequirementId?: string;
         };
         header?: never;
         path: {
@@ -4524,6 +4728,9 @@ export interface components {
     };
     /** Format: binary */
     IFormFile: string;
+    ImportSkillRequest: {
+      content: string;
+    };
     IterationDetailDto: {
       /** Format: uuid */
       id: string;
@@ -4628,6 +4835,12 @@ export interface components {
       updatedAt: string;
       /** Format: uuid */
       defaultTeamId: null | string;
+      /** Format: uuid */
+      requirementTeamId: null | string;
+      /** Format: uuid */
+      defectTeamId: null | string;
+      /** Format: uuid */
+      taskTeamId: null | string;
     };
     ProjectIntegrationDto: {
       /** Format: uuid */
@@ -4751,6 +4964,14 @@ export interface components {
     SetProjectTeamRequest: {
       /** Format: uuid */
       teamId: null | string;
+    };
+    SetProjectTypeTeamsRequest: {
+      /** Format: uuid */
+      requirementTeamId: null | string;
+      /** Format: uuid */
+      defectTeamId: null | string;
+      /** Format: uuid */
+      taskTeamId: null | string;
     };
     SkillDto: {
       /** Format: uuid */

@@ -60,5 +60,11 @@
   "previewContextWorkItem": "Work item (inject context)",
   "previewContextNone": "No work item",
   "empty": "No agents yet — create a provider first",
-  "noProviders": "No model providers yet — create one on the Providers page"
+  "noProviders": "No model providers yet — create one on the Providers page",
+  "typeTeams": "Default teams by work item type",
+  "requirementTeam": "Requirement",
+  "defectTeam": "Defect",
+  "taskTeam": "Task",
+  "inheritDefaultTeam": "Inherit project default",
+  "typeTeamSet": "Type teams updated"
 }

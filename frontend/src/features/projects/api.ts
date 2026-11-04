@@ -73,6 +73,21 @@ export function useSetDefaultTeam(projectId: string) {
   });
 }
 
+export function useSetTypeTeams(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      requirementTeamId: string | null;
+      defectTeamId: string | null;
+      taskTeamId: string | null;
+    }) => api.put<ProjectDetail>(`/projects/${projectId}/type-teams`, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+      void queryClient.invalidateQueries({ queryKey: ["agent-teams", projectId] });
+    },
+  });
+}
+
 export function useWorkItems(
   projectId: string | undefined,
   type?: string,

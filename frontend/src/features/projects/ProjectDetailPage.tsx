@@ -466,7 +466,13 @@ export function ProjectDetailPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <ProjectMembersCard projectId={projectId} />
-        <AgentTeamCard projectId={projectId} defaultTeamId={project.data.defaultTeamId} />
+        <AgentTeamCard
+          projectId={projectId}
+          defaultTeamId={project.data.defaultTeamId}
+          requirementTeamId={project.data.requirementTeamId}
+          defectTeamId={project.data.defectTeamId}
+          taskTeamId={project.data.taskTeamId}
+        />
         <ActivityFeed projectId={projectId} />
       </div>
 
