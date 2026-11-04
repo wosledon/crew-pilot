@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { supportedLanguages } from "@/i18n";
+import { useRealtimeUpdates } from "@/lib/realtime";
 import { cn } from "@/lib/cn";
 
 const navItems = [
@@ -32,6 +33,9 @@ const navItems = [
 export function AppLayout() {
   const { t, i18n } = useTranslation();
   const [dark, setDark] = useState(() => window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  // 实时事件 → TanStack Query 缓存刷新
+  useRealtimeUpdates();
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
