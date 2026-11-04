@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（仅 SQLite）/ 96 项测试全绿 |
+| 后端 | .NET 10 + EF Core（仅 SQLite）/ 97 项测试全绿 |
 | 前端 | React 18 + TS + Vite；`npm run lint` / `format:check` / `build` 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -16,7 +16,7 @@
 | M3 | 核心闭环完成（工作流/审批/卡点队列/模板/团队实体） |
 | M4 | 主体完成（Token 加密、gh/glab、PR/CI 同步、发布） |
 | M5 | 主体完成（Skills/MCP 配置/成本/审计），剩余 MCP 运行时与部署 |
-| 工程化 | 无 CI、无 Docker、无 PostgreSQL、API 类型手写、无前端测试 |
+| 工程化 | CI/Docker/compose/SignalR 已落地；无 PostgreSQL、API 类型手写、无前端测试 |
 
 ## 1. 分阶段实施计划
 
@@ -78,9 +78,9 @@
 
 ### P5 基建与质量
 
-- [ ] SignalR 实时推送（工作项状态 / AgentRun 进度 / 卡点）
+- [x] SignalR 实时推送（工作项状态 / AgentRun 进度 / 卡点，Round 7）
 - [ ] PostgreSQL 支持（Npgsql + provider 切换 + 迁移验证）
-- [ ] CI（GitHub Actions：build/test/lint）+ Dockerfile + compose
+- [x] CI（GitHub Actions：build/test/lint）+ Dockerfile + compose + 部署文档（Round 7）
 - [ ] OpenAPI 生成前端客户端，删除手写类型
 - [ ] 前端测试（Vitest + Testing Library）+ Playwright E2E
 - [ ] 测试补齐：真实 MAF 适配层、取消、沙箱、worktree、安全用例
@@ -286,6 +286,18 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 审计 ✅ Round 6；认证 P5 |
 
 ## 4. 每轮工作日志
+
+### Round 7（2026-11-04）
+
+- P5 基建：
+  - SignalR：`/hubs/realtime` Hub + `IRealtimeNotifier` 领域事件广播；工作项状态、AgentRun 状态、卡点创建/解决实时推送
+  - 前端：`@microsoft/signalr` 自动重连客户端，收到事件按查询根键刷新 TanStack Query 缓存；Vite `/hubs` WebSocket 代理
+  - CI：GitHub Actions（backend restore/build/test + frontend ci/lint/format/build）
+  - 部署：Api Dockerfile、前端 Dockerfile + nginx 反代（/api、/hubs、SPA fallback）、docker-compose、`.dockerignore`、`docs/DEPLOY.md`
+  - 启动配置：`Database:AutoMigrate` 控制迁移（开发默认开、容器置 true）
+- 测试：96 → 97（SignalR negotiate），`dotnet test` 全绿
+- 验证：`npm run lint` 0 error、`format:check` 通过、`npm run build` 通过
+- 说明：本机无 Docker，镜像未实际构建；CI 配置按标准镜像编写
 
 ### Round 6（2026-11-04）
 
