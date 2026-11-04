@@ -87,7 +87,7 @@
 - [x] PostgreSQL 支持（Npgsql + provider 切换 + 独立迁移程序集 + compose 覆盖；Round 10）
 - [x] CI（GitHub Actions：build/test/lint）+ Dockerfile + compose + 部署文档（Round 7）
 - [x] OpenAPI 前端类型：spec 导出 + `api-schema.d.ts` 生成 + 核心 DTO 全部由契约派生（Round 23）；请求体表单类型仍在前端定义
-- [~] OpenAPI 生成完整客户端（P2 工程化；当前生成 DTO + 手写薄封装已覆盖）
+- [x] OpenAPI 生成式客户端（Round 40：openapi-fetch typed client + solve unwrap，认证模块已接入；动态路径仍用薄封装）
 - [x] 前端测试：Vitest（13 项）+ Playwright E2E 起步（Round 16，2 条主链路）
 - [~] 测试补齐（取消/沙箱/worktree/安全已覆盖；真实 MAF 需在线模型，测试用 Fake 引擎）
 - [x] 文档更新：README 进度、AGENTS 现状、README.en
@@ -295,6 +295,11 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 40（2026-11-05，P2 演进 Round 9）
+
+- OpenAPI 生成式客户端（工程化）：引入 `openapi-fetch`，新增 `lib/typed-api.ts`（基于生成 `paths` 的 typed client + ProblemDetails 解包）；认证模块（状态/登录/登出）迁移到 typed client，动态拼接路径继续使用薄封装
+- 测试/验证：后端 168 项不变；前端 lint / format / test / build / E2E 全绿
 
 ### Round 39（2026-11-05，P2 演进 Round 8）
 

@@ -185,7 +185,7 @@ PRD 第 4 节：P2 = 后续演进，不阻塞 v1 验收。
 
 
 | CI webhook 自动推送（当前动作触发） | P2 |
-| 完整生成式 API 客户端（当前生成 DTO + 薄 fetch 封装） | P2 工程化 |
+| 完整生成式 API 客户端：已提供 openapi-fetch typed client，认证模块接入；其余动态路径逐步迁移 |
 | 项目可见性、多用户/RBAC | 单用户产品范围外 |
 | Git OAuth 授权流程（当前 repoUrl + CLI Token） | 范围外/后续 |
 
