@@ -54,5 +54,7 @@
   "fileDeleted": "File deleted",
   "noFiles": "No files yet",
   "deleteFileConfirm": "The file will be removed from the preview",
-  "fileEditorPlaceholder": "File content (html/css/js/json/svg/txt/md)"
+  "fileEditorPlaceholder": "File content (html/css/js/json/svg/txt/md)",
+  "draftRequirement": "Draft requirement",
+  "requirementDrafted": "Requirement created: {{title}}"
 }

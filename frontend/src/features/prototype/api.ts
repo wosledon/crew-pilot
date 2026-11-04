@@ -28,6 +28,19 @@ export function useUpsertPrototypeFile(prototypeId: string) {
   });
 }
 
+export function useDraftRequirement(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (prototypeId: string) =>
+      api.post<{ id: string; title: string }>(`/prototypes/${prototypeId}/draft-requirement`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: prototypeKeys.list(projectId) });
+      void queryClient.invalidateQueries({ queryKey: ["projects", projectId] });
+      void queryClient.invalidateQueries({ queryKey: ["workitems"] });
+    },
+  });
+}
+
 export function useDeletePrototypeFile(prototypeId: string) {
   const queryClient = useQueryClient();
   return useMutation({

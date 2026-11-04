@@ -4,5889 +4,5982 @@
  */
 
 export interface paths {
-  "/health": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/activities": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: {
-          workItemId?: string;
-          eventType?: string;
-          take?: number;
-        };
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ActivityDto"][];
-            "application/json": components["schemas"]["ActivityDto"][];
-            "text/json": components["schemas"]["ActivityDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workitems/{id}/assign-agent": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["AssignAgentRequest"];
-          "text/json": components["schemas"]["AssignAgentRequest"];
-          "application/*+json": components["schemas"]["AssignAgentRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AgentRunListItemDto"];
-            "application/json": components["schemas"]["AgentRunListItemDto"];
-            "text/json": components["schemas"]["AgentRunListItemDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/agents/{id}/runs": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["PreviewAgentRequest"];
-          "text/json": components["schemas"]["PreviewAgentRequest"];
-          "application/*+json": components["schemas"]["PreviewAgentRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AgentRunListItemDto"];
-            "application/json": components["schemas"]["AgentRunListItemDto"];
-            "text/json": components["schemas"]["AgentRunListItemDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/agent-runs/{id}/cancel": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/agent-runs": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: {
-          projectId?: string;
-          workItemId?: string;
-          agentId?: string;
-        };
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AgentRunListItemDto"][];
-            "application/json": components["schemas"]["AgentRunListItemDto"][];
-            "text/json": components["schemas"]["AgentRunListItemDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/agent-runs/{id}/retry": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AgentRunListItemDto"];
-            "application/json": components["schemas"]["AgentRunListItemDto"];
-            "text/json": components["schemas"]["AgentRunListItemDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/agent-activity": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkItemAgentActivityDto"][];
-            "application/json": components["schemas"]["WorkItemAgentActivityDto"][];
-            "text/json": components["schemas"]["WorkItemAgentActivityDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/agent-runs/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AgentRunDetailDto"];
-            "application/json": components["schemas"]["AgentRunDetailDto"];
-            "text/json": components["schemas"]["AgentRunDetailDto"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/agents": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AgentListItemDto"][];
-            "application/json": components["schemas"]["AgentListItemDto"][];
-            "text/json": components["schemas"]["AgentListItemDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateAgentRequest"];
-          "text/json": components["schemas"]["CreateAgentRequest"];
-          "application/*+json": components["schemas"]["CreateAgentRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AgentDetailDto"];
-            "application/json": components["schemas"]["AgentDetailDto"];
-            "text/json": components["schemas"]["AgentDetailDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/agents/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AgentDetailDto"];
-            "application/json": components["schemas"]["AgentDetailDto"];
-            "text/json": components["schemas"]["AgentDetailDto"];
-          };
-        };
-      };
-    };
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpdateAgentRequest"];
-          "text/json": components["schemas"]["UpdateAgentRequest"];
-          "application/*+json": components["schemas"]["UpdateAgentRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AgentDetailDto"];
-            "application/json": components["schemas"]["AgentDetailDto"];
-            "text/json": components["schemas"]["AgentDetailDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/agent-teams": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AgentTeamDto"][];
-            "application/json": components["schemas"]["AgentTeamDto"][];
-            "text/json": components["schemas"]["AgentTeamDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateAgentTeamRequest"];
-          "text/json": components["schemas"]["CreateAgentTeamRequest"];
-          "application/*+json": components["schemas"]["CreateAgentTeamRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AgentTeamDto"];
-            "application/json": components["schemas"]["AgentTeamDto"];
-            "text/json": components["schemas"]["AgentTeamDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/agent-teams/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workitems/{workItemId}/attachments": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          workItemId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AttachmentDto"][];
-            "application/json": components["schemas"]["AttachmentDto"][];
-            "text/json": components["schemas"]["AttachmentDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          workItemId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "multipart/form-data": {
-            file?: components["schemas"]["IFormFile"];
-          };
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AttachmentDto"];
-            "application/json": components["schemas"]["AttachmentDto"];
-            "text/json": components["schemas"]["AttachmentDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/attachments/{id}/download": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/attachments/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/audit": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: {
-          projectId?: string;
-          take?: number;
-        };
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AuditLogDto"][];
-            "application/json": components["schemas"]["AuditLogDto"][];
-            "text/json": components["schemas"]["AuditLogDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/status": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AuthStatusDto"];
-            "application/json": components["schemas"]["AuthStatusDto"];
-            "text/json": components["schemas"]["AuthStatusDto"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/login": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["LoginRequest"];
-          "text/json": components["schemas"]["LoginRequest"];
-          "application/*+json": components["schemas"]["LoginRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AuthStatusDto"];
-            "application/json": components["schemas"]["AuthStatusDto"];
-            "text/json": components["schemas"]["AuthStatusDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/logout": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/blockers": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: {
-          status?: string;
-        };
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["BlockerDto"][];
-            "application/json": components["schemas"]["BlockerDto"][];
-            "text/json": components["schemas"]["BlockerDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/blockers/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["BlockerDto"];
-            "application/json": components["schemas"]["BlockerDto"];
-            "text/json": components["schemas"]["BlockerDto"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/blockers/{id}/resolve": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["ResolveBlockerRequest"];
-          "text/json": components["schemas"]["ResolveBlockerRequest"];
-          "application/*+json": components["schemas"]["ResolveBlockerRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["BlockerDto"];
-            "application/json": components["schemas"]["BlockerDto"];
-            "text/json": components["schemas"]["BlockerDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workitems/{workItemId}/comments": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          workItemId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["CommentDto"][];
-            "application/json": components["schemas"]["CommentDto"][];
-            "text/json": components["schemas"]["CommentDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          workItemId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateCommentRequest"];
-          "text/json": components["schemas"]["CreateCommentRequest"];
-          "application/*+json": components["schemas"]["CreateCommentRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["CreateCommentResultDto"];
-            "application/json": components["schemas"]["CreateCommentResultDto"];
-            "text/json": components["schemas"]["CreateCommentResultDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/comments/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/iterations": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["IterationListItemDto"][];
-            "application/json": components["schemas"]["IterationListItemDto"][];
-            "text/json": components["schemas"]["IterationListItemDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateIterationRequest"];
-          "text/json": components["schemas"]["CreateIterationRequest"];
-          "application/*+json": components["schemas"]["CreateIterationRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["IterationDetailDto"];
-            "application/json": components["schemas"]["IterationDetailDto"];
-            "text/json": components["schemas"]["IterationDetailDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/iterations/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["IterationDetailDto"];
-            "application/json": components["schemas"]["IterationDetailDto"];
-            "text/json": components["schemas"]["IterationDetailDto"];
-          };
-        };
-      };
-    };
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpdateIterationRequest"];
-          "text/json": components["schemas"]["UpdateIterationRequest"];
-          "application/*+json": components["schemas"]["UpdateIterationRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["IterationDetailDto"];
-            "application/json": components["schemas"]["IterationDetailDto"];
-            "text/json": components["schemas"]["IterationDetailDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/iterations/{id}/start": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["IterationDetailDto"];
-            "application/json": components["schemas"]["IterationDetailDto"];
-            "text/json": components["schemas"]["IterationDetailDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/iterations/{id}/complete": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["IterationDetailDto"];
-            "application/json": components["schemas"]["IterationDetailDto"];
-            "text/json": components["schemas"]["IterationDetailDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/iterations/{id}/burndown": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["BurndownDto"];
-            "application/json": components["schemas"]["BurndownDto"];
-            "text/json": components["schemas"]["BurndownDto"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/mcp-servers": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["McpServerDto"][];
-            "application/json": components["schemas"]["McpServerDto"][];
-            "text/json": components["schemas"]["McpServerDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateMcpServerRequest"];
-          "text/json": components["schemas"]["CreateMcpServerRequest"];
-          "application/*+json": components["schemas"]["CreateMcpServerRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["McpServerDto"];
-            "application/json": components["schemas"]["McpServerDto"];
-            "text/json": components["schemas"]["McpServerDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/mcp-servers/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["McpServerDto"];
-            "application/json": components["schemas"]["McpServerDto"];
-            "text/json": components["schemas"]["McpServerDto"];
-          };
-        };
-      };
-    };
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpdateMcpServerRequest"];
-          "text/json": components["schemas"]["UpdateMcpServerRequest"];
-          "application/*+json": components["schemas"]["UpdateMcpServerRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["McpServerDto"];
-            "application/json": components["schemas"]["McpServerDto"];
-            "text/json": components["schemas"]["McpServerDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/mcp-servers/{id}/test": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["McpTestDto"];
-            "application/json": components["schemas"]["McpTestDto"];
-            "text/json": components["schemas"]["McpTestDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/milestones": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["MilestoneDto"][];
-            "application/json": components["schemas"]["MilestoneDto"][];
-            "text/json": components["schemas"]["MilestoneDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateMilestoneRequest"];
-          "text/json": components["schemas"]["CreateMilestoneRequest"];
-          "application/*+json": components["schemas"]["CreateMilestoneRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["MilestoneDto"];
-            "application/json": components["schemas"]["MilestoneDto"];
-            "text/json": components["schemas"]["MilestoneDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/milestones/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpdateMilestoneRequest"];
-          "text/json": components["schemas"]["UpdateMilestoneRequest"];
-          "application/*+json": components["schemas"]["UpdateMilestoneRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["MilestoneDto"];
-            "application/json": components["schemas"]["MilestoneDto"];
-            "text/json": components["schemas"]["MilestoneDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/integration": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectIntegrationDto"];
-            "application/json": components["schemas"]["ProjectIntegrationDto"];
-            "text/json": components["schemas"]["ProjectIntegrationDto"];
-          };
-        };
-      };
-    };
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpsertProjectIntegrationRequest"];
-          "text/json": components["schemas"]["UpsertProjectIntegrationRequest"];
-          "application/*+json": components["schemas"]["UpsertProjectIntegrationRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectIntegrationDto"];
-            "application/json": components["schemas"]["ProjectIntegrationDto"];
-            "text/json": components["schemas"]["ProjectIntegrationDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/integration/test": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["TestIntegrationResponse"];
-            "application/json": components["schemas"]["TestIntegrationResponse"];
-            "text/json": components["schemas"]["TestIntegrationResponse"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/releases": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateReleaseRequest"];
-          "text/json": components["schemas"]["CreateReleaseRequest"];
-          "application/*+json": components["schemas"]["CreateReleaseRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ReleaseDto"];
-            "application/json": components["schemas"]["ReleaseDto"];
-            "text/json": components["schemas"]["ReleaseDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/members": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectMemberDto"][];
-            "application/json": components["schemas"]["ProjectMemberDto"][];
-            "text/json": components["schemas"]["ProjectMemberDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["AddProjectMemberRequest"];
-          "text/json": components["schemas"]["AddProjectMemberRequest"];
-          "application/*+json": components["schemas"]["AddProjectMemberRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectMemberDto"];
-            "application/json": components["schemas"]["ProjectMemberDto"];
-            "text/json": components["schemas"]["ProjectMemberDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/members/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpdateProjectMemberRequest"];
-          "text/json": components["schemas"]["UpdateProjectMemberRequest"];
-          "application/*+json": components["schemas"]["UpdateProjectMemberRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectMemberDto"];
-            "application/json": components["schemas"]["ProjectMemberDto"];
-            "text/json": components["schemas"]["ProjectMemberDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectSummaryDto"][];
-            "application/json": components["schemas"]["ProjectSummaryDto"][];
-            "text/json": components["schemas"]["ProjectSummaryDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateProjectRequest"];
-          "text/json": components["schemas"]["CreateProjectRequest"];
-          "application/*+json": components["schemas"]["CreateProjectRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectDetailDto"];
-            "application/json": components["schemas"]["ProjectDetailDto"];
-            "text/json": components["schemas"]["ProjectDetailDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectDetailDto"];
-            "application/json": components["schemas"]["ProjectDetailDto"];
-            "text/json": components["schemas"]["ProjectDetailDto"];
-          };
-        };
-      };
-    };
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpdateProjectRequest"];
-          "text/json": components["schemas"]["UpdateProjectRequest"];
-          "application/*+json": components["schemas"]["UpdateProjectRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectDetailDto"];
-            "application/json": components["schemas"]["ProjectDetailDto"];
-            "text/json": components["schemas"]["ProjectDetailDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{id}/release-approval": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["SetReleaseApprovalRequest"];
-          "text/json": components["schemas"]["SetReleaseApprovalRequest"];
-          "application/*+json": components["schemas"]["SetReleaseApprovalRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectDetailDto"];
-            "application/json": components["schemas"]["ProjectDetailDto"];
-            "text/json": components["schemas"]["ProjectDetailDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{id}/type-teams": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["SetProjectTypeTeamsRequest"];
-          "text/json": components["schemas"]["SetProjectTypeTeamsRequest"];
-          "application/*+json": components["schemas"]["SetProjectTypeTeamsRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectDetailDto"];
-            "application/json": components["schemas"]["ProjectDetailDto"];
-            "text/json": components["schemas"]["ProjectDetailDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{id}/default-team": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["SetProjectTeamRequest"];
-          "text/json": components["schemas"]["SetProjectTeamRequest"];
-          "application/*+json": components["schemas"]["SetProjectTeamRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectDetailDto"];
-            "application/json": components["schemas"]["ProjectDetailDto"];
-            "text/json": components["schemas"]["ProjectDetailDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{id}/archive": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectDetailDto"];
-            "application/json": components["schemas"]["ProjectDetailDto"];
-            "text/json": components["schemas"]["ProjectDetailDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{id}/unarchive": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProjectDetailDto"];
-            "application/json": components["schemas"]["ProjectDetailDto"];
-            "text/json": components["schemas"]["ProjectDetailDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/prototypes": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: {
-          requirementId?: string;
-        };
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PrototypeDto"][];
-            "application/json": components["schemas"]["PrototypeDto"][];
-            "text/json": components["schemas"]["PrototypeDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreatePrototypeRequest"];
-          "text/json": components["schemas"]["CreatePrototypeRequest"];
-          "application/*+json": components["schemas"]["CreatePrototypeRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PrototypeDto"];
-            "application/json": components["schemas"]["PrototypeDto"];
-            "text/json": components["schemas"]["PrototypeDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/prototypes/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PrototypeDto"];
-            "application/json": components["schemas"]["PrototypeDto"];
-            "text/json": components["schemas"]["PrototypeDto"];
-          };
-        };
-      };
-    };
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpdatePrototypeRequest"];
-          "text/json": components["schemas"]["UpdatePrototypeRequest"];
-          "application/*+json": components["schemas"]["UpdatePrototypeRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PrototypeDto"];
-            "application/json": components["schemas"]["PrototypeDto"];
-            "text/json": components["schemas"]["PrototypeDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/prototypes/{id}/versions": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PrototypeVersionDto"][];
-            "application/json": components["schemas"]["PrototypeVersionDto"][];
-            "text/json": components["schemas"]["PrototypeVersionDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/prototypes/{id}/versions/{version}/restore": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-          version: number;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PrototypeDto"];
-            "application/json": components["schemas"]["PrototypeDto"];
-            "text/json": components["schemas"]["PrototypeDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/prototypes/{id}/files": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PrototypeFileDto"][];
-            "application/json": components["schemas"]["PrototypeFileDto"][];
-            "text/json": components["schemas"]["PrototypeFileDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpsertPrototypeFileRequest"];
-          "text/json": components["schemas"]["UpsertPrototypeFileRequest"];
-          "application/*+json": components["schemas"]["UpsertPrototypeFileRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PrototypeFileDto"];
-            "application/json": components["schemas"]["PrototypeFileDto"];
-            "text/json": components["schemas"]["PrototypeFileDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/prototype-files/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/prototypes/{id}/preview/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-          path: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/prototype-images": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "multipart/form-data": {
-            file?: components["schemas"]["IFormFile"];
-          };
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PrototypeImageDto"];
-            "application/json": components["schemas"]["PrototypeImageDto"];
-            "text/json": components["schemas"]["PrototypeImageDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/prototype-images/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          path: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/providers": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProviderListItemDto"][];
-            "application/json": components["schemas"]["ProviderListItemDto"][];
-            "text/json": components["schemas"]["ProviderListItemDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateProviderRequest"];
-          "text/json": components["schemas"]["CreateProviderRequest"];
-          "application/*+json": components["schemas"]["CreateProviderRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProviderDetailDto"];
-            "application/json": components["schemas"]["ProviderDetailDto"];
-            "text/json": components["schemas"]["ProviderDetailDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/providers/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProviderDetailDto"];
-            "application/json": components["schemas"]["ProviderDetailDto"];
-            "text/json": components["schemas"]["ProviderDetailDto"];
-          };
-        };
-      };
-    };
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpdateProviderRequest"];
-          "text/json": components["schemas"]["UpdateProviderRequest"];
-          "application/*+json": components["schemas"]["UpdateProviderRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProviderDetailDto"];
-            "application/json": components["schemas"]["ProviderDetailDto"];
-            "text/json": components["schemas"]["ProviderDetailDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/providers/{id}/test": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["TestConnectionDto"];
-            "application/json": components["schemas"]["TestConnectionDto"];
-            "text/json": components["schemas"]["TestConnectionDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/providers/{id}/sync-models": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: {
-          catalogKey?: string;
-        };
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/providers/{id}/default": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ProviderDetailDto"];
-            "application/json": components["schemas"]["ProviderDetailDto"];
-            "text/json": components["schemas"]["ProviderDetailDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/providers/{id}/models": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpsertModelRequest"];
-          "text/json": components["schemas"]["UpsertModelRequest"];
-          "application/*+json": components["schemas"]["UpsertModelRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ModelDto"];
-            "application/json": components["schemas"]["ModelDto"];
-            "text/json": components["schemas"]["ModelDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/providers/models/{modelId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          modelId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpsertModelRequest"];
-          "text/json": components["schemas"]["UpsertModelRequest"];
-          "application/*+json": components["schemas"]["UpsertModelRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["ModelDto"];
-            "application/json": components["schemas"]["ModelDto"];
-            "text/json": components["schemas"]["ModelDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          modelId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workitems/{workItemId}/pull-request": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          workItemId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PullRequestStatusDto"];
-            "application/json": components["schemas"]["PullRequestStatusDto"];
-            "text/json": components["schemas"]["PullRequestStatusDto"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          workItemId: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreatePullRequestRequest"];
-          "text/json": components["schemas"]["CreatePullRequestRequest"];
-          "application/*+json": components["schemas"]["CreatePullRequestRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PullRequestCreatedDto"];
-            "application/json": components["schemas"]["PullRequestCreatedDto"];
-            "text/json": components["schemas"]["PullRequestCreatedDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workitems/{workItemId}/pull-request/sync": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          workItemId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PullRequestStatusDto"];
-            "application/json": components["schemas"]["PullRequestStatusDto"];
-            "text/json": components["schemas"]["PullRequestStatusDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workitems/{workItemId}/pull-request/merge": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          workItemId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["PullRequestStatusDto"];
-            "application/json": components["schemas"]["PullRequestStatusDto"];
-            "text/json": components["schemas"]["PullRequestStatusDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/hours-report": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: {
-          iterationId?: string;
-          from?: string;
-          to?: string;
-        };
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["HoursReportDto"];
-            "application/json": components["schemas"]["HoursReportDto"];
-            "text/json": components["schemas"]["HoursReportDto"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/human-cost-report": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["HumanCostReportDto"];
-            "application/json": components["schemas"]["HumanCostReportDto"];
-            "text/json": components["schemas"]["HumanCostReportDto"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/estimate-deviation": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["EstimateDeviationReportDto"];
-            "application/json": components["schemas"]["EstimateDeviationReportDto"];
-            "text/json": components["schemas"]["EstimateDeviationReportDto"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/weekly-report": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: {
-          days?: number;
-        };
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WeeklyReportDto"];
-            "application/json": components["schemas"]["WeeklyReportDto"];
-            "text/json": components["schemas"]["WeeklyReportDto"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/weekly-report/agent": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: {
-          days?: number;
-        };
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["AgentRunListItemDto"];
-            "application/json": components["schemas"]["AgentRunListItemDto"];
-            "text/json": components["schemas"]["AgentRunListItemDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/cost-report": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: {
-          iterationId?: string;
-          from?: string;
-          to?: string;
-        };
-        header?: never;
-        path: {
-          projectId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["CostReportDto"];
-            "application/json": components["schemas"]["CostReportDto"];
-            "text/json": components["schemas"]["CostReportDto"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/skills": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["SkillDto"][];
-            "application/json": components["schemas"]["SkillDto"][];
-            "text/json": components["schemas"]["SkillDto"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateSkillRequest"];
-          "text/json": components["schemas"]["CreateSkillRequest"];
-          "application/*+json": components["schemas"]["CreateSkillRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["SkillDto"];
-            "application/json": components["schemas"]["SkillDto"];
-            "text/json": components["schemas"]["SkillDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/skills/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["SkillDto"];
-            "application/json": components["schemas"]["SkillDto"];
-            "text/json": components["schemas"]["SkillDto"];
-          };
-        };
-      };
-    };
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpdateSkillRequest"];
-          "text/json": components["schemas"]["UpdateSkillRequest"];
-          "application/*+json": components["schemas"]["UpdateSkillRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["SkillDto"];
-            "application/json": components["schemas"]["SkillDto"];
-            "text/json": components["schemas"]["SkillDto"];
-          };
-        };
-      };
-    };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/skills/{id}/export": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/skills/import": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["ImportSkillRequest"];
-          "text/json": components["schemas"]["ImportSkillRequest"];
-          "application/*+json": components["schemas"]["ImportSkillRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["SkillDto"];
-            "application/json": components["schemas"]["SkillDto"];
-            "text/json": components["schemas"]["SkillDto"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/skills/{id}/bundle": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/skills/{id}/files": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": string[];
-            "application/json": string[];
-            "text/json": string[];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/skills/import-bundle": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/x-www-form-urlencoded": {
-            ContentType?: string;
-            ContentDisposition?: string;
-            Headers?: {
-              [key: string]: string[];
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
             };
-            /** Format: int64 */
-            Length?: number;
-            Name?: string;
-            FileName?: string;
-          };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["SkillDto"];
-            "application/json": components["schemas"]["SkillDto"];
-            "text/json": components["schemas"]["SkillDto"];
-          };
-        };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/workflows": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/projects/{projectId}/activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    workItemId?: string;
+                    eventType?: string;
+                    take?: number;
+                };
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ActivityDto"][];
+                        "application/json": components["schemas"]["ActivityDto"][];
+                        "text/json": components["schemas"]["ActivityDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
+    "/api/workitems/{id}/assign-agent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkflowDto"][];
-            "application/json": components["schemas"]["WorkflowDto"][];
-            "text/json": components["schemas"]["WorkflowDto"][];
-          };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AssignAgentRequest"];
+                    "text/json": components["schemas"]["AssignAgentRequest"];
+                    "application/*+json": components["schemas"]["AssignAgentRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AgentRunListItemDto"];
+                        "application/json": components["schemas"]["AgentRunListItemDto"];
+                        "text/json": components["schemas"]["AgentRunListItemDto"];
+                    };
+                };
+            };
         };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
+    "/api/agents/{id}/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateWorkflowRequest"];
-          "text/json": components["schemas"]["CreateWorkflowRequest"];
-          "application/*+json": components["schemas"]["CreateWorkflowRequest"];
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PreviewAgentRequest"];
+                    "text/json": components["schemas"]["PreviewAgentRequest"];
+                    "application/*+json": components["schemas"]["PreviewAgentRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AgentRunListItemDto"];
+                        "application/json": components["schemas"]["AgentRunListItemDto"];
+                        "text/json": components["schemas"]["AgentRunListItemDto"];
+                    };
+                };
+            };
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkflowDto"];
-            "application/json": components["schemas"]["WorkflowDto"];
-            "text/json": components["schemas"]["WorkflowDto"];
-          };
-        };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workflows/templates": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/agent-runs/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkflowTemplateDto"][];
-            "application/json": components["schemas"]["WorkflowTemplateDto"][];
-            "text/json": components["schemas"]["WorkflowTemplateDto"][];
-          };
+    "/api/agent-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
+        get: {
+            parameters: {
+                query?: {
+                    projectId?: string;
+                    workItemId?: string;
+                    agentId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AgentRunListItemDto"][];
+                        "application/json": components["schemas"]["AgentRunListItemDto"][];
+                        "text/json": components["schemas"]["AgentRunListItemDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workflows/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/agent-runs/{id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AgentRunListItemDto"];
+                        "application/json": components["schemas"]["AgentRunListItemDto"];
+                        "text/json": components["schemas"]["AgentRunListItemDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/projects/{projectId}/agent-activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkflowDto"];
-            "application/json": components["schemas"]["WorkflowDto"];
-            "text/json": components["schemas"]["WorkflowDto"];
-          };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkItemAgentActivityDto"][];
+                        "application/json": components["schemas"]["WorkItemAgentActivityDto"][];
+                        "text/json": components["schemas"]["WorkItemAgentActivityDto"][];
+                    };
+                };
+            };
         };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/agent-runs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpdateWorkflowRequest"];
-          "text/json": components["schemas"]["UpdateWorkflowRequest"];
-          "application/*+json": components["schemas"]["UpdateWorkflowRequest"];
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AgentRunDetailDto"];
+                        "application/json": components["schemas"]["AgentRunDetailDto"];
+                        "text/json": components["schemas"]["AgentRunDetailDto"];
+                    };
+                };
+            };
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkflowDto"];
-            "application/json": components["schemas"]["WorkflowDto"];
-            "text/json": components["schemas"]["WorkflowDto"];
-          };
-        };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AgentListItemDto"][];
+                        "application/json": components["schemas"]["AgentListItemDto"][];
+                        "text/json": components["schemas"]["AgentListItemDto"][];
+                    };
+                };
+            };
         };
-      };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateAgentRequest"];
+                    "text/json": components["schemas"]["CreateAgentRequest"];
+                    "application/*+json": components["schemas"]["CreateAgentRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AgentDetailDto"];
+                        "application/json": components["schemas"]["AgentDetailDto"];
+                        "text/json": components["schemas"]["AgentDetailDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/workflows/from-template": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/agents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AgentDetailDto"];
+                        "application/json": components["schemas"]["AgentDetailDto"];
+                        "text/json": components["schemas"]["AgentDetailDto"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateAgentRequest"];
+                    "text/json": components["schemas"]["UpdateAgentRequest"];
+                    "application/*+json": components["schemas"]["UpdateAgentRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AgentDetailDto"];
+                        "application/json": components["schemas"]["AgentDetailDto"];
+                        "text/json": components["schemas"]["AgentDetailDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
+    "/api/projects/{projectId}/agent-teams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateWorkflowFromTemplateRequest"];
-          "text/json": components["schemas"]["CreateWorkflowFromTemplateRequest"];
-          "application/*+json": components["schemas"]["CreateWorkflowFromTemplateRequest"];
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AgentTeamDto"][];
+                        "application/json": components["schemas"]["AgentTeamDto"][];
+                        "text/json": components["schemas"]["AgentTeamDto"][];
+                    };
+                };
+            };
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkflowDto"];
-            "application/json": components["schemas"]["WorkflowDto"];
-            "text/json": components["schemas"]["WorkflowDto"];
-          };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateAgentTeamRequest"];
+                    "text/json": components["schemas"]["CreateAgentTeamRequest"];
+                    "application/*+json": components["schemas"]["CreateAgentTeamRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AgentTeamDto"];
+                        "application/json": components["schemas"]["AgentTeamDto"];
+                        "text/json": components["schemas"]["AgentTeamDto"];
+                    };
+                };
+            };
         };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workflows/{id}/runs": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/agent-teams/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/workitems/{workItemId}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["StartWorkflowRequest"];
-          "text/json": components["schemas"]["StartWorkflowRequest"];
-          "application/*+json": components["schemas"]["StartWorkflowRequest"];
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    workItemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AttachmentDto"][];
+                        "application/json": components["schemas"]["AttachmentDto"][];
+                        "text/json": components["schemas"]["AttachmentDto"][];
+                    };
+                };
+            };
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkflowRunDto"];
-            "application/json": components["schemas"]["WorkflowRunDto"];
-            "text/json": components["schemas"]["WorkflowRunDto"];
-          };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    workItemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        file?: components["schemas"]["IFormFile"];
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AttachmentDto"];
+                        "application/json": components["schemas"]["AttachmentDto"];
+                        "text/json": components["schemas"]["AttachmentDto"];
+                    };
+                };
+            };
         };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workflow-runs": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/attachments/{id}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: {
-      parameters: {
-        query?: {
-          projectId?: string;
-          workItemId?: string;
-          status?: string;
+    "/api/attachments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkflowRunDto"][];
-            "application/json": components["schemas"]["WorkflowRunDto"][];
-            "text/json": components["schemas"]["WorkflowRunDto"][];
-          };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
         };
-      };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workflow-runs/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    projectId?: string;
+                    take?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AuditLogDto"][];
+                        "application/json": components["schemas"]["AuditLogDto"][];
+                        "text/json": components["schemas"]["AuditLogDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/auth/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkflowRunDetailDto"];
-            "application/json": components["schemas"]["WorkflowRunDetailDto"];
-            "text/json": components["schemas"]["WorkflowRunDetailDto"];
-          };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AuthStatusDto"];
+                        "application/json": components["schemas"]["AuthStatusDto"];
+                        "text/json": components["schemas"]["AuthStatusDto"];
+                    };
+                };
+            };
         };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workflow-runs/{id}/cancel": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["LoginRequest"];
+                    "text/json": components["schemas"]["LoginRequest"];
+                    "application/*+json": components["schemas"]["LoginRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AuthStatusDto"];
+                        "application/json": components["schemas"]["AuthStatusDto"];
+                        "text/json": components["schemas"]["AuthStatusDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
         };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/dependencies": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/projects/{projectId}/blockers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    status?: string;
+                };
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BlockerDto"][];
+                        "application/json": components["schemas"]["BlockerDto"][];
+                        "text/json": components["schemas"]["BlockerDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
+    "/api/blockers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkItemDependencyDto"][];
-            "application/json": components["schemas"]["WorkItemDependencyDto"][];
-            "text/json": components["schemas"]["WorkItemDependencyDto"][];
-          };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BlockerDto"];
+                        "application/json": components["schemas"]["BlockerDto"];
+                        "text/json": components["schemas"]["BlockerDto"];
+                    };
+                };
+            };
         };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
+    "/api/blockers/{id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateWorkItemDependencyRequest"];
-          "text/json": components["schemas"]["CreateWorkItemDependencyRequest"];
-          "application/*+json": components["schemas"]["CreateWorkItemDependencyRequest"];
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ResolveBlockerRequest"];
+                    "text/json": components["schemas"]["ResolveBlockerRequest"];
+                    "application/*+json": components["schemas"]["ResolveBlockerRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BlockerDto"];
+                        "application/json": components["schemas"]["BlockerDto"];
+                        "text/json": components["schemas"]["BlockerDto"];
+                    };
+                };
+            };
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkItemDependencyDto"];
-            "application/json": components["schemas"]["WorkItemDependencyDto"];
-            "text/json": components["schemas"]["WorkItemDependencyDto"];
-          };
-        };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/critical-path": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/workitems/{workItemId}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    workItemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CommentDto"][];
+                        "application/json": components["schemas"]["CommentDto"][];
+                        "text/json": components["schemas"]["CommentDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    workItemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateCommentRequest"];
+                    "text/json": components["schemas"]["CreateCommentRequest"];
+                    "application/*+json": components["schemas"]["CreateCommentRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CreateCommentResultDto"];
+                        "application/json": components["schemas"]["CreateCommentResultDto"];
+                        "text/json": components["schemas"]["CreateCommentResultDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
+    "/api/comments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["CriticalPathDto"];
-            "application/json": components["schemas"]["CriticalPathDto"];
-            "text/json": components["schemas"]["CriticalPathDto"];
-          };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
         };
-      };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/dependencies/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/projects/{projectId}/iterations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["IterationListItemDto"][];
+                        "application/json": components["schemas"]["IterationListItemDto"][];
+                        "text/json": components["schemas"]["IterationListItemDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateIterationRequest"];
+                    "text/json": components["schemas"]["CreateIterationRequest"];
+                    "application/*+json": components["schemas"]["CreateIterationRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["IterationDetailDto"];
+                        "application/json": components["schemas"]["IterationDetailDto"];
+                        "text/json": components["schemas"]["IterationDetailDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/iterations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["IterationDetailDto"];
+                        "application/json": components["schemas"]["IterationDetailDto"];
+                        "text/json": components["schemas"]["IterationDetailDto"];
+                    };
+                };
+            };
         };
-      };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateIterationRequest"];
+                    "text/json": components["schemas"]["UpdateIterationRequest"];
+                    "application/*+json": components["schemas"]["UpdateIterationRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["IterationDetailDto"];
+                        "application/json": components["schemas"]["IterationDetailDto"];
+                        "text/json": components["schemas"]["IterationDetailDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/projects/{projectId}/workitems": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/iterations/{id}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["IterationDetailDto"];
+                        "application/json": components["schemas"]["IterationDetailDto"];
+                        "text/json": components["schemas"]["IterationDetailDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: {
-      parameters: {
-        query?: {
-          type?: string;
-          status?: string;
-          tag?: string;
-          relatedRequirementId?: string;
+    "/api/iterations/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        header?: never;
-        path: {
-          projectId: string;
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["IterationDetailDto"];
+                        "application/json": components["schemas"]["IterationDetailDto"];
+                        "text/json": components["schemas"]["IterationDetailDto"];
+                    };
+                };
+            };
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkItemListItemDto"][];
-            "application/json": components["schemas"]["WorkItemListItemDto"][];
-            "text/json": components["schemas"]["WorkItemListItemDto"][];
-          };
-        };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          projectId: string;
+    "/api/iterations/{id}/burndown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateWorkItemRequest"];
-          "text/json": components["schemas"]["CreateWorkItemRequest"];
-          "application/*+json": components["schemas"]["CreateWorkItemRequest"];
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BurndownDto"];
+                        "application/json": components["schemas"]["BurndownDto"];
+                        "text/json": components["schemas"]["BurndownDto"];
+                    };
+                };
+            };
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkItemDetailDto"];
-            "application/json": components["schemas"]["WorkItemDetailDto"];
-            "text/json": components["schemas"]["WorkItemDetailDto"];
-          };
-        };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workitems/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/mcp-servers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["McpServerDto"][];
+                        "application/json": components["schemas"]["McpServerDto"][];
+                        "text/json": components["schemas"]["McpServerDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateMcpServerRequest"];
+                    "text/json": components["schemas"]["CreateMcpServerRequest"];
+                    "application/*+json": components["schemas"]["CreateMcpServerRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["McpServerDto"];
+                        "application/json": components["schemas"]["McpServerDto"];
+                        "text/json": components["schemas"]["McpServerDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/mcp-servers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkItemDetailDto"];
-            "application/json": components["schemas"]["WorkItemDetailDto"];
-            "text/json": components["schemas"]["WorkItemDetailDto"];
-          };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["McpServerDto"];
+                        "application/json": components["schemas"]["McpServerDto"];
+                        "text/json": components["schemas"]["McpServerDto"];
+                    };
+                };
+            };
         };
-      };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateMcpServerRequest"];
+                    "text/json": components["schemas"]["UpdateMcpServerRequest"];
+                    "application/*+json": components["schemas"]["UpdateMcpServerRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["McpServerDto"];
+                        "application/json": components["schemas"]["McpServerDto"];
+                        "text/json": components["schemas"]["McpServerDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/mcp-servers/{id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["UpdateWorkItemRequest"];
-          "text/json": components["schemas"]["UpdateWorkItemRequest"];
-          "application/*+json": components["schemas"]["UpdateWorkItemRequest"];
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["McpTestDto"];
+                        "application/json": components["schemas"]["McpTestDto"];
+                        "text/json": components["schemas"]["McpTestDto"];
+                    };
+                };
+            };
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkItemDetailDto"];
-            "application/json": components["schemas"]["WorkItemDetailDto"];
-            "text/json": components["schemas"]["WorkItemDetailDto"];
-          };
-        };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    post?: never;
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/projects/{projectId}/milestones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MilestoneDto"][];
+                        "application/json": components["schemas"]["MilestoneDto"][];
+                        "text/json": components["schemas"]["MilestoneDto"][];
+                    };
+                };
+            };
         };
-      };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateMilestoneRequest"];
+                    "text/json": components["schemas"]["CreateMilestoneRequest"];
+                    "application/*+json": components["schemas"]["CreateMilestoneRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MilestoneDto"];
+                        "application/json": components["schemas"]["MilestoneDto"];
+                        "text/json": components["schemas"]["MilestoneDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workitems/{id}/status": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/milestones/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateMilestoneRequest"];
+                    "text/json": components["schemas"]["UpdateMilestoneRequest"];
+                    "application/*+json": components["schemas"]["UpdateMilestoneRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MilestoneDto"];
+                        "application/json": components["schemas"]["MilestoneDto"];
+                        "text/json": components["schemas"]["MilestoneDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/projects/{projectId}/integration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["TransitionRequest"];
-          "text/json": components["schemas"]["TransitionRequest"];
-          "application/*+json": components["schemas"]["TransitionRequest"];
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectIntegrationDto"];
+                        "application/json": components["schemas"]["ProjectIntegrationDto"];
+                        "text/json": components["schemas"]["ProjectIntegrationDto"];
+                    };
+                };
+            };
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkItemDetailDto"];
-            "application/json": components["schemas"]["WorkItemDetailDto"];
-            "text/json": components["schemas"]["WorkItemDetailDto"];
-          };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpsertProjectIntegrationRequest"];
+                    "text/json": components["schemas"]["UpsertProjectIntegrationRequest"];
+                    "application/*+json": components["schemas"]["UpsertProjectIntegrationRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectIntegrationDto"];
+                        "application/json": components["schemas"]["ProjectIntegrationDto"];
+                        "text/json": components["schemas"]["ProjectIntegrationDto"];
+                    };
+                };
+            };
         };
-      };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workitems/batch": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/projects/{projectId}/integration/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["TestIntegrationResponse"];
+                        "application/json": components["schemas"]["TestIntegrationResponse"];
+                        "text/json": components["schemas"]["TestIntegrationResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["BatchWorkItemsRequest"];
-          "text/json": components["schemas"]["BatchWorkItemsRequest"];
-          "application/*+json": components["schemas"]["BatchWorkItemsRequest"];
+    "/api/projects/{projectId}/releases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["BatchWorkItemsResultDto"];
-            "application/json": components["schemas"]["BatchWorkItemsResultDto"];
-            "text/json": components["schemas"]["BatchWorkItemsResultDto"];
-          };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateReleaseRequest"];
+                    "text/json": components["schemas"]["CreateReleaseRequest"];
+                    "application/*+json": components["schemas"]["CreateReleaseRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ReleaseDto"];
+                        "application/json": components["schemas"]["ReleaseDto"];
+                        "text/json": components["schemas"]["ReleaseDto"];
+                    };
+                };
+            };
         };
-      };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/workitems/{id}/worklogs": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/projects/{projectId}/integrations/webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    "X-CrewPilot-Webhook-Token"?: string;
+                };
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["IntegrationWebhookRequest"];
+                    "text/json": components["schemas"]["IntegrationWebhookRequest"];
+                    "application/*+json": components["schemas"]["IntegrationWebhookRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/projects/{projectId}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkLogDto"][];
-            "application/json": components["schemas"]["WorkLogDto"][];
-            "text/json": components["schemas"]["WorkLogDto"][];
-          };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectMemberDto"][];
+                        "application/json": components["schemas"]["ProjectMemberDto"][];
+                        "text/json": components["schemas"]["ProjectMemberDto"][];
+                    };
+                };
+            };
         };
-      };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AddProjectMemberRequest"];
+                    "text/json": components["schemas"]["AddProjectMemberRequest"];
+                    "application/*+json": components["schemas"]["AddProjectMemberRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectMemberDto"];
+                        "application/json": components["schemas"]["ProjectMemberDto"];
+                        "text/json": components["schemas"]["ProjectMemberDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
+    "/api/members/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["CreateWorkLogRequest"];
-          "text/json": components["schemas"]["CreateWorkLogRequest"];
-          "application/*+json": components["schemas"]["CreateWorkLogRequest"];
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateProjectMemberRequest"];
+                    "text/json": components["schemas"]["UpdateProjectMemberRequest"];
+                    "application/*+json": components["schemas"]["UpdateProjectMemberRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectMemberDto"];
+                        "application/json": components["schemas"]["ProjectMemberDto"];
+                        "text/json": components["schemas"]["ProjectMemberDto"];
+                    };
+                };
+            };
         };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "text/plain": components["schemas"]["WorkLogDto"];
-            "application/json": components["schemas"]["WorkLogDto"];
-            "text/json": components["schemas"]["WorkLogDto"];
-          };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
         };
-      };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/api/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectSummaryDto"][];
+                        "application/json": components["schemas"]["ProjectSummaryDto"][];
+                        "text/json": components["schemas"]["ProjectSummaryDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateProjectRequest"];
+                    "text/json": components["schemas"]["CreateProjectRequest"];
+                    "application/*+json": components["schemas"]["CreateProjectRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectDetailDto"];
+                        "application/json": components["schemas"]["ProjectDetailDto"];
+                        "text/json": components["schemas"]["ProjectDetailDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectDetailDto"];
+                        "application/json": components["schemas"]["ProjectDetailDto"];
+                        "text/json": components["schemas"]["ProjectDetailDto"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateProjectRequest"];
+                    "text/json": components["schemas"]["UpdateProjectRequest"];
+                    "application/*+json": components["schemas"]["UpdateProjectRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectDetailDto"];
+                        "application/json": components["schemas"]["ProjectDetailDto"];
+                        "text/json": components["schemas"]["ProjectDetailDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{id}/release-approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SetReleaseApprovalRequest"];
+                    "text/json": components["schemas"]["SetReleaseApprovalRequest"];
+                    "application/*+json": components["schemas"]["SetReleaseApprovalRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectDetailDto"];
+                        "application/json": components["schemas"]["ProjectDetailDto"];
+                        "text/json": components["schemas"]["ProjectDetailDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{id}/type-teams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SetProjectTypeTeamsRequest"];
+                    "text/json": components["schemas"]["SetProjectTypeTeamsRequest"];
+                    "application/*+json": components["schemas"]["SetProjectTypeTeamsRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectDetailDto"];
+                        "application/json": components["schemas"]["ProjectDetailDto"];
+                        "text/json": components["schemas"]["ProjectDetailDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{id}/default-team": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SetProjectTeamRequest"];
+                    "text/json": components["schemas"]["SetProjectTeamRequest"];
+                    "application/*+json": components["schemas"]["SetProjectTeamRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectDetailDto"];
+                        "application/json": components["schemas"]["ProjectDetailDto"];
+                        "text/json": components["schemas"]["ProjectDetailDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectDetailDto"];
+                        "application/json": components["schemas"]["ProjectDetailDto"];
+                        "text/json": components["schemas"]["ProjectDetailDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{id}/unarchive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProjectDetailDto"];
+                        "application/json": components["schemas"]["ProjectDetailDto"];
+                        "text/json": components["schemas"]["ProjectDetailDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/prototypes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    requirementId?: string;
+                };
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PrototypeDto"][];
+                        "application/json": components["schemas"]["PrototypeDto"][];
+                        "text/json": components["schemas"]["PrototypeDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreatePrototypeRequest"];
+                    "text/json": components["schemas"]["CreatePrototypeRequest"];
+                    "application/*+json": components["schemas"]["CreatePrototypeRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PrototypeDto"];
+                        "application/json": components["schemas"]["PrototypeDto"];
+                        "text/json": components["schemas"]["PrototypeDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prototypes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PrototypeDto"];
+                        "application/json": components["schemas"]["PrototypeDto"];
+                        "text/json": components["schemas"]["PrototypeDto"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdatePrototypeRequest"];
+                    "text/json": components["schemas"]["UpdatePrototypeRequest"];
+                    "application/*+json": components["schemas"]["UpdatePrototypeRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PrototypeDto"];
+                        "application/json": components["schemas"]["PrototypeDto"];
+                        "text/json": components["schemas"]["PrototypeDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prototypes/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PrototypeVersionDto"][];
+                        "application/json": components["schemas"]["PrototypeVersionDto"][];
+                        "text/json": components["schemas"]["PrototypeVersionDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prototypes/{id}/versions/{version}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                    version: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PrototypeDto"];
+                        "application/json": components["schemas"]["PrototypeDto"];
+                        "text/json": components["schemas"]["PrototypeDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prototypes/{id}/draft-requirement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["RequirementDraftDto"];
+                        "application/json": components["schemas"]["RequirementDraftDto"];
+                        "text/json": components["schemas"]["RequirementDraftDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prototypes/{id}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PrototypeFileDto"][];
+                        "application/json": components["schemas"]["PrototypeFileDto"][];
+                        "text/json": components["schemas"]["PrototypeFileDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpsertPrototypeFileRequest"];
+                    "text/json": components["schemas"]["UpsertPrototypeFileRequest"];
+                    "application/*+json": components["schemas"]["UpsertPrototypeFileRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PrototypeFileDto"];
+                        "application/json": components["schemas"]["PrototypeFileDto"];
+                        "text/json": components["schemas"]["PrototypeFileDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prototype-files/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prototypes/{id}/preview/{path}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                    path: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/prototype-images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        file?: components["schemas"]["IFormFile"];
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PrototypeImageDto"];
+                        "application/json": components["schemas"]["PrototypeImageDto"];
+                        "text/json": components["schemas"]["PrototypeImageDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/prototype-images/{path}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    path: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProviderListItemDto"][];
+                        "application/json": components["schemas"]["ProviderListItemDto"][];
+                        "text/json": components["schemas"]["ProviderListItemDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateProviderRequest"];
+                    "text/json": components["schemas"]["CreateProviderRequest"];
+                    "application/*+json": components["schemas"]["CreateProviderRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProviderDetailDto"];
+                        "application/json": components["schemas"]["ProviderDetailDto"];
+                        "text/json": components["schemas"]["ProviderDetailDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/providers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProviderDetailDto"];
+                        "application/json": components["schemas"]["ProviderDetailDto"];
+                        "text/json": components["schemas"]["ProviderDetailDto"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateProviderRequest"];
+                    "text/json": components["schemas"]["UpdateProviderRequest"];
+                    "application/*+json": components["schemas"]["UpdateProviderRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProviderDetailDto"];
+                        "application/json": components["schemas"]["ProviderDetailDto"];
+                        "text/json": components["schemas"]["ProviderDetailDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/providers/{id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["TestConnectionDto"];
+                        "application/json": components["schemas"]["TestConnectionDto"];
+                        "text/json": components["schemas"]["TestConnectionDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/providers/{id}/sync-models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: {
+                    catalogKey?: string;
+                };
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/providers/{id}/default": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProviderDetailDto"];
+                        "application/json": components["schemas"]["ProviderDetailDto"];
+                        "text/json": components["schemas"]["ProviderDetailDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/providers/{id}/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpsertModelRequest"];
+                    "text/json": components["schemas"]["UpsertModelRequest"];
+                    "application/*+json": components["schemas"]["UpsertModelRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ModelDto"];
+                        "application/json": components["schemas"]["ModelDto"];
+                        "text/json": components["schemas"]["ModelDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/providers/models/{modelId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    modelId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpsertModelRequest"];
+                    "text/json": components["schemas"]["UpsertModelRequest"];
+                    "application/*+json": components["schemas"]["UpsertModelRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ModelDto"];
+                        "application/json": components["schemas"]["ModelDto"];
+                        "text/json": components["schemas"]["ModelDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    modelId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workitems/{workItemId}/pull-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    workItemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PullRequestStatusDto"];
+                        "application/json": components["schemas"]["PullRequestStatusDto"];
+                        "text/json": components["schemas"]["PullRequestStatusDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    workItemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreatePullRequestRequest"];
+                    "text/json": components["schemas"]["CreatePullRequestRequest"];
+                    "application/*+json": components["schemas"]["CreatePullRequestRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PullRequestCreatedDto"];
+                        "application/json": components["schemas"]["PullRequestCreatedDto"];
+                        "text/json": components["schemas"]["PullRequestCreatedDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workitems/{workItemId}/pull-request/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    workItemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PullRequestStatusDto"];
+                        "application/json": components["schemas"]["PullRequestStatusDto"];
+                        "text/json": components["schemas"]["PullRequestStatusDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workitems/{workItemId}/pull-request/merge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    workItemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PullRequestStatusDto"];
+                        "application/json": components["schemas"]["PullRequestStatusDto"];
+                        "text/json": components["schemas"]["PullRequestStatusDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/hours-report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    iterationId?: string;
+                    from?: string;
+                    to?: string;
+                };
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["HoursReportDto"];
+                        "application/json": components["schemas"]["HoursReportDto"];
+                        "text/json": components["schemas"]["HoursReportDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/human-cost-report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["HumanCostReportDto"];
+                        "application/json": components["schemas"]["HumanCostReportDto"];
+                        "text/json": components["schemas"]["HumanCostReportDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/estimate-deviation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["EstimateDeviationReportDto"];
+                        "application/json": components["schemas"]["EstimateDeviationReportDto"];
+                        "text/json": components["schemas"]["EstimateDeviationReportDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/weekly-report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    days?: number;
+                };
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WeeklyReportDto"];
+                        "application/json": components["schemas"]["WeeklyReportDto"];
+                        "text/json": components["schemas"]["WeeklyReportDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/weekly-report/agent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: {
+                    days?: number;
+                };
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AgentRunListItemDto"];
+                        "application/json": components["schemas"]["AgentRunListItemDto"];
+                        "text/json": components["schemas"]["AgentRunListItemDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/cost-report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    iterationId?: string;
+                    from?: string;
+                    to?: string;
+                };
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CostReportDto"];
+                        "application/json": components["schemas"]["CostReportDto"];
+                        "text/json": components["schemas"]["CostReportDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/skills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["SkillDto"][];
+                        "application/json": components["schemas"]["SkillDto"][];
+                        "text/json": components["schemas"]["SkillDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateSkillRequest"];
+                    "text/json": components["schemas"]["CreateSkillRequest"];
+                    "application/*+json": components["schemas"]["CreateSkillRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["SkillDto"];
+                        "application/json": components["schemas"]["SkillDto"];
+                        "text/json": components["schemas"]["SkillDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/skills/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["SkillDto"];
+                        "application/json": components["schemas"]["SkillDto"];
+                        "text/json": components["schemas"]["SkillDto"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateSkillRequest"];
+                    "text/json": components["schemas"]["UpdateSkillRequest"];
+                    "application/*+json": components["schemas"]["UpdateSkillRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["SkillDto"];
+                        "application/json": components["schemas"]["SkillDto"];
+                        "text/json": components["schemas"]["SkillDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/skills/{id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/skills/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ImportSkillRequest"];
+                    "text/json": components["schemas"]["ImportSkillRequest"];
+                    "application/*+json": components["schemas"]["ImportSkillRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["SkillDto"];
+                        "application/json": components["schemas"]["SkillDto"];
+                        "text/json": components["schemas"]["SkillDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/skills/{id}/bundle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/skills/{id}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": string[];
+                        "application/json": string[];
+                        "text/json": string[];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/skills/import-bundle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/x-www-form-urlencoded": {
+                        ContentType?: string;
+                        ContentDisposition?: string;
+                        Headers?: {
+                            [key: string]: string[];
+                        };
+                        /** Format: int64 */
+                        Length?: number;
+                        Name?: string;
+                        FileName?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["SkillDto"];
+                        "application/json": components["schemas"]["SkillDto"];
+                        "text/json": components["schemas"]["SkillDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/workflows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkflowDto"][];
+                        "application/json": components["schemas"]["WorkflowDto"][];
+                        "text/json": components["schemas"]["WorkflowDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateWorkflowRequest"];
+                    "text/json": components["schemas"]["CreateWorkflowRequest"];
+                    "application/*+json": components["schemas"]["CreateWorkflowRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkflowDto"];
+                        "application/json": components["schemas"]["WorkflowDto"];
+                        "text/json": components["schemas"]["WorkflowDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workflows/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkflowTemplateDto"][];
+                        "application/json": components["schemas"]["WorkflowTemplateDto"][];
+                        "text/json": components["schemas"]["WorkflowTemplateDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workflows/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkflowDto"];
+                        "application/json": components["schemas"]["WorkflowDto"];
+                        "text/json": components["schemas"]["WorkflowDto"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateWorkflowRequest"];
+                    "text/json": components["schemas"]["UpdateWorkflowRequest"];
+                    "application/*+json": components["schemas"]["UpdateWorkflowRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkflowDto"];
+                        "application/json": components["schemas"]["WorkflowDto"];
+                        "text/json": components["schemas"]["WorkflowDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/workflows/from-template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateWorkflowFromTemplateRequest"];
+                    "text/json": components["schemas"]["CreateWorkflowFromTemplateRequest"];
+                    "application/*+json": components["schemas"]["CreateWorkflowFromTemplateRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkflowDto"];
+                        "application/json": components["schemas"]["WorkflowDto"];
+                        "text/json": components["schemas"]["WorkflowDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workflows/{id}/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["StartWorkflowRequest"];
+                    "text/json": components["schemas"]["StartWorkflowRequest"];
+                    "application/*+json": components["schemas"]["StartWorkflowRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkflowRunDto"];
+                        "application/json": components["schemas"]["WorkflowRunDto"];
+                        "text/json": components["schemas"]["WorkflowRunDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workflow-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    projectId?: string;
+                    workItemId?: string;
+                    status?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkflowRunDto"][];
+                        "application/json": components["schemas"]["WorkflowRunDto"][];
+                        "text/json": components["schemas"]["WorkflowRunDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workflow-runs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkflowRunDetailDto"];
+                        "application/json": components["schemas"]["WorkflowRunDetailDto"];
+                        "text/json": components["schemas"]["WorkflowRunDetailDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workflow-runs/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/dependencies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkItemDependencyDto"][];
+                        "application/json": components["schemas"]["WorkItemDependencyDto"][];
+                        "text/json": components["schemas"]["WorkItemDependencyDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateWorkItemDependencyRequest"];
+                    "text/json": components["schemas"]["CreateWorkItemDependencyRequest"];
+                    "application/*+json": components["schemas"]["CreateWorkItemDependencyRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkItemDependencyDto"];
+                        "application/json": components["schemas"]["WorkItemDependencyDto"];
+                        "text/json": components["schemas"]["WorkItemDependencyDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/critical-path": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CriticalPathDto"];
+                        "application/json": components["schemas"]["CriticalPathDto"];
+                        "text/json": components["schemas"]["CriticalPathDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dependencies/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{projectId}/workitems": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    type?: string;
+                    status?: string;
+                    tag?: string;
+                    relatedRequirementId?: string;
+                };
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkItemListItemDto"][];
+                        "application/json": components["schemas"]["WorkItemListItemDto"][];
+                        "text/json": components["schemas"]["WorkItemListItemDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    projectId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateWorkItemRequest"];
+                    "text/json": components["schemas"]["CreateWorkItemRequest"];
+                    "application/*+json": components["schemas"]["CreateWorkItemRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkItemDetailDto"];
+                        "application/json": components["schemas"]["WorkItemDetailDto"];
+                        "text/json": components["schemas"]["WorkItemDetailDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workitems/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkItemDetailDto"];
+                        "application/json": components["schemas"]["WorkItemDetailDto"];
+                        "text/json": components["schemas"]["WorkItemDetailDto"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateWorkItemRequest"];
+                    "text/json": components["schemas"]["UpdateWorkItemRequest"];
+                    "application/*+json": components["schemas"]["UpdateWorkItemRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkItemDetailDto"];
+                        "application/json": components["schemas"]["WorkItemDetailDto"];
+                        "text/json": components["schemas"]["WorkItemDetailDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workitems/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["TransitionRequest"];
+                    "text/json": components["schemas"]["TransitionRequest"];
+                    "application/*+json": components["schemas"]["TransitionRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkItemDetailDto"];
+                        "application/json": components["schemas"]["WorkItemDetailDto"];
+                        "text/json": components["schemas"]["WorkItemDetailDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workitems/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["BatchWorkItemsRequest"];
+                    "text/json": components["schemas"]["BatchWorkItemsRequest"];
+                    "application/*+json": components["schemas"]["BatchWorkItemsRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BatchWorkItemsResultDto"];
+                        "application/json": components["schemas"]["BatchWorkItemsResultDto"];
+                        "text/json": components["schemas"]["BatchWorkItemsResultDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workitems/{id}/worklogs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkLogDto"][];
+                        "application/json": components["schemas"]["WorkLogDto"][];
+                        "text/json": components["schemas"]["WorkLogDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateWorkLogRequest"];
+                    "text/json": components["schemas"]["CreateWorkLogRequest"];
+                    "application/*+json": components["schemas"]["CreateWorkLogRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkLogDto"];
+                        "application/json": components["schemas"]["WorkLogDto"];
+                        "text/json": components["schemas"]["WorkLogDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    ActivityDto: {
-      /** Format: uuid */
-      id: string;
-      eventType: string;
-      payload: string;
-      actorName: null | string;
-      actorKind: null | string;
-      /** Format: uuid */
-      workItemId: null | string;
-      /** Format: date-time */
-      createdAt: string;
-    };
-    AddProjectMemberRequest: {
-      displayName: null | string;
-      role: null | string;
-      /** Format: uuid */
-      agentId?: null | string;
-      /** Format: double */
-      hourlyRate?: null | number;
-    };
-    AgentDetailDto: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      job: string;
-      /** Format: uuid */
-      providerId: string;
-      providerName: string;
-      model: string;
-      systemPrompt: string;
-      tools: null | string;
-      commandWhitelist: null | string;
-      enabled: boolean;
-      skillIds: string[];
-      mcpServerIds: string[];
-      sandboxPolicy: string;
-    };
-    AgentListItemDto: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      job: string;
-      providerName: string;
-      model: string;
-      enabled: boolean;
-      /** Format: int32 */
-      runCount: number;
-    };
-    AgentRunDetailDto: {
-      /** Format: uuid */
-      id: string;
-      agentName: string;
-      model: null | string;
-      /** Format: uuid */
-      workItemId: null | string;
-      workItemTitle: null | string;
-      trigger: string;
-      status: string;
-      workingDirectory: null | string;
-      prompt: string;
-      output: null | string;
-      error: null | string;
-      /** Format: int32 */
-      promptTokens: null | number;
-      /** Format: int32 */
-      completionTokens: null | number;
-      /** Format: date-time */
-      createdAt: string;
-      /** Format: date-time */
-      startedAt: null | string;
-      /** Format: date-time */
-      finishedAt: null | string;
-      duration: null | string;
-      logs: components["schemas"]["RunLogDto"][];
-    };
-    AgentRunListItemDto: {
-      /** Format: uuid */
-      id: string;
-      agentName: string;
-      /** Format: uuid */
-      workItemId: null | string;
-      workItemTitle: null | string;
-      trigger: string;
-      status: string;
-      error: null | string;
-      /** Format: date-time */
-      createdAt: string;
-      /** Format: date-time */
-      finishedAt: null | string;
-      duration: null | string;
-      /** Format: int32 */
-      promptTokens: null | number;
-      /** Format: int32 */
-      completionTokens: null | number;
-    };
-    AgentTeamDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      projectId: string;
-      name: string;
-      goal: null | string;
-      members: components["schemas"]["AgentTeamMemberDto"][];
-    };
-    AgentTeamMemberDto: {
-      /** Format: uuid */
-      agentId: string;
-      agentName: string;
-      role: null | string;
-    };
-    AssignAgentRequest: {
-      /** Format: uuid */
-      agentId: string;
-    };
-    AttachmentDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      workItemId: string;
-      fileName: string;
-      contentType: string;
-      /** Format: int64 */
-      size: number;
-      /** Format: date-time */
-      createdAt: string;
-    };
-    AuditLogDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      projectId: null | string;
-      action: string;
-      targetType: string;
-      targetId: null | string;
-      actor: string;
-      detail: null | string;
-      /** Format: date-time */
-      createdAt: string;
-    };
-    AuthStatusDto: {
-      enabled: boolean;
-      authenticated: boolean;
-    };
-    BatchItemResultDto: {
-      /** Format: uuid */
-      id: string;
-      ok: boolean;
-      error: null | string;
-    };
-    BatchWorkItemsRequest: {
-      ids: string[];
-      action: string;
-      toStatus?: null | string;
-      assigneeName?: null | string;
-    };
-    BatchWorkItemsResultDto: {
-      /** Format: int32 */
-      succeeded: number;
-      /** Format: int32 */
-      failed: number;
-      results: components["schemas"]["BatchItemResultDto"][];
-    };
-    BlockerDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      projectId: string;
-      /** Format: uuid */
-      workItemId: string;
-      workItemTitle: string;
-      /** Format: uuid */
-      workflowRunId: null | string;
-      /** Format: uuid */
-      agentRunId: null | string;
-      kind: string;
-      reason: string;
-      contextSnapshot: null | string;
-      status: string;
-      resolution: null | string;
-      resolutionNote: null | string;
-      /** Format: date-time */
-      createdAt: string;
-      /** Format: date-time */
-      resolvedAt: null | string;
-    };
-    BurndownDto: {
-      /** Format: uuid */
-      iterationId: string;
-      /** Format: double */
-      totalEstimatedHours: number;
-      points: components["schemas"]["BurndownPointDto"][];
-    };
-    BurndownPointDto: {
-      /** Format: date */
-      date: string;
-      /** Format: double */
-      remainingHours: number;
-      /** Format: double */
-      idealHours: number;
-    };
-    CiCheckDto: {
-      name: string;
-      status: string;
-      conclusion: null | string;
-      url: null | string;
-    };
-    CommentDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      workItemId: string;
-      content: string;
-      authorName: string;
-      authorKind: string;
-      /** Format: date-time */
-      createdAt: string;
-    };
-    CostByModelDto: {
-      provider: string;
-      model: string;
-      /** Format: int32 */
-      promptTokens: number;
-      /** Format: int32 */
-      completionTokens: number;
-      /** Format: double */
-      cost: number;
-    };
-    CostReportDto: {
-      /** Format: int32 */
-      totalPromptTokens: number;
-      /** Format: int32 */
-      totalCompletionTokens: number;
-      /** Format: double */
-      totalCost: number;
-      byModel: components["schemas"]["CostByModelDto"][];
-    };
-    CreateAgentRequest: {
-      name: string;
-      job: string;
-      /** Format: uuid */
-      providerId: string;
-      model: string;
-      systemPrompt: string;
-      tools: null | string;
-      commandWhitelist: null | string;
-      skillIds?: null | string[];
-      mcpServerIds?: null | string[];
-      sandboxPolicy?: null | string;
-    };
-    CreateAgentTeamRequest: {
-      name: string;
-      goal: null | string;
-      agentIds: string[];
-    };
-    CreateCommentRequest: {
-      content: string;
-      /** Format: uuid */
-      mentionAgentId?: null | string;
-    };
-    CreateCommentResultDto: {
-      comment: components["schemas"]["CommentDto"];
-      /** Format: uuid */
-      agentRunId: null | string;
-    };
-    CreateIterationRequest: {
-      name: string;
-      goal: null | string;
-      /** Format: date */
-      startDate: string;
-      /** Format: date */
-      endDate: string;
-      /** Format: uuid */
-      milestoneId?: null | string;
-    };
-    CreateMcpServerRequest: {
-      name: string;
-      endpoint: string;
-      transport: string;
-      authToken: null | string;
-    };
-    CreateMilestoneRequest: {
-      name: string;
-      description: null | string;
-      /** Format: date */
-      date: string;
-    };
-    CreateProjectRequest: {
-      key: string;
-      name: string;
-      description: null | string;
-      repoUrl: null | string;
-      localPath?: null | string;
-    };
-    CreatePrototypeRequest: {
-      name: string;
-      type: string;
-      content: string;
-      /** Format: uuid */
-      requirementId: null | string;
-    };
-    CreateProviderRequest: {
-      name: string;
-      baseUrl: string;
-      apiKey: string;
-    };
-    CreatePullRequestRequest: {
-      branch: string;
-      title: string;
-      body: null | string;
-    };
-    CreateReleaseRequest: {
-      tag: string;
-      title: null | string;
-      notes: null | string;
-    };
-    CreateSkillRequest: {
-      name: string;
-      description: null | string;
-      promptContent: string;
-      tools: null | string;
-      scriptPath: null | string;
-    };
-    CreateWorkflowFromTemplateRequest: {
-      templateKey: string;
-      name: null | string;
-    };
-    CreateWorkflowRequest: {
-      name: string;
-      description: null | string;
-      steps: components["schemas"]["WorkflowStepRequest"][];
-    };
-    CreateWorkItemDependencyRequest: {
-      /** Format: uuid */
-      fromWorkItemId: string;
-      /** Format: uuid */
-      toWorkItemId: string;
-      type: null | string;
-    };
-    CreateWorkItemRequest: {
-      type: string;
-      title: string;
-      description: null | string;
-      acceptanceCriteria: null | string;
-      priority: null | string;
-      /** Format: int32 */
-      storyPoints: null | number;
-      /** Format: double */
-      estimatedHours: null | number;
-      /** Format: double */
-      remainingHours: null | number;
-      /** Format: date */
-      dueDate: null | string;
-      /** Format: uuid */
-      iterationId: null | string;
-      assigneeName: null | string;
-      severity: null | string;
-      reproSteps: null | string;
-      environment: null | string;
-      tags?: null | string;
-      /** Format: uuid */
-      parentWorkItemId?: null | string;
-      /** Format: uuid */
-      relatedRequirementId?: null | string;
-    };
-    CreateWorkLogRequest: {
-      /** Format: double */
-      hours: number;
-      /** Format: date */
-      date: null | string;
-      note: null | string;
-    };
-    CriticalPathDto: {
-      /** Format: double */
-      totalHours: number;
-      itemIds: string[];
-    };
-    EstimateDeviationReportDto: {
-      /** Format: double */
-      estimatedHours: number;
-      /** Format: double */
-      loggedHours: number;
-      /** Format: double */
-      deviationHours: number;
-      /** Format: double */
-      deviationPercent: null | number;
-      /** Format: int32 */
-      itemCount: number;
-      /** Format: int32 */
-      overrunCount: number;
-      byType: components["schemas"]["EstimateDeviationRowDto"][];
-    };
-    EstimateDeviationRowDto: {
-      key: string;
-      label: string;
-      /** Format: double */
-      estimatedHours: number;
-      /** Format: double */
-      loggedHours: number;
-      /** Format: double */
-      deviationHours: number;
-      /** Format: double */
-      deviationPercent: null | number;
-      /** Format: int32 */
-      itemCount: number;
-      /** Format: int32 */
-      overrunCount: number;
-    };
-    HoursByGroupDto: {
-      key: string;
-      label: string;
-      /** Format: double */
-      estimatedHours: number;
-      /** Format: double */
-      loggedHours: number;
-    };
-    HoursReportDto: {
-      /** Format: double */
-      totalEstimatedHours: number;
-      /** Format: double */
-      totalLoggedHours: number;
-      byType: components["schemas"]["HoursByGroupDto"][];
-      byAssignee: components["schemas"]["HoursByGroupDto"][];
-      byMember: components["schemas"]["HoursByGroupDto"][];
-    };
-    HumanCostByMemberDto: {
-      key: string;
-      label: string;
-      /** Format: double */
-      hours: number;
-      /** Format: double */
-      hourlyRate: null | number;
-      /** Format: double */
-      cost: number;
-    };
-    HumanCostReportDto: {
-      /** Format: double */
-      totalHours: number;
-      /** Format: double */
-      totalCost: number;
-      byMember: components["schemas"]["HumanCostByMemberDto"][];
-    };
-    /** Format: binary */
-    IFormFile: string;
-    ImportSkillRequest: {
-      content: string;
-    };
-    IterationDetailDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      projectId: string;
-      name: string;
-      goal: null | string;
-      /** Format: date */
-      startDate: string;
-      /** Format: date */
-      endDate: string;
-      status: string;
-      /** Format: int32 */
-      workItemCount: number;
-      /** Format: uuid */
-      milestoneId: null | string;
-    };
-    IterationListItemDto: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      goal: null | string;
-      /** Format: date */
-      startDate: string;
-      /** Format: date */
-      endDate: string;
-      status: string;
-      /** Format: int32 */
-      workItemCount: number;
-      /** Format: double */
-      estimatedHours: number;
-      /** Format: double */
-      loggedHours: number;
-      /** Format: uuid */
-      milestoneId: null | string;
-    };
-    LoginRequest: {
-      password: string;
-    };
-    McpServerDto: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      endpoint: string;
-      transport: string;
-      hasToken: boolean;
-      enabled: boolean;
-      /** Format: int32 */
-      agentCount: number;
-      /** Format: date-time */
-      updatedAt: string;
-    };
-    McpTestDto: {
-      ok: boolean;
-      message: string;
-    };
-    MilestoneDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      projectId: string;
-      name: string;
-      description: null | string;
-      /** Format: date */
-      date: string;
-      /** Format: int32 */
-      iterationCount: number;
-    };
-    ModelDto: {
-      /** Format: uuid */
-      id: string;
-      modelId: string;
-      displayName: string;
-      /** Format: int32 */
-      contextLength: null | number;
-      capabilities: null | string;
-      /** Format: double */
-      inputPricePerMillion: null | number;
-      /** Format: double */
-      outputPricePerMillion: null | number;
-      enabled: boolean;
-    };
-    PreviewAgentRequest: {
-      prompt: string;
-      /** Format: uuid */
-      workItemId?: null | string;
-    };
-    ProjectDetailDto: {
-      /** Format: uuid */
-      id: string;
-      key: string;
-      name: string;
-      description: null | string;
-      repoUrl: null | string;
-      localPath: null | string;
-      status: string;
-      /** Format: int32 */
-      workItemCount: number;
-      /** Format: date-time */
-      createdAt: string;
-      /** Format: date-time */
-      updatedAt: string;
-      /** Format: uuid */
-      defaultTeamId: null | string;
-      /** Format: uuid */
-      requirementTeamId: null | string;
-      /** Format: uuid */
-      defectTeamId: null | string;
-      /** Format: uuid */
-      taskTeamId: null | string;
-      releaseRequiresApproval: boolean;
-    };
-    ProjectIntegrationDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      projectId: string;
-      platform: string;
-      hasToken: boolean;
-      repository: null | string;
-      /** Format: date-time */
-      updatedAt: string;
-    };
-    ProjectMemberDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      projectId: string;
-      kind: string;
-      role: string;
-      displayName: string;
-      /** Format: date-time */
-      createdAt: string;
-      /** Format: double */
-      hourlyRate: null | number;
-    };
-    ProjectSummaryDto: {
-      /** Format: uuid */
-      id: string;
-      key: string;
-      name: string;
-      repoUrl: null | string;
-      status: string;
-      /** Format: int32 */
-      workItemCount: number;
-      /** Format: date-time */
-      createdAt: string;
-    };
-    PrototypeDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      projectId: string;
-      /** Format: uuid */
-      requirementId: null | string;
-      name: string;
-      type: string;
-      content: string;
-      /** Format: int32 */
-      version: number;
-      createdByName: null | string;
-      /** Format: date-time */
-      updatedAt: string;
-    };
-    PrototypeFileDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      prototypeId: string;
-      path: string;
-      content: string;
-      /** Format: date-time */
-      updatedAt: string;
-    };
-    PrototypeImageDto: {
-      path: string;
-      url: string;
-      /** Format: int64 */
-      size: number;
-    };
-    PrototypeVersionDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      prototypeId: string;
-      /** Format: int32 */
-      version: number;
-      name: string;
-      content: string;
-      createdByName: null | string;
-      /** Format: date-time */
-      createdAt: string;
-    };
-    ProviderDetailDto: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      baseUrl: string;
-      source: string;
-      enabled: boolean;
-      isDefault: boolean;
-      models: components["schemas"]["ModelDto"][];
-    };
-    ProviderListItemDto: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      baseUrl: string;
-      source: string;
-      enabled: boolean;
-      isDefault: boolean;
-      /** Format: int32 */
-      modelCount: number;
-    };
-    PullRequestCreatedDto: {
-      url: string;
-    };
-    PullRequestStatusDto: {
-      state: string;
-      ciStatus: string;
-      mergeable: null | boolean;
-      url: null | string;
-      checks: components["schemas"]["CiCheckDto"][];
-    };
-    ReleaseDto: {
-      tag: string;
-      url: null | string;
-      message: string;
-    };
-    ResolveBlockerRequest: {
-      resolution: string;
-      note: null | string;
-    };
-    RunLogDto: {
-      /** Format: int32 */
-      sequence: number;
-      kind: string;
-      content: string;
-      /** Format: date-time */
-      createdAt: string;
-    };
-    SetProjectTeamRequest: {
-      /** Format: uuid */
-      teamId: null | string;
-    };
-    SetProjectTypeTeamsRequest: {
-      /** Format: uuid */
-      requirementTeamId: null | string;
-      /** Format: uuid */
-      defectTeamId: null | string;
-      /** Format: uuid */
-      taskTeamId: null | string;
-    };
-    SetReleaseApprovalRequest: {
-      required: boolean;
-    };
-    SkillDto: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      description: null | string;
-      promptContent: string;
-      tools: null | string;
-      scriptPath: null | string;
-      enabled: boolean;
-      /** Format: int32 */
-      agentCount: number;
-      /** Format: date-time */
-      createdAt: string;
-      /** Format: date-time */
-      updatedAt: string;
-    };
-    StartWorkflowRequest: {
-      /** Format: uuid */
-      workItemId: string;
-    };
-    TestConnectionDto: {
-      ok: boolean;
-      message: string;
-      /** Format: int32 */
-      modelCount: number;
-    };
-    TestIntegrationResponse: {
-      ok: boolean;
-      message: string;
-    };
-    TransitionRequest: {
-      toStatus: string;
-    };
-    UpdateAgentRequest: {
-      name: string;
-      job: string;
-      systemPrompt: string;
-      tools: null | string;
-      commandWhitelist: null | string;
-      enabled: boolean;
-      skillIds?: null | string[];
-      mcpServerIds?: null | string[];
-      sandboxPolicy?: null | string;
-    };
-    UpdateIterationRequest: {
-      name: string;
-      goal: null | string;
-      /** Format: date */
-      startDate: string;
-      /** Format: date */
-      endDate: string;
-      /** Format: uuid */
-      milestoneId?: null | string;
-    };
-    UpdateMcpServerRequest: {
-      name: string;
-      endpoint: string;
-      transport: string;
-      authToken: null | string;
-      enabled: boolean;
-    };
-    UpdateMilestoneRequest: {
-      name: string;
-      description: null | string;
-      /** Format: date */
-      date: string;
-    };
-    UpdateProjectMemberRequest: {
-      displayName: string;
-      role: string;
-      /** Format: double */
-      hourlyRate?: null | number;
-    };
-    UpdateProjectRequest: {
-      name: string;
-      description: null | string;
-      repoUrl: null | string;
-      localPath?: null | string;
-    };
-    UpdatePrototypeRequest: {
-      name: string;
-      content: string;
-      /** Format: uuid */
-      requirementId?: null | string;
-    };
-    UpdateProviderRequest: {
-      name: string;
-      baseUrl: string;
-      apiKey: null | string;
-      enabled: boolean;
-    };
-    UpdateSkillRequest: {
-      name: string;
-      description: null | string;
-      promptContent: string;
-      tools: null | string;
-      scriptPath: null | string;
-      enabled: boolean;
-    };
-    UpdateWorkflowRequest: {
-      name: string;
-      description: null | string;
-      steps: components["schemas"]["WorkflowStepRequest"][];
-    };
-    UpdateWorkItemRequest: {
-      title: string;
-      description: null | string;
-      acceptanceCriteria: null | string;
-      priority: null | string;
-      /** Format: int32 */
-      storyPoints: null | number;
-      /** Format: double */
-      estimatedHours: null | number;
-      /** Format: double */
-      remainingHours: null | number;
-      /** Format: date */
-      dueDate: null | string;
-      /** Format: uuid */
-      iterationId: null | string;
-      assigneeName?: null | string;
-      severity?: null | string;
-      reproSteps?: null | string;
-      environment?: null | string;
-      tags?: null | string;
-      /** Format: uuid */
-      parentWorkItemId?: null | string;
-      branchUrl?: null | string;
-      prUrl?: null | string;
-      /** Format: uuid */
-      relatedRequirementId?: null | string;
-    };
-    UpsertModelRequest: {
-      modelId: string;
-      displayName: null | string;
-      /** Format: int32 */
-      contextLength: null | number;
-      capabilities: null | string;
-      /** Format: double */
-      inputPricePerMillion: null | number;
-      /** Format: double */
-      outputPricePerMillion: null | number;
-      enabled?: null | boolean;
-    };
-    UpsertProjectIntegrationRequest: {
-      platform: string;
-      token: null | string;
-      repository: null | string;
-    };
-    UpsertPrototypeFileRequest: {
-      path: string;
-      content: string;
-    };
-    WeeklyReportDto: {
-      /** Format: date */
-      from: string;
-      /** Format: date */
-      to: string;
-      markdown: string;
-      /** Format: int32 */
-      completedCount: number;
-      /** Format: int32 */
-      activeCount: number;
-      /** Format: int32 */
-      openBlockers: number;
-    };
-    WorkflowDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      projectId: null | string;
-      name: string;
-      description: null | string;
-      isTemplate: boolean;
-      enabled: boolean;
-      steps: components["schemas"]["WorkflowStepDto"][];
-      /** Format: date-time */
-      createdAt: string;
-      /** Format: date-time */
-      updatedAt: string;
-    };
-    WorkflowRunDetailDto: {
-      run: components["schemas"]["WorkflowRunDto"];
-      agentRuns: components["schemas"]["AgentRunListItemDto"][];
-      blockers: components["schemas"]["BlockerDto"][];
-    };
-    WorkflowRunDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      workflowId: string;
-      workflowName: string;
-      /** Format: uuid */
-      workItemId: string;
-      workItemTitle: string;
-      status: string;
-      /** Format: int32 */
-      currentStepOrder: number;
-      /** Format: uuid */
-      currentStepId: null | string;
-      /** Format: date-time */
-      createdAt: string;
-      /** Format: date-time */
-      finishedAt: null | string;
-    };
-    WorkflowStepDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: int32 */
-      order: number;
-      name: string;
-      /** Format: uuid */
-      agentId: null | string;
-      agentName: null | string;
-      requiredJob: null | string;
-      instruction: null | string;
-      approvalPolicy: string;
-      /** Format: int32 */
-      maxRetries: number;
-      inputContract: null | string;
-      outputContract: null | string;
-    };
-    WorkflowStepRequest: {
-      name: string;
-      /** Format: int32 */
-      order: number;
-      /** Format: uuid */
-      agentId: null | string;
-      requiredJob: null | string;
-      instruction: null | string;
-      approvalPolicy: null | string;
-      /** Format: int32 */
-      maxRetries: null | number;
-      inputContract: null | string;
-      outputContract: null | string;
-    };
-    WorkflowTemplateDto: {
-      key: string;
-      name: string;
-      description: string;
-      steps: components["schemas"]["WorkflowTemplateStepDto"][];
-    };
-    WorkflowTemplateStepDto: {
-      name: string;
-      job: string;
-      instruction: null | string;
-      approvalPolicy: string;
-      /** Format: int32 */
-      maxRetries: number;
-    };
-    WorkItemAgentActivityDto: {
-      /** Format: uuid */
-      workItemId: string;
-      /** Format: uuid */
-      agentRunId: string;
-      agentName: string;
-      status: string;
-      /** Format: date-time */
-      updatedAt: string;
-    };
-    WorkItemDependencyDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      projectId: string;
-      /** Format: uuid */
-      fromWorkItemId: string;
-      fromTitle: string;
-      /** Format: uuid */
-      toWorkItemId: string;
-      toTitle: string;
-      type: string;
-      /** Format: date-time */
-      createdAt: string;
-    };
-    WorkItemDetailDto: {
-      /** Format: uuid */
-      id: string;
-      type: string;
-      title: string;
-      status: string;
-      priority: string;
-      description: null | string;
-      acceptanceCriteria: null | string;
-      severity: null | string;
-      reproSteps: null | string;
-      environment: null | string;
-      /** Format: int32 */
-      storyPoints: null | number;
-      /** Format: double */
-      estimatedHours: null | number;
-      /** Format: double */
-      loggedHours: number;
-      /** Format: double */
-      remainingHours: null | number;
-      assigneeName: null | string;
-      /** Format: uuid */
-      iterationId: null | string;
-      /** Format: date */
-      dueDate: null | string;
-      branchUrl: null | string;
-      prUrl: null | string;
-      /** Format: date-time */
-      createdAt: string;
-      /** Format: date-time */
-      updatedAt: string;
-      tags: null | string;
-      /** Format: uuid */
-      parentWorkItemId: null | string;
-      /** Format: uuid */
-      relatedRequirementId: null | string;
-      relatedRequirementTitle: null | string;
-    };
-    WorkItemListItemDto: {
-      /** Format: uuid */
-      id: string;
-      type: string;
-      title: string;
-      status: string;
-      priority: string;
-      assigneeName: null | string;
-      /** Format: double */
-      estimatedHours: null | number;
-      /** Format: double */
-      loggedHours: number;
-      /** Format: double */
-      remainingHours: null | number;
-      /** Format: date */
-      dueDate: null | string;
-      prUrl: null | string;
-      /** Format: date-time */
-      updatedAt: string;
-      tags: null | string;
-    };
-    WorkLogDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: double */
-      hours: number;
-      /** Format: date */
-      date: string;
-      note: null | string;
-      memberName: null | string;
-      /** Format: uuid */
-      agentRunId: null | string;
-      /** Format: date-time */
-      createdAt: string;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    schemas: {
+        ActivityDto: {
+            /** Format: uuid */
+            id: string;
+            eventType: string;
+            payload: string;
+            actorName: null | string;
+            actorKind: null | string;
+            /** Format: uuid */
+            workItemId: null | string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AddProjectMemberRequest: {
+            displayName: null | string;
+            role: null | string;
+            /** Format: uuid */
+            agentId?: null | string;
+            /** Format: double */
+            hourlyRate?: null | number;
+        };
+        AgentDetailDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            job: string;
+            /** Format: uuid */
+            providerId: string;
+            providerName: string;
+            model: string;
+            systemPrompt: string;
+            tools: null | string;
+            commandWhitelist: null | string;
+            enabled: boolean;
+            skillIds: string[];
+            mcpServerIds: string[];
+            sandboxPolicy: string;
+        };
+        AgentListItemDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            job: string;
+            providerName: string;
+            model: string;
+            enabled: boolean;
+            /** Format: int32 */
+            runCount: number;
+        };
+        AgentRunDetailDto: {
+            /** Format: uuid */
+            id: string;
+            agentName: string;
+            model: null | string;
+            /** Format: uuid */
+            workItemId: null | string;
+            workItemTitle: null | string;
+            trigger: string;
+            status: string;
+            workingDirectory: null | string;
+            prompt: string;
+            output: null | string;
+            error: null | string;
+            /** Format: int32 */
+            promptTokens: null | number;
+            /** Format: int32 */
+            completionTokens: null | number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            startedAt: null | string;
+            /** Format: date-time */
+            finishedAt: null | string;
+            duration: null | string;
+            logs: components["schemas"]["RunLogDto"][];
+        };
+        AgentRunListItemDto: {
+            /** Format: uuid */
+            id: string;
+            agentName: string;
+            /** Format: uuid */
+            workItemId: null | string;
+            workItemTitle: null | string;
+            trigger: string;
+            status: string;
+            error: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            finishedAt: null | string;
+            duration: null | string;
+            /** Format: int32 */
+            promptTokens: null | number;
+            /** Format: int32 */
+            completionTokens: null | number;
+        };
+        AgentTeamDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            name: string;
+            goal: null | string;
+            members: components["schemas"]["AgentTeamMemberDto"][];
+        };
+        AgentTeamMemberDto: {
+            /** Format: uuid */
+            agentId: string;
+            agentName: string;
+            role: null | string;
+        };
+        AssignAgentRequest: {
+            /** Format: uuid */
+            agentId: string;
+        };
+        AttachmentDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            workItemId: string;
+            fileName: string;
+            contentType: string;
+            /** Format: int64 */
+            size: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AuditLogDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: null | string;
+            action: string;
+            targetType: string;
+            targetId: null | string;
+            actor: string;
+            detail: null | string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AuthStatusDto: {
+            enabled: boolean;
+            authenticated: boolean;
+        };
+        BatchItemResultDto: {
+            /** Format: uuid */
+            id: string;
+            ok: boolean;
+            error: null | string;
+        };
+        BatchWorkItemsRequest: {
+            ids: string[];
+            action: string;
+            toStatus?: null | string;
+            assigneeName?: null | string;
+        };
+        BatchWorkItemsResultDto: {
+            /** Format: int32 */
+            succeeded: number;
+            /** Format: int32 */
+            failed: number;
+            results: components["schemas"]["BatchItemResultDto"][];
+        };
+        BlockerDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            /** Format: uuid */
+            workItemId: string;
+            workItemTitle: string;
+            /** Format: uuid */
+            workflowRunId: null | string;
+            /** Format: uuid */
+            agentRunId: null | string;
+            kind: string;
+            reason: string;
+            contextSnapshot: null | string;
+            status: string;
+            resolution: null | string;
+            resolutionNote: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            resolvedAt: null | string;
+        };
+        BurndownDto: {
+            /** Format: uuid */
+            iterationId: string;
+            /** Format: double */
+            totalEstimatedHours: number;
+            points: components["schemas"]["BurndownPointDto"][];
+        };
+        BurndownPointDto: {
+            /** Format: date */
+            date: string;
+            /** Format: double */
+            remainingHours: number;
+            /** Format: double */
+            idealHours: number;
+        };
+        CiCheckDto: {
+            name: string;
+            status: string;
+            conclusion: null | string;
+            url: null | string;
+        };
+        CommentDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            workItemId: string;
+            content: string;
+            authorName: string;
+            authorKind: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CostByModelDto: {
+            provider: string;
+            model: string;
+            /** Format: int32 */
+            promptTokens: number;
+            /** Format: int32 */
+            completionTokens: number;
+            /** Format: double */
+            cost: number;
+        };
+        CostReportDto: {
+            /** Format: int32 */
+            totalPromptTokens: number;
+            /** Format: int32 */
+            totalCompletionTokens: number;
+            /** Format: double */
+            totalCost: number;
+            byModel: components["schemas"]["CostByModelDto"][];
+        };
+        CreateAgentRequest: {
+            name: string;
+            job: string;
+            /** Format: uuid */
+            providerId: string;
+            model: string;
+            systemPrompt: string;
+            tools: null | string;
+            commandWhitelist: null | string;
+            skillIds?: null | string[];
+            mcpServerIds?: null | string[];
+            sandboxPolicy?: null | string;
+        };
+        CreateAgentTeamRequest: {
+            name: string;
+            goal: null | string;
+            agentIds: string[];
+        };
+        CreateCommentRequest: {
+            content: string;
+            /** Format: uuid */
+            mentionAgentId?: null | string;
+        };
+        CreateCommentResultDto: {
+            comment: components["schemas"]["CommentDto"];
+            /** Format: uuid */
+            agentRunId: null | string;
+        };
+        CreateIterationRequest: {
+            name: string;
+            goal: null | string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            /** Format: uuid */
+            milestoneId?: null | string;
+        };
+        CreateMcpServerRequest: {
+            name: string;
+            endpoint: string;
+            transport: string;
+            authToken: null | string;
+        };
+        CreateMilestoneRequest: {
+            name: string;
+            description: null | string;
+            /** Format: date */
+            date: string;
+        };
+        CreateProjectRequest: {
+            key: string;
+            name: string;
+            description: null | string;
+            repoUrl: null | string;
+            localPath?: null | string;
+        };
+        CreatePrototypeRequest: {
+            name: string;
+            type: string;
+            content: string;
+            /** Format: uuid */
+            requirementId: null | string;
+        };
+        CreateProviderRequest: {
+            name: string;
+            baseUrl: string;
+            apiKey: string;
+        };
+        CreatePullRequestRequest: {
+            branch: string;
+            title: string;
+            body: null | string;
+        };
+        CreateReleaseRequest: {
+            tag: string;
+            title: null | string;
+            notes: null | string;
+        };
+        CreateSkillRequest: {
+            name: string;
+            description: null | string;
+            promptContent: string;
+            tools: null | string;
+            scriptPath: null | string;
+        };
+        CreateWorkflowFromTemplateRequest: {
+            templateKey: string;
+            name: null | string;
+        };
+        CreateWorkflowRequest: {
+            name: string;
+            description: null | string;
+            steps: components["schemas"]["WorkflowStepRequest"][];
+        };
+        CreateWorkItemDependencyRequest: {
+            /** Format: uuid */
+            fromWorkItemId: string;
+            /** Format: uuid */
+            toWorkItemId: string;
+            type: null | string;
+        };
+        CreateWorkItemRequest: {
+            type: string;
+            title: string;
+            description: null | string;
+            acceptanceCriteria: null | string;
+            priority: null | string;
+            /** Format: int32 */
+            storyPoints: null | number;
+            /** Format: double */
+            estimatedHours: null | number;
+            /** Format: double */
+            remainingHours: null | number;
+            /** Format: date */
+            dueDate: null | string;
+            /** Format: uuid */
+            iterationId: null | string;
+            assigneeName: null | string;
+            severity: null | string;
+            reproSteps: null | string;
+            environment: null | string;
+            tags?: null | string;
+            /** Format: uuid */
+            parentWorkItemId?: null | string;
+            /** Format: uuid */
+            relatedRequirementId?: null | string;
+        };
+        CreateWorkLogRequest: {
+            /** Format: double */
+            hours: number;
+            /** Format: date */
+            date: null | string;
+            note: null | string;
+        };
+        CriticalPathDto: {
+            /** Format: double */
+            totalHours: number;
+            itemIds: string[];
+        };
+        EstimateDeviationReportDto: {
+            /** Format: double */
+            estimatedHours: number;
+            /** Format: double */
+            loggedHours: number;
+            /** Format: double */
+            deviationHours: number;
+            /** Format: double */
+            deviationPercent: null | number;
+            /** Format: int32 */
+            itemCount: number;
+            /** Format: int32 */
+            overrunCount: number;
+            byType: components["schemas"]["EstimateDeviationRowDto"][];
+        };
+        EstimateDeviationRowDto: {
+            key: string;
+            label: string;
+            /** Format: double */
+            estimatedHours: number;
+            /** Format: double */
+            loggedHours: number;
+            /** Format: double */
+            deviationHours: number;
+            /** Format: double */
+            deviationPercent: null | number;
+            /** Format: int32 */
+            itemCount: number;
+            /** Format: int32 */
+            overrunCount: number;
+        };
+        HoursByGroupDto: {
+            key: string;
+            label: string;
+            /** Format: double */
+            estimatedHours: number;
+            /** Format: double */
+            loggedHours: number;
+        };
+        HoursReportDto: {
+            /** Format: double */
+            totalEstimatedHours: number;
+            /** Format: double */
+            totalLoggedHours: number;
+            byType: components["schemas"]["HoursByGroupDto"][];
+            byAssignee: components["schemas"]["HoursByGroupDto"][];
+            byMember: components["schemas"]["HoursByGroupDto"][];
+        };
+        HumanCostByMemberDto: {
+            key: string;
+            label: string;
+            /** Format: double */
+            hours: number;
+            /** Format: double */
+            hourlyRate: null | number;
+            /** Format: double */
+            cost: number;
+        };
+        HumanCostReportDto: {
+            /** Format: double */
+            totalHours: number;
+            /** Format: double */
+            totalCost: number;
+            byMember: components["schemas"]["HumanCostByMemberDto"][];
+        };
+        /** Format: binary */
+        IFormFile: string;
+        ImportSkillRequest: {
+            content: string;
+        };
+        IntegrationWebhookRequest: {
+            prUrl: null | string;
+            state: null | string;
+            ciStatus: null | string;
+        };
+        IterationDetailDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            name: string;
+            goal: null | string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            status: string;
+            /** Format: int32 */
+            workItemCount: number;
+            /** Format: uuid */
+            milestoneId: null | string;
+        };
+        IterationListItemDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            goal: null | string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            status: string;
+            /** Format: int32 */
+            workItemCount: number;
+            /** Format: double */
+            estimatedHours: number;
+            /** Format: double */
+            loggedHours: number;
+            /** Format: uuid */
+            milestoneId: null | string;
+        };
+        LoginRequest: {
+            password: string;
+        };
+        McpServerDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            endpoint: string;
+            transport: string;
+            hasToken: boolean;
+            enabled: boolean;
+            /** Format: int32 */
+            agentCount: number;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        McpTestDto: {
+            ok: boolean;
+            message: string;
+        };
+        MilestoneDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            name: string;
+            description: null | string;
+            /** Format: date */
+            date: string;
+            /** Format: int32 */
+            iterationCount: number;
+        };
+        ModelDto: {
+            /** Format: uuid */
+            id: string;
+            modelId: string;
+            displayName: string;
+            /** Format: int32 */
+            contextLength: null | number;
+            capabilities: null | string;
+            /** Format: double */
+            inputPricePerMillion: null | number;
+            /** Format: double */
+            outputPricePerMillion: null | number;
+            enabled: boolean;
+        };
+        PreviewAgentRequest: {
+            prompt: string;
+            /** Format: uuid */
+            workItemId?: null | string;
+        };
+        ProjectDetailDto: {
+            /** Format: uuid */
+            id: string;
+            key: string;
+            name: string;
+            description: null | string;
+            repoUrl: null | string;
+            localPath: null | string;
+            status: string;
+            /** Format: int32 */
+            workItemCount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            /** Format: uuid */
+            defaultTeamId: null | string;
+            /** Format: uuid */
+            requirementTeamId: null | string;
+            /** Format: uuid */
+            defectTeamId: null | string;
+            /** Format: uuid */
+            taskTeamId: null | string;
+            releaseRequiresApproval: boolean;
+        };
+        ProjectIntegrationDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            platform: string;
+            hasToken: boolean;
+            repository: null | string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        ProjectMemberDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            kind: string;
+            role: string;
+            displayName: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: double */
+            hourlyRate: null | number;
+        };
+        ProjectSummaryDto: {
+            /** Format: uuid */
+            id: string;
+            key: string;
+            name: string;
+            repoUrl: null | string;
+            status: string;
+            /** Format: int32 */
+            workItemCount: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        PrototypeDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            /** Format: uuid */
+            requirementId: null | string;
+            name: string;
+            type: string;
+            content: string;
+            /** Format: int32 */
+            version: number;
+            createdByName: null | string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        PrototypeFileDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            prototypeId: string;
+            path: string;
+            content: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        PrototypeImageDto: {
+            path: string;
+            url: string;
+            /** Format: int64 */
+            size: number;
+        };
+        PrototypeVersionDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            prototypeId: string;
+            /** Format: int32 */
+            version: number;
+            name: string;
+            content: string;
+            createdByName: null | string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        ProviderDetailDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            baseUrl: string;
+            source: string;
+            enabled: boolean;
+            isDefault: boolean;
+            models: components["schemas"]["ModelDto"][];
+        };
+        ProviderListItemDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            baseUrl: string;
+            source: string;
+            enabled: boolean;
+            isDefault: boolean;
+            /** Format: int32 */
+            modelCount: number;
+        };
+        PullRequestCreatedDto: {
+            url: string;
+        };
+        PullRequestStatusDto: {
+            state: string;
+            ciStatus: string;
+            mergeable: null | boolean;
+            url: null | string;
+            checks: components["schemas"]["CiCheckDto"][];
+        };
+        ReleaseDto: {
+            tag: string;
+            url: null | string;
+            message: string;
+        };
+        RequirementDraftDto: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            description: null | string;
+        };
+        ResolveBlockerRequest: {
+            resolution: string;
+            note: null | string;
+        };
+        RunLogDto: {
+            /** Format: int32 */
+            sequence: number;
+            kind: string;
+            content: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        SetProjectTeamRequest: {
+            /** Format: uuid */
+            teamId: null | string;
+        };
+        SetProjectTypeTeamsRequest: {
+            /** Format: uuid */
+            requirementTeamId: null | string;
+            /** Format: uuid */
+            defectTeamId: null | string;
+            /** Format: uuid */
+            taskTeamId: null | string;
+        };
+        SetReleaseApprovalRequest: {
+            required: boolean;
+        };
+        SkillDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            description: null | string;
+            promptContent: string;
+            tools: null | string;
+            scriptPath: null | string;
+            enabled: boolean;
+            /** Format: int32 */
+            agentCount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        StartWorkflowRequest: {
+            /** Format: uuid */
+            workItemId: string;
+        };
+        TestConnectionDto: {
+            ok: boolean;
+            message: string;
+            /** Format: int32 */
+            modelCount: number;
+        };
+        TestIntegrationResponse: {
+            ok: boolean;
+            message: string;
+        };
+        TransitionRequest: {
+            toStatus: string;
+        };
+        UpdateAgentRequest: {
+            name: string;
+            job: string;
+            systemPrompt: string;
+            tools: null | string;
+            commandWhitelist: null | string;
+            enabled: boolean;
+            skillIds?: null | string[];
+            mcpServerIds?: null | string[];
+            sandboxPolicy?: null | string;
+        };
+        UpdateIterationRequest: {
+            name: string;
+            goal: null | string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            /** Format: uuid */
+            milestoneId?: null | string;
+        };
+        UpdateMcpServerRequest: {
+            name: string;
+            endpoint: string;
+            transport: string;
+            authToken: null | string;
+            enabled: boolean;
+        };
+        UpdateMilestoneRequest: {
+            name: string;
+            description: null | string;
+            /** Format: date */
+            date: string;
+        };
+        UpdateProjectMemberRequest: {
+            displayName: string;
+            role: string;
+            /** Format: double */
+            hourlyRate?: null | number;
+        };
+        UpdateProjectRequest: {
+            name: string;
+            description: null | string;
+            repoUrl: null | string;
+            localPath?: null | string;
+        };
+        UpdatePrototypeRequest: {
+            name: string;
+            content: string;
+            /** Format: uuid */
+            requirementId?: null | string;
+        };
+        UpdateProviderRequest: {
+            name: string;
+            baseUrl: string;
+            apiKey: null | string;
+            enabled: boolean;
+        };
+        UpdateSkillRequest: {
+            name: string;
+            description: null | string;
+            promptContent: string;
+            tools: null | string;
+            scriptPath: null | string;
+            enabled: boolean;
+        };
+        UpdateWorkflowRequest: {
+            name: string;
+            description: null | string;
+            steps: components["schemas"]["WorkflowStepRequest"][];
+        };
+        UpdateWorkItemRequest: {
+            title: string;
+            description: null | string;
+            acceptanceCriteria: null | string;
+            priority: null | string;
+            /** Format: int32 */
+            storyPoints: null | number;
+            /** Format: double */
+            estimatedHours: null | number;
+            /** Format: double */
+            remainingHours: null | number;
+            /** Format: date */
+            dueDate: null | string;
+            /** Format: uuid */
+            iterationId: null | string;
+            assigneeName?: null | string;
+            severity?: null | string;
+            reproSteps?: null | string;
+            environment?: null | string;
+            tags?: null | string;
+            /** Format: uuid */
+            parentWorkItemId?: null | string;
+            branchUrl?: null | string;
+            prUrl?: null | string;
+            /** Format: uuid */
+            relatedRequirementId?: null | string;
+        };
+        UpsertModelRequest: {
+            modelId: string;
+            displayName: null | string;
+            /** Format: int32 */
+            contextLength: null | number;
+            capabilities: null | string;
+            /** Format: double */
+            inputPricePerMillion: null | number;
+            /** Format: double */
+            outputPricePerMillion: null | number;
+            enabled?: null | boolean;
+        };
+        UpsertProjectIntegrationRequest: {
+            platform: string;
+            token: null | string;
+            repository: null | string;
+        };
+        UpsertPrototypeFileRequest: {
+            path: string;
+            content: string;
+        };
+        WeeklyReportDto: {
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+            markdown: string;
+            /** Format: int32 */
+            completedCount: number;
+            /** Format: int32 */
+            activeCount: number;
+            /** Format: int32 */
+            openBlockers: number;
+        };
+        WorkflowDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: null | string;
+            name: string;
+            description: null | string;
+            isTemplate: boolean;
+            enabled: boolean;
+            steps: components["schemas"]["WorkflowStepDto"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        WorkflowRunDetailDto: {
+            run: components["schemas"]["WorkflowRunDto"];
+            agentRuns: components["schemas"]["AgentRunListItemDto"][];
+            blockers: components["schemas"]["BlockerDto"][];
+        };
+        WorkflowRunDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            workflowId: string;
+            workflowName: string;
+            /** Format: uuid */
+            workItemId: string;
+            workItemTitle: string;
+            status: string;
+            /** Format: int32 */
+            currentStepOrder: number;
+            /** Format: uuid */
+            currentStepId: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            finishedAt: null | string;
+        };
+        WorkflowStepDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            order: number;
+            name: string;
+            /** Format: uuid */
+            agentId: null | string;
+            agentName: null | string;
+            requiredJob: null | string;
+            instruction: null | string;
+            approvalPolicy: string;
+            /** Format: int32 */
+            maxRetries: number;
+            inputContract: null | string;
+            outputContract: null | string;
+        };
+        WorkflowStepRequest: {
+            name: string;
+            /** Format: int32 */
+            order: number;
+            /** Format: uuid */
+            agentId: null | string;
+            requiredJob: null | string;
+            instruction: null | string;
+            approvalPolicy: null | string;
+            /** Format: int32 */
+            maxRetries: null | number;
+            inputContract: null | string;
+            outputContract: null | string;
+        };
+        WorkflowTemplateDto: {
+            key: string;
+            name: string;
+            description: string;
+            steps: components["schemas"]["WorkflowTemplateStepDto"][];
+        };
+        WorkflowTemplateStepDto: {
+            name: string;
+            job: string;
+            instruction: null | string;
+            approvalPolicy: string;
+            /** Format: int32 */
+            maxRetries: number;
+        };
+        WorkItemAgentActivityDto: {
+            /** Format: uuid */
+            workItemId: string;
+            /** Format: uuid */
+            agentRunId: string;
+            agentName: string;
+            status: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        WorkItemDependencyDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            /** Format: uuid */
+            fromWorkItemId: string;
+            fromTitle: string;
+            /** Format: uuid */
+            toWorkItemId: string;
+            toTitle: string;
+            type: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        WorkItemDetailDto: {
+            /** Format: uuid */
+            id: string;
+            type: string;
+            title: string;
+            status: string;
+            priority: string;
+            description: null | string;
+            acceptanceCriteria: null | string;
+            severity: null | string;
+            reproSteps: null | string;
+            environment: null | string;
+            /** Format: int32 */
+            storyPoints: null | number;
+            /** Format: double */
+            estimatedHours: null | number;
+            /** Format: double */
+            loggedHours: number;
+            /** Format: double */
+            remainingHours: null | number;
+            assigneeName: null | string;
+            /** Format: uuid */
+            iterationId: null | string;
+            /** Format: date */
+            dueDate: null | string;
+            branchUrl: null | string;
+            prUrl: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            tags: null | string;
+            /** Format: uuid */
+            parentWorkItemId: null | string;
+            /** Format: uuid */
+            relatedRequirementId: null | string;
+            relatedRequirementTitle: null | string;
+        };
+        WorkItemListItemDto: {
+            /** Format: uuid */
+            id: string;
+            type: string;
+            title: string;
+            status: string;
+            priority: string;
+            assigneeName: null | string;
+            /** Format: double */
+            estimatedHours: null | number;
+            /** Format: double */
+            loggedHours: number;
+            /** Format: double */
+            remainingHours: null | number;
+            /** Format: date */
+            dueDate: null | string;
+            prUrl: null | string;
+            /** Format: date-time */
+            updatedAt: string;
+            tags: null | string;
+        };
+        WorkLogDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: double */
+            hours: number;
+            /** Format: date */
+            date: string;
+            note: null | string;
+            memberName: null | string;
+            /** Format: uuid */
+            agentRunId: null | string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+    };
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export type operations = Record<string, never>;

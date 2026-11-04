@@ -14,6 +14,7 @@ import {
   useCreatePrototype,
   useDeletePrototype,
   useDeletePrototypeFile,
+  useDraftRequirement,
   usePrototypeFiles,
   usePrototypeVersions,
   usePrototypes,
@@ -52,6 +53,7 @@ export function PrototypeStudioPage() {
   const deletePrototype = useDeletePrototype(activeProjectId ?? "");
   const uploadImage = useUploadPrototypeImage(activeProjectId ?? "");
   const restoreVersion = useRestorePrototypeVersion(activeProjectId ?? "");
+  const draftRequirement = useDraftRequirement(activeProjectId ?? "");
   const confirm = useConfirm();
 
   const [name, setName] = useState("");
@@ -69,6 +71,18 @@ export function PrototypeStudioPage() {
   const [uploading, setUploading] = useState(false);
 
   const hasIndexHtml = (files.data ?? []).some((file) => file.path === "index.html");
+
+  const handleDraftRequirement = async () => {
+    if (currentId === null) {
+      return;
+    }
+    try {
+      const requirement = await draftRequirement.mutateAsync(currentId);
+      toast.success(t("prototype:requirementDrafted", { title: requirement.title }));
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
 
   const handleSaveFile = async () => {
     if (currentId === null || filePath.trim() === "") {
@@ -316,6 +330,16 @@ export function PrototypeStudioPage() {
               <Save className="h-4 w-4" />
               {currentId === null ? t("prototype:save") : t("common:save")}
             </Button>
+            {currentId !== null ? (
+              <Button
+                className="w-full"
+                variant="outline"
+                disabled={draftRequirement.isPending}
+                onClick={() => void handleDraftRequirement()}
+              >
+                {t("prototype:draftRequirement")}
+              </Button>
+            ) : null}
           </CardContent>
         </Card>
 
