@@ -8,8 +8,8 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 109 项测试全绿 |
-| 前端 | React 18 + TS + Vite；lint / format / build / 10 项 Vitest 全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 113 项测试全绿 |
+| 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
 | M2 | 完成并硬化（取消/沙箱/工具权限/LocalPath 已修） |
@@ -40,7 +40,7 @@
 - [~] 工作项：标签/编辑/删除/指派人变更已完成；列表视图 + 批量操作 + 看板筛选待补
 - [x] 工作项：迭代/截止日/故事点录入 UI；Task 父子关系与状态流转
 - [~] 工时：登记人归属/剩余工时扣减/按成员报表已完成；成本视图与迭代/日期过滤待补
-- [ ] 原型：URL/图片/MCP 渲染、图片上传、版本历史、需求关联 UI、CSP 加固
+- [x] 原型：URL/图片/MCP 渲染、图片上传、版本历史、需求关联 UI、CSP 加固（Round 11）
 - [ ] 模型供应商：默认供应商切换、模型手动增删改/启停、定时刷新
 
 ### P2 M3 工作流与卡点（Round 4 完成核心闭环）
@@ -74,7 +74,7 @@
 - [x] 成本统计：token × 模型单价 → 项目级费用，按供应商/模型汇总
 - [x] 审计日志：敏感操作留痕 + 查询 API/页面
 - [ ] 结构化日志与可观测
-- [ ] 安全加固：原型 CSP、密钥轮换界面、发布审批
+- [ ] 安全加固：密钥轮换界面、发布审批
 - [ ] 部署文档 + `docker compose`
 
 ### P5 基建与质量
@@ -123,12 +123,12 @@
 
 - [x] HTML 编辑 + sandbox iframe 实时预览
 - [ ] 多文件支持
-- [ ] 版本历史（当前只有自增计数，无快照）
-- [ ] URL / 图片 / MCP 原型渲染（当前只存字符串）
-- [ ] 图片上传 / 存储
-- [ ] 设计 MCP 客户端
-- [ ] 原型 ↔ 需求关联 UI
-- [ ] 严格 CSP 与沙箱加固
+- [x] 版本历史（Round 11：自动快照 + 恢复）
+- [x] URL / 图片 / MCP 原型渲染（Round 11）
+- [x] 图片上传 / 存储（Round 11：PNG/JPG/WEBP/GIF，10MB，只读图片接口）
+- [x] 设计 MCP 客户端（配置/运行时工具，Round 9；原型内嵌渲染仍为引用）
+- [x] 原型 ↔ 需求关联 UI（Round 11）
+- [x] 严格 CSP 与沙箱加固（Round 11：CSP meta 注入 + sandbox iframe）
 
 ### 4.5 工时管理（P0）
 
@@ -264,7 +264,7 @@
 - [ ] PostgreSQL
 - [x] 审计日志（Round 6）
 - [ ] 认证
-- [ ] CSP（原型）
+- [x] CSP（原型，Round 11）
 
 ## 3. 已知缺陷 / 安全债
 
@@ -287,6 +287,19 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 审计 ✅ Round 6；认证 P5 |
 
 ## 4. 每轮工作日志
+
+### Round 11（2026-11-04）
+
+- 原型工坊增强（PRD 4.4）：
+  - 版本历史：`PrototypeVersion` 实体 + 迁移（SQLite/PostgreSQL 各一）；创建/保存自动快照；列表与恢复 API（恢复生成新版本，不丢历史）
+  - 图片原型：`POST /api/projects/{id}/prototype-images` 上传（PNG/JPG/WEBP/GIF，10MB）；`GET /api/prototype-images/{**path}` 只读访问；图片原型只接受存储路径
+  - URL 原型：http(s) 绝对地址校验，前端 sandbox iframe 预览 + 外链
+  - MCP 原型：引用地址/标识展示（运行时 MCP 工具已在 Round 9）
+  - 需求关联：创建/更新可绑定需求（同项目校验），列表按需求过滤；前端需求下拉
+  - CSP 加固：HTML 预览注入严格 CSP（`default-src 'none'`、禁止外网/表单/顶层跳转）+ sandbox iframe
+  - 前端：类型化预览（HTML/URL/图片/MCP）、图片上传、版本历史面板与恢复
+- 测试：109 → 113（版本快照/恢复、URL 校验、图片上传与字节读取、需求关联过滤），`dotnet test` 全绿；前端 10 → 13（CSP 注入 3 项）
+- 验证：`dotnet test`、`npm run lint` / `format:check` / `test:run` / `build` 全绿
 
 ### Round 10（2026-11-04）
 
