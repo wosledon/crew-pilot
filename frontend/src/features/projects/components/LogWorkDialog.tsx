@@ -12,12 +12,7 @@ export interface LogWorkDialogProps {
 }
 
 /** 登记工时（1:1，不加权） */
-export function LogWorkDialog({
-  open,
-  onOpenChange,
-  workItemTitle,
-  onSubmit,
-}: LogWorkDialogProps) {
+export function LogWorkDialog({ open, onOpenChange, workItemTitle, onSubmit }: LogWorkDialogProps) {
   const { t } = useTranslation(["workitems", "common"]);
   const [hours, setHours] = useState("1");
   const [note, setNote] = useState("");

@@ -19,8 +19,7 @@ export const projectKeys = {
   workItems: (projectId: string, type?: string) =>
     ["projects", projectId, "workitems", type ?? "all"] as const,
   workLogs: (workItemId: string) => ["workitems", workItemId, "worklogs"] as const,
-  prototypes: (projectId: string) =>
-    ["projects", projectId, "prototypes"] as const,
+  prototypes: (projectId: string) => ["projects", projectId, "prototypes"] as const,
   activities: (projectId: string) => ["projects", projectId, "activities"] as const,
   burndown: (iterationId: string) => ["iterations", iterationId, "burndown"] as const,
   hoursReport: (projectId: string) => ["projects", projectId, "hours-report"] as const,
@@ -45,9 +44,7 @@ export function useWorkItems(projectId: string | undefined, type?: string) {
   return useQuery({
     queryKey: projectKeys.workItems(projectId ?? "", type),
     queryFn: () =>
-      api.get<WorkItemListItem[]>(
-        `/projects/${projectId}/workitems${type ? `?type=${type}` : ""}`,
-      ),
+      api.get<WorkItemListItem[]>(`/projects/${projectId}/workitems${type ? `?type=${type}` : ""}`),
     enabled: projectId !== undefined,
   });
 }
@@ -96,8 +93,7 @@ export function useStartIteration() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.post<IterationDetail>(`/iterations/${id}/start`),
-    onSuccess: () =>
-      void queryClient.invalidateQueries({ queryKey: ["projects"] }),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["projects"] }),
   });
 }
 
@@ -105,20 +101,15 @@ export function useCompleteIteration() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.post<IterationDetail>(`/iterations/${id}/complete`),
-    onSuccess: () =>
-      void queryClient.invalidateQueries({ queryKey: ["projects"] }),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["projects"] }),
   });
 }
 
 export function useCreateIteration(projectId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (body: {
-      name: string;
-      goal?: string;
-      startDate: string;
-      endDate: string;
-    }) => api.post<IterationDetail>(`/projects/${projectId}/iterations`, body),
+    mutationFn: (body: { name: string; goal?: string; startDate: string; endDate: string }) =>
+      api.post<IterationDetail>(`/projects/${projectId}/iterations`, body),
     onSuccess: () =>
       void queryClient.invalidateQueries({ queryKey: projectKeys.iterations(projectId) }),
   });
@@ -138,15 +129,14 @@ export interface CreateProjectBody {
   name: string;
   description?: string;
   repoUrl?: string;
+  localPath?: string;
 }
 
 export function useCreateProject() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (body: CreateProjectBody) =>
-      api.post<ProjectDetail>("/projects", body),
-    onSuccess: () =>
-      void queryClient.invalidateQueries({ queryKey: projectKeys.all }),
+    mutationFn: (body: CreateProjectBody) => api.post<ProjectDetail>("/projects", body),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: projectKeys.all }),
   });
 }
 
@@ -154,8 +144,7 @@ export function useDeleteProject() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/projects/${id}`),
-    onSuccess: () =>
-      void queryClient.invalidateQueries({ queryKey: projectKeys.all }),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: projectKeys.all }),
   });
 }
 
@@ -191,8 +180,7 @@ export function useTransitionWorkItem() {
       api.post<WorkItemDetail>(`/workitems/${variables.id}/status`, {
         toStatus: variables.toStatus,
       }),
-    onSuccess: () =>
-      void queryClient.invalidateQueries({ queryKey: ["projects"] }),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["projects"] }),
   });
 }
 

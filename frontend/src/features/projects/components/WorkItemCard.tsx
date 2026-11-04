@@ -64,7 +64,8 @@ export function WorkItemCard({
           ) : null}
           <Button
             variant="outline"
-            size="icon"            aria-label={t("agentruns:assign")}
+            size="icon"
+            aria-label={t("agentruns:assign")}
             disabled={transitioning}
             onClick={() => onAssign(item)}
           >
@@ -72,7 +73,8 @@ export function WorkItemCard({
           </Button>
           <Button
             variant="outline"
-            size="icon"            aria-label={t("workitems:logWork")}
+            size="icon"
+            aria-label={t("workitems:logWork")}
             disabled={transitioning}
             onClick={() => onLogWork(item)}
           >

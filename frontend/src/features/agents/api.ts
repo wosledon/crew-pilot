@@ -59,9 +59,7 @@ export function useDeleteProvider() {
 export function useTestProvider() {
   return useMutation({
     mutationFn: (id: string) =>
-      api.post<{ ok: boolean; message: string; modelCount: number }>(
-        `/providers/${id}/test`,
-      ),
+      api.post<{ ok: boolean; message: string; modelCount: number }>(`/providers/${id}/test`),
   });
 }
 
@@ -137,9 +135,7 @@ export function useAgentRuns(params: {
     queryFn: () => api.get<AgentRunListItem[]>(`/agent-runs${suffix}`),
     refetchInterval: (query) => {
       const data = query.state.data;
-      const running = data?.some((run) =>
-        ["queued", "running"].includes(run.status),
-      );
+      const running = data?.some((run) => ["queued", "running"].includes(run.status));
       return running ? 2000 : false;
     },
   });
@@ -161,10 +157,9 @@ export function useAssignAgent() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (variables: { workItemId: string; agentId: string }) =>
-      api.post<AgentRunListItem>(
-        `/workitems/${variables.workItemId}/assign-agent`,
-        { agentId: variables.agentId },
-      ),
+      api.post<AgentRunListItem>(`/workitems/${variables.workItemId}/assign-agent`, {
+        agentId: variables.agentId,
+      }),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["agent-runs"] }),
   });
 }

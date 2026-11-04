@@ -85,7 +85,11 @@
     background-color: var(--background);
     color: var(--foreground);
     font-family:
-      "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+      "PingFang SC",
+      "Microsoft YaHei",
+      system-ui,
+      -apple-system,
+      sans-serif;
     font-size: 14px;
     -webkit-font-smoothing: antialiased;
   }

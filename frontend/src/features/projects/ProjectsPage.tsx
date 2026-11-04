@@ -3,7 +3,14 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/Card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card";
 import { Dialog } from "@/components/ui/Dialog";
 import { Input, Textarea } from "@/components/ui/Input";
 import { toast } from "@/components/ui/Toast";
@@ -24,6 +31,7 @@ export function ProjectsPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [repoUrl, setRepoUrl] = useState("");
+  const [localPath, setLocalPath] = useState("");
 
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
@@ -35,6 +43,7 @@ export function ProjectsPage() {
         name: name.trim(),
         description: description.trim() || undefined,
         repoUrl: repoUrl.trim() || undefined,
+        localPath: localPath.trim() || undefined,
       });
       toast.success(t("projects:created"));
       setDialogOpen(false);
@@ -42,6 +51,7 @@ export function ProjectsPage() {
       setName("");
       setDescription("");
       setRepoUrl("");
+      setLocalPath("");
     } catch (error) {
       toast.error(errorMessage(error));
     }
@@ -156,6 +166,15 @@ export function ProjectsPage() {
               onChange={(event) => setRepoUrl(event.target.value)}
               placeholder={t("projects:repoUrlPlaceholder")}
             />
+          </label>
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("projects:localPath")}</span>
+            <Input
+              value={localPath}
+              onChange={(event) => setLocalPath(event.target.value)}
+              placeholder={t("projects:localPathPlaceholder")}
+            />
+            <span className="text-xs text-muted-foreground">{t("projects:localPathHint")}</span>
           </label>
           <label className="block space-y-1.5 text-sm">
             <span className="font-medium">{t("projects:descriptionLabel")}</span>

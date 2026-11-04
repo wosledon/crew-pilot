@@ -9,12 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { toast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
-import {
-  useCreatePrototype,
-  useDeletePrototype,
-  usePrototypes,
-  useUpdatePrototype,
-} from "./api";
+import { useCreatePrototype, useDeletePrototype, usePrototypes, useUpdatePrototype } from "./api";
 import { useProjects } from "@/features/projects/api";
 import { formatDateTime } from "@/lib/format";
 
@@ -230,11 +225,7 @@ export function PrototypeStudioPage() {
                 <CardContent className="flex items-center justify-between">
                   <Badge tone="neutral">{t(`prototype:types.${prototype.type}`)}</Badge>
                   <div className="flex gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleLoad(prototype.id)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => handleLoad(prototype.id)}>
                       {t("prototype:load")}
                     </Button>
                     <Button

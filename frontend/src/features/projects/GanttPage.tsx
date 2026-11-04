@@ -50,10 +50,7 @@ export function GanttPage() {
 
   const min = dates.reduce((a, b) => (a < b ? a : b));
   const max = dates.reduce((a, b) => (a > b ? a : b));
-  const span = Math.max(
-    1,
-    (Date.parse(max) - Date.parse(min)) / (24 * 60 * 60 * 1000),
-  );
+  const span = Math.max(1, (Date.parse(max) - Date.parse(min)) / (24 * 60 * 60 * 1000));
   const percent = (date: string) =>
     ((Date.parse(date) - Date.parse(min)) / (span * 24 * 60 * 60 * 1000)) * 100;
 
@@ -74,10 +71,7 @@ export function GanttPage() {
           ) : (
             iterationList.map((iteration) => {
               const left = percent(iteration.startDate);
-              const width = Math.max(
-                1,
-                percent(iteration.endDate) - left,
-              );
+              const width = Math.max(1, percent(iteration.endDate) - left);
               return (
                 <div key={iteration.id} className="flex items-center gap-3">
                   <span className="w-32 shrink-0 truncate text-sm">{iteration.name}</span>
@@ -123,7 +117,12 @@ export function GanttPage() {
             <p className="text-sm text-muted-foreground">{t("gantt:empty")}</p>
           ) : (
             datedItems.map((item) => (
-              <WorkItemRow key={item.id} item={item} percent={percent(item.dueDate as string)} today={today} />
+              <WorkItemRow
+                key={item.id}
+                item={item}
+                percent={percent(item.dueDate as string)}
+                today={today}
+              />
             ))
           )}
           {undatedItems.length > 0 ? (
@@ -156,7 +155,11 @@ function WorkItemRow({
   today: string;
 }) {
   const { t } = useTranslation(["gantt", "workitems"]);
-  const overdue = item.dueDate !== null && item.dueDate < today && item.status !== "done" && item.status !== "closed";
+  const overdue =
+    item.dueDate !== null &&
+    item.dueDate < today &&
+    item.status !== "done" &&
+    item.status !== "closed";
 
   return (
     <div className="flex items-center gap-3">
@@ -240,10 +243,7 @@ function HoursReportSection({
           title={t("report:byAssignee")}
           rows={report.byAssignee.map((group) => ({
             key: group.key,
-            label:
-              group.key === "unassigned"
-                ? t("report:unassigned")
-                : group.label,
+            label: group.key === "unassigned" ? t("report:unassigned") : group.label,
             estimatedHours: group.estimatedHours,
             loggedHours: group.loggedHours,
           }))}
@@ -282,7 +282,12 @@ function HoursGroupTable({
             <tr key={row.key} className="border-t border-border">
               <td className="py-1.5">{row.label}</td>
               <td className="py-1.5 text-right">{row.estimatedHours}h</td>
-              <td className={cn("py-1.5 text-right", row.loggedHours > row.estimatedHours && "text-destructive")}>
+              <td
+                className={cn(
+                  "py-1.5 text-right",
+                  row.loggedHours > row.estimatedHours && "text-destructive",
+                )}
+              >
                 {row.loggedHours}h
               </td>
             </tr>

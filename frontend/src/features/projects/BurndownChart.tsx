@@ -21,10 +21,8 @@ export function BurndownChart({ burndown }: { burndown: Burndown }) {
   );
 
   const x = (index: number) =>
-    padding +
-    (index * (width - padding * 2)) / Math.max(1, burndown.points.length - 1);
-  const y = (hours: number) =>
-    height - padding - (hours / maxHours) * (height - padding * 2);
+    padding + (index * (width - padding * 2)) / Math.max(1, burndown.points.length - 1);
+  const y = (hours: number) => height - padding - (hours / maxHours) * (height - padding * 2);
 
   const toPath = (picker: (point: Burndown["points"][number]) => number) =>
     burndown.points

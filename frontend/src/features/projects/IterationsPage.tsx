@@ -131,8 +131,8 @@ export function IterationsPage() {
                   </Badge>
                 </CardTitle>
                 <p className="text-xs text-muted-foreground">
-                  {iteration.startDate} → {iteration.endDate} ·{" "}
-                  {iteration.workItemCount} {t("iterations:workItemCount")} ·{" "}
+                  {iteration.startDate} → {iteration.endDate} · {iteration.workItemCount}{" "}
+                  {t("iterations:workItemCount")} ·{" "}
                   {t("iterations:hours", {
                     logged: iteration.loggedHours,
                     estimated: iteration.estimatedHours,
@@ -244,7 +244,12 @@ export function IterationsPage() {
             </Button>
             <Button
               onClick={() => void handleCreate()}
-              disabled={createIteration.isPending || name.trim() === "" || startDate === "" || endDate === ""}
+              disabled={
+                createIteration.isPending ||
+                name.trim() === "" ||
+                startDate === "" ||
+                endDate === ""
+              }
             >
               {t("common:create")}
             </Button>

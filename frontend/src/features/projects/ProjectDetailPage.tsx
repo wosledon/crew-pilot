@@ -88,8 +88,7 @@ export function ProjectDetailPage() {
         <div>
           <h1 className="text-xl font-semibold">{project.data.name}</h1>
           <p className="text-sm text-muted-foreground">
-            {project.data.key} · {project.data.workItemCount}{" "}
-            {t("projects:detail.workItems")}
+            {project.data.key} · {project.data.workItemCount} {t("projects:detail.workItems")}
           </p>
         </div>
       </div>

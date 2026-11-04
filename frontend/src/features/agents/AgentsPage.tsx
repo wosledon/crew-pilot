@@ -11,7 +11,14 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { api } from "@/lib/api";
-import { useAgent, useAgents, useCreateAgent, useDeleteAgent, useProvider, useProviders } from "./api";
+import {
+  useAgent,
+  useAgents,
+  useCreateAgent,
+  useDeleteAgent,
+  useProvider,
+  useProviders,
+} from "./api";
 
 const defaultTools = '["read_file","write_file","list_files","run_command"]';
 const defaultWhitelist = '["git","dotnet","npm"]';
@@ -221,11 +228,7 @@ export function AgentsPage() {
                 ariaLabel={t("agents:provider")}
               />
             </label>
-            <ModelSelect
-              providerId={providerId}
-              value={model}
-              onChange={setModel}
-            />
+            <ModelSelect providerId={providerId} value={model} onChange={setModel} />
           </div>
 
           <label className="block space-y-1.5 text-sm">

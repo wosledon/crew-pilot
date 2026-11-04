@@ -18,6 +18,7 @@ export interface ProjectDetail {
   name: string;
   description: string | null;
   repoUrl: string | null;
+  localPath: string | null;
   status: ProjectStatus;
   workItemCount: number;
   createdAt: string;

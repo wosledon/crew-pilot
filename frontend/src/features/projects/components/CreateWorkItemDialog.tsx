@@ -22,11 +22,7 @@ export interface CreateWorkItemDialogProps {
   }) => Promise<unknown>;
 }
 
-export function CreateWorkItemDialog({
-  open,
-  onOpenChange,
-  onSubmit,
-}: CreateWorkItemDialogProps) {
+export function CreateWorkItemDialog({ open, onOpenChange, onSubmit }: CreateWorkItemDialogProps) {
   const { t } = useTranslation(["workitems", "common"]);
   const [type, setType] = useState("requirement");
   const [title, setTitle] = useState("");
@@ -105,10 +101,7 @@ export function CreateWorkItemDialog({
 
         <label className="block space-y-1.5 text-sm">
           <span className="font-medium">{t("workitems:description")}</span>
-          <Textarea
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-          />
+          <Textarea value={description} onChange={(event) => setDescription(event.target.value)} />
         </label>
 
         <label className="block space-y-1.5 text-sm">
@@ -180,10 +173,7 @@ export function CreateWorkItemDialog({
             </label>
             <label className="block space-y-1.5 text-sm">
               <span className="font-medium">{t("workitems:environment")}</span>
-              <Input
-                value={environment}
-                onChange={(event) => setEnvironment(event.target.value)}
-              />
+              <Input value={environment} onChange={(event) => setEnvironment(event.target.value)} />
             </label>
           </>
         ) : null}
@@ -192,10 +182,7 @@ export function CreateWorkItemDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t("common:cancel")}
           </Button>
-          <Button
-            onClick={() => void handleSubmit()}
-            disabled={submitting || title.trim() === ""}
-          >
+          <Button onClick={() => void handleSubmit()} disabled={submitting || title.trim() === ""}>
             {t("common:create")}
           </Button>
         </div>

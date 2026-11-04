@@ -27,8 +27,7 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
+  extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {}
 
 /** forwardRef：供 Radix asChild（AlertDialog Cancel/Action 等）传递 ref */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

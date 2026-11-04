@@ -33,7 +33,9 @@ export function nextStatuses(type: WorkItemType, status: string): string[] {
   return [];
 }
 
-export function statusTone(status: string): "neutral" | "primary" | "success" | "warning" | "danger" | "info" {
+export function statusTone(
+  status: string,
+): "neutral" | "primary" | "success" | "warning" | "danger" | "info" {
   switch (status) {
     case "done":
     case "closed":
@@ -55,7 +57,9 @@ export function statusTone(status: string): "neutral" | "primary" | "success" | 
   }
 }
 
-export function priorityTone(priority: string): "neutral" | "primary" | "success" | "warning" | "danger" | "info" {
+export function priorityTone(
+  priority: string,
+): "neutral" | "primary" | "success" | "warning" | "danger" | "info" {
   switch (priority) {
     case "p0":
       return "danger";

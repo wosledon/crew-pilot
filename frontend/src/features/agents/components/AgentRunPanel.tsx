@@ -44,9 +44,7 @@ export function AssignAgentDialog({
       toast.success(t("agentruns:assigned"));
       onOpenChange(false);
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : t("common:error"),
-      );
+      toast.error(error instanceof Error ? error.message : t("common:error"));
     }
   };
 
@@ -108,9 +106,7 @@ export function AgentRunPanel({
       await cancelRun.mutateAsync(id);
       toast.success(t("agentruns:canceled"));
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : t("common:error"),
-      );
+      toast.error(error instanceof Error ? error.message : t("common:error"));
     }
   };
 
@@ -139,9 +135,7 @@ export function AgentRunPanel({
                 <Badge tone={statusTones[run.status] ?? "neutral"}>
                   {t(`agentruns:statuses.${run.status}`)}
                 </Badge>
-                <Badge tone="neutral">
-                  {t(`agentruns:triggers.${run.trigger}`)}
-                </Badge>
+                <Badge tone="neutral">{t(`agentruns:triggers.${run.trigger}`)}</Badge>
               </CardTitle>
               <div className="flex shrink-0 items-center gap-2">
                 {run.duration !== null ? (
@@ -150,20 +144,14 @@ export function AgentRunPanel({
                   </span>
                 ) : null}
                 {run.status === "queued" || run.status === "running" ? (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => void handleCancel(run.id)}
-                  >
+                  <Button size="sm" variant="outline" onClick={() => void handleCancel(run.id)}>
                     {t("agentruns:cancel")}
                   </Button>
                 ) : null}
               </div>
             </CardHeader>
             {run.error !== null ? (
-              <CardContent className="pt-0 text-xs text-destructive">
-                {run.error}
-              </CardContent>
+              <CardContent className="pt-0 text-xs text-destructive">{run.error}</CardContent>
             ) : null}
           </Card>
         </li>

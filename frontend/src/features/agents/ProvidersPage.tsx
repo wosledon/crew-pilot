@@ -137,9 +137,7 @@ export function ProvidersPage() {
                 <p className="text-xs text-muted-foreground">
                   {t("providers:modelCount", { count: provider.modelCount })}
                 </p>
-                {expandedId === provider.id ? (
-                  <ProviderModels providerId={provider.id} />
-                ) : null}
+                {expandedId === provider.id ? <ProviderModels providerId={provider.id} /> : null}
                 <div className="flex flex-wrap gap-2">
                   <Button
                     size="sm"
@@ -162,9 +160,7 @@ export function ProvidersPage() {
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() =>
-                      setExpandedId(expandedId === provider.id ? null : provider.id)
-                    }
+                    onClick={() => setExpandedId(expandedId === provider.id ? null : provider.id)}
                   >
                     {t("providers:models")}
                   </Button>
@@ -222,7 +218,12 @@ export function ProvidersPage() {
             </Button>
             <Button
               onClick={() => void handleCreate()}
-              disabled={createProvider.isPending || name.trim() === "" || baseUrl.trim() === "" || apiKey.trim() === ""}
+              disabled={
+                createProvider.isPending ||
+                name.trim() === "" ||
+                baseUrl.trim() === "" ||
+                apiKey.trim() === ""
+              }
             >
               {t("common:create")}
             </Button>

@@ -18,9 +18,7 @@ const navItems = [
 /** 应用骨架：左侧固定导航 + 主内容区（卡片风格见 tokens.css） */
 export function AppLayout() {
   const { t, i18n } = useTranslation();
-  const [dark, setDark] = useState(
-    () => window.matchMedia("(prefers-color-scheme: dark)").matches,
-  );
+  const [dark, setDark] = useState(() => window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -37,9 +35,7 @@ export function AppLayout() {
           </span>
           <div className="leading-tight">
             <div className="text-sm font-semibold">{t("layout:sidebar.title")}</div>
-            <div className="text-xs text-muted-foreground">
-              {t("layout:sidebar.subtitle")}
-            </div>
+            <div className="text-xs text-muted-foreground">{t("layout:sidebar.subtitle")}</div>
           </div>
         </div>
         <nav className="flex flex-col gap-1 p-2">

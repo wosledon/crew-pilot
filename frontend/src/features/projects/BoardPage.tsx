@@ -64,13 +64,7 @@ function DraggableCard({ item }: { item: WorkItemListItem }) {
   );
 }
 
-function Column({
-  status,
-  items,
-}: {
-  status: string;
-  items: WorkItemListItem[];
-}) {
+function Column({ status, items }: { status: string; items: WorkItemListItem[] }) {
   const { t } = useTranslation(["workitems", "kanban"]);
   const { setNodeRef, isOver } = useDroppable({ id: status });
 
@@ -108,9 +102,7 @@ export function BoardPage() {
   const workItems = useWorkItems(projectId, type);
   const transitionWorkItem = useTransitionWorkItem();
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  );
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const items = workItems.data ?? [];
   const columns = columnsFor(type);

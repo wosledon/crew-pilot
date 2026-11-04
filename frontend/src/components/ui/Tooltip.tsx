@@ -3,9 +3,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 export function TooltipProvider({ children }: { children: ReactNode }) {
-  return (
-    <TooltipPrimitive.Provider delayDuration={200}>{children}</TooltipPrimitive.Provider>
-  );
+  return <TooltipPrimitive.Provider delayDuration={200}>{children}</TooltipPrimitive.Provider>;
 }
 
 export interface TooltipProps {

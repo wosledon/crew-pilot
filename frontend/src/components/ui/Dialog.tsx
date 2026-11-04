@@ -31,9 +31,7 @@ export function Dialog({
             className,
           )}
         >
-          <DialogPrimitive.Title className="text-base font-semibold">
-            {title}
-          </DialogPrimitive.Title>
+          <DialogPrimitive.Title className="text-base font-semibold">{title}</DialogPrimitive.Title>
           <div className="mt-4">{children}</div>
           <DialogPrimitive.Close
             aria-label={closeLabel}
