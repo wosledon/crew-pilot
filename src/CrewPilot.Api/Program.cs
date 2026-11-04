@@ -2,6 +2,7 @@ using CrewPilot.Agents.Abstractions;
 using CrewPilot.Agents.Engine;
 using CrewPilot.Agents.Execution;
 using CrewPilot.Agents.Workflows;
+using CrewPilot.Api.Auth;
 using CrewPilot.Api.Providers;
 using CrewPilot.Api.Realtime;
 using CrewPilot.Core.Abstractions;
@@ -100,6 +101,36 @@ builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
+// 单用户认证：配置 Auth:Password 后启用 Cookie 登录（默认关闭，自托管开箱即用）
+builder.Services.Configure<AuthOptions>(builder.Configuration.GetSection("Auth"));
+var authPassword = builder.Configuration["Auth:Password"];
+if (!string.IsNullOrWhiteSpace(authPassword))
+{
+    builder.Services
+        .AddAuthentication(
+            Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults
+                .AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.Cookie.Name = "crewpilot_auth";
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SameSite = SameSiteMode.Strict;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            options.ExpireTimeSpan = TimeSpan.FromDays(7);
+            options.SlidingExpiration = true;
+            options.Events.OnRedirectToLogin = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Task.CompletedTask;
+            };
+            options.Events.OnRedirectToAccessDenied = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                return Task.CompletedTask;
+            };
+        });
+}
+
 // CORS：开发期前端 dev server（Vite 默认 5173 / 预览 4173）
 builder.Services.AddCors(options =>
     options.AddPolicy("FrontendDev", policy => policy
@@ -130,6 +161,12 @@ app.Use(async (context, next) =>
 });
 
 app.UseCors("FrontendDev");
+
+if (!string.IsNullOrWhiteSpace(authPassword))
+{
+    app.UseAuthentication();
+    app.UseMiddleware<AuthGateMiddleware>();
+}
 
 if (app.Environment.IsDevelopment())
 {

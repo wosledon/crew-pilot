@@ -18,7 +18,7 @@ namespace CrewPilot.IntegrationTests;
 /// 而不是共享同一个 SqliteConnection 实例——后台 AgentRun Worker 与 HTTP 请求会并发访问数据库，
 /// 共享连接实例会触发 "unable to delete/modify user-function due to active statements"。
 /// </summary>
-public sealed class CrewPilotApiFactory : WebApplicationFactory<Program>
+public class CrewPilotApiFactory : WebApplicationFactory<Program>
 {
     private readonly string _connectionString;
     private readonly string _attachmentRoot = Path.Combine(
