@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:5095/"
+      "url": "http://127.0.0.1:5096/"
     }
   ],
   "paths": {
@@ -5551,7 +5551,8 @@
           "commandWhitelist",
           "enabled",
           "skillIds",
-          "mcpServerIds"
+          "mcpServerIds",
+          "sandboxPolicy"
         ],
         "type": "object",
         "properties": {
@@ -5606,6 +5607,9 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "sandboxPolicy": {
+            "type": "string"
           }
         }
       },
@@ -6476,6 +6480,12 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "sandboxPolicy": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -8398,6 +8408,12 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "sandboxPolicy": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

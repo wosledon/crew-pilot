@@ -21,7 +21,8 @@ public sealed record AgentDetailDto(
     string? CommandWhitelist,
     bool Enabled,
     IReadOnlyList<Guid> SkillIds,
-    IReadOnlyList<Guid> McpServerIds);
+    IReadOnlyList<Guid> McpServerIds,
+    string SandboxPolicy);
 
 public sealed record CreateAgentRequest(
     string Name,
@@ -32,7 +33,8 @@ public sealed record CreateAgentRequest(
     string? Tools,
     string? CommandWhitelist,
     IReadOnlyList<Guid>? SkillIds = null,
-    IReadOnlyList<Guid>? McpServerIds = null);
+    IReadOnlyList<Guid>? McpServerIds = null,
+    string? SandboxPolicy = null);
 
 public sealed record UpdateAgentRequest(
     string Name,
@@ -42,7 +44,8 @@ public sealed record UpdateAgentRequest(
     string? CommandWhitelist,
     bool Enabled,
     IReadOnlyList<Guid>? SkillIds = null,
-    IReadOnlyList<Guid>? McpServerIds = null);
+    IReadOnlyList<Guid>? McpServerIds = null,
+    string? SandboxPolicy = null);
 
 public sealed record AgentRunListItemDto(
     Guid Id,

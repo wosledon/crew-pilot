@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using CrewPilot.Api.Contracts;
+using CrewPilot.Core.Agents;
 using FluentAssertions;
 using Xunit;
 
@@ -120,6 +121,35 @@ public sealed class AgentClaimTests(CrewPilotApiFactory factory) : IClassFixture
 
         var retry = await client.PostAsync($"/api/agent-runs/{run.Id}/retry", null);
         retry.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task SandboxPolicy_IsPersistedAndPassedToEngine()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var provider = await CreateProviderAsync(client);
+        var agentResponse = await client.PostAsJsonAsync("/api/agents", new
+        {
+            name = "只读 Agent" + Guid.NewGuid().ToString("N")[..6],
+            job = "developer",
+            providerId = provider.Id,
+            model = "gpt-4o-mini",
+            systemPrompt = "只读分析",
+            sandboxPolicy = "readonly",
+        });
+        agentResponse.EnsureSuccessStatusCode();
+        var agent = await agentResponse.Content.ReadFromJsonAsync<AgentDetailDto>();
+        agent!.SandboxPolicy.Should().Be("readonly");
+
+        var workItem = await CreateRequirementAsync(client, project.Id);
+        var assign = await client.PostAsJsonAsync(
+            $"/api/workitems/{workItem.Id}/assign-agent", new { agentId = agent.Id });
+        var run = await assign.Content.ReadFromJsonAsync<AgentRunListItemDto>();
+        var detail = await WaitForTerminalAsync(client, run!.Id);
+
+        detail!.Status.Should().Be("succeeded");
+        factory.Engine.LastRequest!.SandboxPolicy.Should().Be(SandboxPolicy.ReadOnly);
     }
 
     private static async Task<AgentRunDetailDto?> WaitForTerminalAsync(

@@ -160,7 +160,8 @@ public sealed class AgentRunExecutor
                 Tools: ParseTools(run.Agent.Tools),
                 CommandWhitelist: ParseTools(run.Agent.CommandWhitelist),
                 McpTools: mcpSession.Tools,
-                McpInvoker: mcpSession.Invoker);
+                McpInvoker: mcpSession.Invoker,
+                SandboxPolicy: run.Agent.SandboxPolicy);
 
             var result = await _engine.RunAsync(request, runCts.Token);
 

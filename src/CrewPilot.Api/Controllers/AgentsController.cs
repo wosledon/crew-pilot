@@ -95,6 +95,7 @@ public sealed class AgentsController(
             SystemPrompt = request.SystemPrompt,
             Tools = request.Tools,
             CommandWhitelist = request.CommandWhitelist,
+            SandboxPolicy = ParseSandboxPolicy(request.SandboxPolicy, SandboxPolicy.WorkspaceWrite),
         };
         db.Agents.Add(agent);
         await db.SaveChangesAsync(ct);
@@ -143,6 +144,7 @@ public sealed class AgentsController(
         agent.SystemPrompt = request.SystemPrompt;
         agent.Tools = request.Tools;
         agent.CommandWhitelist = request.CommandWhitelist;
+        agent.SandboxPolicy = ParseSandboxPolicy(request.SandboxPolicy, agent.SandboxPolicy);
         agent.Enabled = request.Enabled;
         agent.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -238,5 +240,9 @@ public sealed class AgentsController(
         agent.CommandWhitelist,
         agent.Enabled,
         agent.Skills.Select(s => s.SkillId).ToList(),
-        agent.McpServers.Select(m => m.McpServerId).ToList());
+        agent.McpServers.Select(m => m.McpServerId).ToList(),
+        agent.SandboxPolicy.ToString().ToLowerInvariant());
+
+    private static SandboxPolicy ParseSandboxPolicy(string? value, SandboxPolicy fallback) =>
+        Enum.TryParse<SandboxPolicy>(value, ignoreCase: true, out var policy) ? policy : fallback;
 }

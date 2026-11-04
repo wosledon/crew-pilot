@@ -40,6 +40,7 @@ public sealed class MafAgentEngine : IAgentEngine
                 request.WorkingDirectory,
                 request.Tools,
                 request.CommandWhitelist,
+                request.SandboxPolicy,
                 cancellationToken);
             foreach (var mcpTool in AgentTools.CreateMcpTools(
                          request.McpTools, request.McpInvoker))

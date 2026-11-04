@@ -51,6 +51,9 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Property<Guid>("ProviderId")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("SandboxPolicy")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("SystemPrompt")
                         .IsRequired()
                         .HasMaxLength(16000)

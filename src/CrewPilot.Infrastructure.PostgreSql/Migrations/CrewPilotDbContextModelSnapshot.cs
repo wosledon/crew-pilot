@@ -56,6 +56,9 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                     b.Property<Guid>("ProviderId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("SandboxPolicy")
+                        .HasColumnType("integer");
+
                     b.Property<string>("SystemPrompt")
                         .IsRequired()
                         .HasMaxLength(16000)

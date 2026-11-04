@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using CrewPilot.Agents.Abstractions;
+using CrewPilot.Core.Agents;
 using Microsoft.Extensions.AI;
 
 namespace CrewPilot.Agents.Engine;
@@ -29,6 +30,7 @@ public static class AgentTools
         string? workingDirectory,
         IReadOnlyList<string>? enabledTools = null,
         IReadOnlyList<string>? whitelist = null,
+        SandboxPolicy sandboxPolicy = SandboxPolicy.WorkspaceWrite,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(workingDirectory) || !Directory.Exists(workingDirectory))
@@ -40,6 +42,11 @@ public static class AgentTools
         var enabled = enabledTools is { Count: > 0 }
             ? enabledTools.ToHashSet(StringComparer.OrdinalIgnoreCase)
             : AllToolNames.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (sandboxPolicy == SandboxPolicy.ReadOnly)
+        {
+            enabled.IntersectWith(["read_file", "list_files"]);
+        }
+
         var tools = new List<AITool>();
 
         if (enabled.Contains("read_file"))
@@ -95,9 +102,11 @@ public static class AgentTools
                 "列出工作目录中的文件与子目录"));
         }
 
-        if (enabled.Contains("run_command") && whitelist is { Count: > 0 })
+        if (enabled.Contains("run_command") &&
+            (sandboxPolicy == SandboxPolicy.Trusted || whitelist is { Count: > 0 }))
         {
-            var allowed = whitelist.ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var allowAnyCommand = sandboxPolicy == SandboxPolicy.Trusted;
+            var allowed = (whitelist ?? []).ToHashSet(StringComparer.OrdinalIgnoreCase);
             tools.Add(AIFunctionFactory.Create(
                 ([Description("要执行的命令，如 git status（不经过 shell，不支持管道/重定向）")] string command) =>
                 {
@@ -108,7 +117,7 @@ public static class AgentTools
                     }
 
                     var name = Path.GetFileNameWithoutExtension(tokens[0]);
-                    if (!allowed.Contains(name))
+                    if (!allowAnyCommand && !allowed.Contains(name))
                     {
                         return $"命令不在白名单：{name}";
                     }
@@ -116,7 +125,9 @@ public static class AgentTools
                     return RunCommandAsync(root, tokens, cancellationToken).GetAwaiter().GetResult();
                 },
                 "run_command",
-                "在工作目录执行白名单内的终端命令（git/dotnet/npm/gh 等）"));
+                sandboxPolicy == SandboxPolicy.Trusted
+                    ? "在工作目录执行终端命令（受信策略，不经过 shell）"
+                    : "在工作目录执行白名单内的终端命令（git/dotnet/npm/gh 等）"));
         }
 
         return tools;

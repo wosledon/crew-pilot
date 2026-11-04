@@ -28,6 +28,9 @@ public class Agent : Entity
     /// <summary>终端命令白名单（JSON 数组，仅 run_command 工具生效）。</summary>
     public string? CommandWhitelist { get; set; }
 
+    /// <summary>沙箱策略（默认工作区读写；只读禁用写入/执行；受信命令免白名单）。</summary>
+    public SandboxPolicy SandboxPolicy { get; set; } = SandboxPolicy.WorkspaceWrite;
+
     public bool Enabled { get; set; } = true;
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;

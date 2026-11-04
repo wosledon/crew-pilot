@@ -107,6 +107,48 @@ public sealed class AgentToolingTests
     }
 
     [Fact]
+    public void Create_ReadOnlyPolicy_RemovesWriteAndCommandTools()
+    {
+        var root = Directory.CreateTempSubdirectory("crewpilot_tools_").FullName;
+        try
+        {
+            var tools = AgentTools.Create(
+                root,
+                null,
+                ["git"],
+                SandboxPolicy.ReadOnly);
+
+            tools.Select(tool => tool.Name)
+                .Should().BeEquivalentTo(["read_file", "list_files"]);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void Create_TrustedPolicy_AllowsCommandsWithoutWhitelist()
+    {
+        var root = Directory.CreateTempSubdirectory("crewpilot_tools_").FullName;
+        try
+        {
+            var tools = AgentTools.Create(
+                root,
+                null,
+                null,
+                SandboxPolicy.Trusted);
+
+            tools.Select(tool => tool.Name)
+                .Should().Contain("run_command");
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Create_DefaultsToFileTools_AndRunCommandRequiresWhitelist()
     {
         var root = Directory.CreateTempSubdirectory("crewpilot_tools_").FullName;
