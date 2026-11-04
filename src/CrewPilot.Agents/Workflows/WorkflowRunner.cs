@@ -277,7 +277,7 @@ public sealed class WorkflowRunner(
         CancellationToken ct)
     {
         var projectId = await GetProjectIdAsync(run, ct);
-        var agent = await ResolveAgentAsync(step, ct);
+        var agent = await ResolveAgentAsync(step, projectId, ct);
         if (agent is null)
         {
             await CreateBlockerAsync(
@@ -451,7 +451,8 @@ public sealed class WorkflowRunner(
         return run.Workflow.Steps.OrderBy(s => s.Order).FirstOrDefault();
     }
 
-    private async Task<Agent?> ResolveAgentAsync(WorkflowStep step, CancellationToken ct)
+    private async Task<Agent?> ResolveAgentAsync(
+        WorkflowStep step, Guid projectId, CancellationToken ct)
     {
         if (step.AgentId is Guid agentId)
         {
@@ -465,6 +466,26 @@ public sealed class WorkflowRunner(
 
         if (step.RequiredJob is AgentJob job)
         {
+            // 优先项目默认团队中同岗位的 Agent
+            var defaultTeamId = await db.Projects
+                .Where(p => p.Id == projectId)
+                .Select(p => p.DefaultTeamId)
+                .FirstOrDefaultAsync(ct);
+            if (defaultTeamId is Guid teamId)
+            {
+                var teamAgent = await db.AgentTeams
+                    .Where(t => t.Id == teamId)
+                    .SelectMany(t => t.Members)
+                    .Where(m => m.Agent.Enabled && m.Agent.Job == job)
+                    .Select(m => m.Agent)
+                    .OrderBy(a => a.Name)
+                    .FirstOrDefaultAsync(ct);
+                if (teamAgent is not null)
+                {
+                    return teamAgent;
+                }
+            }
+
             return await db.Agents
                 .Where(a => a.Enabled && a.Job == job)
                 .OrderBy(a => a.Name)

@@ -19,7 +19,8 @@ public sealed record ProjectDetailDto(
     string Status,
     int WorkItemCount,
     DateTimeOffset CreatedAt,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    Guid? DefaultTeamId);
 
 public sealed record CreateProjectRequest(
     string Key,
@@ -48,3 +49,5 @@ public sealed record AddProjectMemberRequest(
     Guid? AgentId = null);
 
 public sealed record UpdateProjectMemberRequest(string DisplayName, string Role);
+
+public sealed record SetProjectTeamRequest(Guid? TeamId);

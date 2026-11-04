@@ -1,3 +1,4 @@
+using System.Text.Json;
 using CrewPilot.Api.Contracts;
 using CrewPilot.Core.Collaboration;
 using CrewPilot.Core.Projects;
@@ -123,6 +124,41 @@ public sealed class ProjectsController(
         return Ok(dto);
     }
 
+    /// <summary>设置/清除项目默认 Agent 团队。</summary>
+    [HttpPut("{id:guid}/default-team")]
+    public async Task<ActionResult<ProjectDetailDto>> SetDefaultTeam(
+        Guid id, [FromBody] SetProjectTeamRequest request, CancellationToken ct)
+    {
+        var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == id, ct);
+        if (project is null)
+        {
+            return Problem(detail: "项目不存在", statusCode: 404);
+        }
+
+        if (request.TeamId is Guid teamId)
+        {
+            var teamExists = await db.AgentTeams.AnyAsync(
+                t => t.Id == teamId && t.ProjectId == id, ct);
+            if (!teamExists)
+            {
+                return Problem(detail: "团队不存在或不属于该项目", statusCode: 400);
+            }
+        }
+
+        project.DefaultTeamId = request.TeamId;
+        project.UpdatedAt = DateTimeOffset.UtcNow;
+        db.Activities.Add(new Activity
+        {
+            ProjectId = project.Id,
+            EventType = "project.defaultTeam.changed",
+            Payload = JsonSerializer.Serialize(new { teamId = request.TeamId }),
+            ActorKind = MemberKind.User,
+        });
+        await db.SaveChangesAsync(ct);
+
+        return Ok(await GetAsync(id, ct));
+    }
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
@@ -224,6 +260,7 @@ public sealed class ProjectsController(
                 p.RepoUrl,
                 p.LocalPath,
                 p.Status,
+                p.DefaultTeamId,
                 Count = p.WorkItems.Count,
                 p.CreatedAt,
                 p.UpdatedAt,
@@ -234,6 +271,7 @@ public sealed class ProjectsController(
             ? null
             : new ProjectDetailDto(
                 row.Id, row.Key, row.Name, row.Description, row.RepoUrl, row.LocalPath,
-                row.Status.ToString().ToLowerInvariant(), row.Count, row.CreatedAt, row.UpdatedAt);
+                row.Status.ToString().ToLowerInvariant(), row.Count, row.CreatedAt, row.UpdatedAt,
+                row.DefaultTeamId);
     }
 }

@@ -566,6 +566,9 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("DefaultTeamId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
                         .HasMaxLength(4000)
                         .HasColumnType("TEXT");

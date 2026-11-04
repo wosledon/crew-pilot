@@ -20,6 +20,9 @@ public class Project : Entity
 
     public ProjectStatus Status { get; set; } = ProjectStatus.Active;
 
+    /// <summary>默认 Agent 团队（工作流步骤未显式指定 Agent 时优先从该团队按岗位选择）。</summary>
+    public Guid? DefaultTeamId { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
