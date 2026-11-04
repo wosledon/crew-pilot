@@ -58,7 +58,7 @@ tests/
 docs/PRD.md                 # 产品需求（事实来源）
 ```
 
-## 当前进度（M0 + M1 已完成）
+## 当前进度（M0 + M1 + M2 已完成）
 
 - [x] 解决方案分层（Api / Core / Infrastructure / Agents / Tests）
 - [x] 项目 / 需求 / 缺陷 CRUD + 状态机 + 工时登记（1:1）
@@ -68,8 +68,11 @@ docs/PRD.md                 # 产品需求（事实来源）
 - [x] 迭代管理：CRUD + 开始/完成 + 按工时燃尽图
 - [x] 甘特图：迭代时间线 + 工作项截止日 + 逾期标红
 - [x] 工时报表：按类型/指派人统计预估与已耗
-- [x] 测试：31 项全绿（单测 + WebApplicationFactory 集成测试）
-- [ ] M2：模型供应商（models.dev）、AgentEngine、Agent 认领闭环
+- [x] 模型供应商：自定义 OpenAI 兼容端点 + DPAPI 加密 + models.dev 目录同步 + 连通性测试
+- [x] Agent 数字员工：岗位/模型/提示词/工具权限 CRUD + 试运行
+- [x] AgentEngine：Microsoft Agent Framework（MAF 1.27）落地，工具白名单 + worktree 隔离
+- [x] 认领闭环：指派 → 后台执行 → 日志/产物/token 留痕 → 工时 1:1 折算 → PR 回填 → 可取消接管
+- [x] 测试：47 项全绿（单测 + WebApplicationFactory 集成测试，Fake 引擎）
 - [ ] M3：工作流编排、卡点机制、审批策略
 - [ ] M4：gh/glab CI/CD 集成
 - [ ] M5：Skills、设计 MCP、成本统计
