@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 132 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 133 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -70,8 +70,8 @@
 - [ ] Skills 收尾：SKILL.md 目录/脚本/资源、导入导出、脚本执行
 - [x] MCP：Server 配置、认证加密、启停、连通性测试、按 Agent 授权
 - [x] MCP 运行时：Streamable HTTP 客户端（initialize / tools/list / tools/call，Round 9）
-- [x] MCP 运行时：stdio 传输（Round 15）
-- [ ] MCP 收尾：旧版 HTTP+SSE 双通道、工具级审计
+- [x] MCP 运行时：stdio 传输（Round 15）、旧版 HTTP+SSE 双通道（Round 20）
+- [ ] MCP 收尾：工具级审计
 - [x] 成本统计：token × 模型单价 → 项目级费用，按供应商/模型汇总
 - [x] 审计日志：敏感操作留痕 + 查询 API/页面
 - [x] 结构化日志（生产 JSON console，Round 14）+ 请求关联 ID
@@ -233,7 +233,7 @@
 - [x] Server 配置、认证加密、启停、连通性测试
 - [x] 按 Agent 授权（AgentMcpServer）
 - [x] 运行时 MCP 客户端（Streamable HTTP：initialize/tools/list/tools/call，工具注入 AgentEngine；Round 9）
-- [x] stdio 传输（Round 15；旧版 HTTP+SSE 双通道未支持）
+- [x] stdio（Round 15）与旧版 HTTP+SSE 双通道（Round 20）；Streamable HTTP 为主路径
 - [ ] 设计 MCP 链路（原型 ↔ MCP）
 
 ### 5.8 单用户协同（P0）
@@ -292,6 +292,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 20（2026-11-04）
+
+- MCP 旧版 HTTP+SSE 双通道（PRD 5.7）：新增 `SseMcpClient`（GET 长连接、endpoint 事件、消息 POST、响应经事件流按 id 匹配、心跳忽略、超时/释放）；`McpToolSession` 按 transport 选择 HTTP/旧版 SSE/stdio
+- MCP 连通性测试页对 SSE 走真实握手并报告工具数量；旧版 SSE 单测（假服务端事件流 + Bearer + sessionId 校验）
+- 测试：132 → 133，`dotnet test` 全绿；前端 lint / test / build 仍绿
+- 验证：`dotnet test`、`npm run lint` / `test:run` / `build` 全绿
 
 ### Round 19（2026-11-04）
 
