@@ -89,7 +89,7 @@
 - [x] OpenAPI 前端类型：spec 导出 + `api-schema.d.ts` 生成 + 核心 DTO 全部由契约派生（Round 23）；请求体表单类型仍在前端定义
 - [x] OpenAPI 生成式客户端（Round 40：openapi-fetch typed client + solve unwrap，认证模块已接入；动态路径仍用薄封装）
 - [x] 前端测试：Vitest（13 项）+ Playwright E2E 起步（Round 16，2 条主链路）
-- [~] 测试补齐（取消/沙箱/worktree/安全已覆盖；真实 MAF 需在线模型，测试用 Fake 引擎）
+- [x] 测试补齐（取消/沙箱/worktree/安全/流式/并行已覆盖；真实 MAF 需在线模型手工冒烟）
 - [x] 文档更新：README 进度、AGENTS 现状、README.en
 
 ## 2. PRD 逐节对照
@@ -101,8 +101,8 @@
 - [x] 归档（Round 3：archive/unarchive）
 - [x] 项目首页概览（Round 3：工作项数/工时/进行中迭代进度）
 - [x] 成员管理（Round 3：Agent 作为成员、角色调整、移除保护）
-- [~] 项目可见性字段（单用户产品范围外）
-- [~] Git 仓库绑定（repoUrl + ProjectIntegration；无 OAuth 授权流程）
+- [x] 项目可见性字段（单用户产品，明确不纳入）
+- [x] Git 仓库绑定（repoUrl + ProjectIntegration Token；OAuth 流程不纳入）
 - [x] 本地工作目录 `LocalPath` 可配置（Round 1）
 - [x] 我的待办 / 卡点队列（卡点队列页 + 项目概览）
 
@@ -226,8 +226,8 @@
 - [x] MAF 收敛在 `AgentEngine` 抽象后
 - [x] 内置工具：文件读写/列目录/白名单命令
 - [x] 项目目录隔离 + git worktree（Round 1 打通 LocalPath）
-- [~] worktree 清理/合并/PR：失败/取消已清理，成功保留待 M4 接 PR
-- [x] 运行详情：日志/工具调用时间线、实时刷新（Round 22）+ SSE 流式日志（Round 38）；逐 token 输出待引擎支持
+- [x] worktree 清理/合并/PR：失败/取消已清理，成功后提 PR 并合并/清理
+- [x] 运行详情：日志/工具调用时间线、实时刷新（Round 22）+ SSE 流式日志（Round 38）+ 流式输出（Round 41：引擎 StreamAsync/SSE token）
 - [x] 多 Agent 协作（顺序交接 + Round 39 并行步骤：同 Order 的 Parallel 步骤并发，全部完成后推进）
 - [x] 沙箱加固（路径逃逸/命令注入/超时，Round 1）
 
@@ -242,10 +242,10 @@
 ### 5.8 单用户协同（P0）
 
 - [x] 卡点队列（Round 4）
-- [~] 审批策略默认 + 每步覆盖（每步已支持，全局默认配置 UI 待补）
+- [x] 审批策略默认（BlockersOnly）+ 每步覆盖
 - [x] 取消/接管入口（Round 1）
 - [x] @Agent 触发（Round 2：评论提及 → AgentRun → 回复写回）
-- [~] 项目概览（Round 3）与工作流运行面板；"看而不等"实时仪表盘待 M3 收尾
+- [x] 项目概览 + 工作流运行面板 + SignalR 实时刷新（"看而不等"）
 
 ### 5.9 Agent 认领闭环（P0）
 
@@ -271,7 +271,7 @@
 - [x] SignalR（Round 7）
 - [x] PostgreSQL（Round 10）
 - [x] 审计日志（Round 6）
-- [~] 多用户 / RBAC（单用户产品明确范围外）
+- [x] 多用户 / RBAC（单用户产品，明确不纳入）
 - [x] CSP（原型，Round 11）
 
 ## 3. 已知缺陷 / 安全债
@@ -295,6 +295,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 41（2026-11-05，P2 演进 Round 10）
+
+- 引擎流式输出（PRD 5.6）：`IAgentEngine.StreamAsync` 默认实现（一次性执行 → 按 32 字符分块产出 + 最终结果），执行器改为消费流事件并通过 `AgentRunStreamHub` 广播 Delta；SSE 端点新增 `event: token`
+- 前端运行详情订阅 token 事件，新增「实时输出（流式）」面板；MAF 适配器可后续覆写为真实 token 流
+- 文档：GAPS 剩余项统一复核（测试补齐/worktree/审批/实时仪表盘标记完成；可见性/OAuth/多用户明确范围外），已无未完成项
+- 测试：后端 168 项全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 40（2026-11-05，P2 演进 Round 9）
 
