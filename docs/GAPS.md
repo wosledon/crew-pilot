@@ -9,7 +9,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 164 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 165 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -237,7 +237,7 @@
 - [x] 按 Agent 授权（AgentMcpServer）
 - [x] 运行时 MCP 客户端（Streamable HTTP：initialize/tools/list/tools/call，工具注入 AgentEngine；Round 9）
 - [x] stdio（Round 15）与旧版 HTTP+SSE 双通道（Round 20）；Streamable HTTP 为主路径
-- [~] 设计 MCP 链路（通用 MCP 工具已可用；设计稿→需求专用链路 P2）
+- [x] 设计 MCP 链路（Round 37：原型→需求草稿 + 通用 MCP 工具；Figma 解析由 Agent 工具完成）
 
 ### 5.8 单用户协同（P0）
 
@@ -295,6 +295,12 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 37（2026-11-05，P2 演进 Round 6）
+
+- 设计链路（PRD 4.4/5.7 P2）：`POST /api/prototypes/{id}/draft-requirement` 把原型名称/类型/内容落为 Backlog 需求草稿（含验收标准占位）并回链原型，记录活动流
+- 前端原型工坊新增「生成需求草稿」按钮（成功后提示需求标题并刷新列表）；配合通用 MCP 工具，Figma 等设计源可由 Agent 读取后走同一链路
+- 测试：164 → 165（原型→需求草稿、回链与工作项详情），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 36（2026-11-05，P2 演进 Round 5）
 

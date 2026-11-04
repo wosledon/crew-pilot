@@ -9,7 +9,7 @@
 | 项 | 命令 | 结果 |
 | --- | --- | --- |
 | 后端构建 | `dotnet build CrewPilot.slnx` | 0 警告 / 0 错误 |
-| 后端测试 | `dotnet test CrewPilot.slnx` | **164 项通过**（50 单测 + 114 集成） |
+| 后端测试 | `dotnet test CrewPilot.slnx` | **165 项通过**（50 单测 + 115 集成） |
 | 前端静态检查 | `npm run lint` / `npm run format:check` | 0 error，格式通过 |
 | 前端单测 | `npm run test:run` | **13 项通过** |
 | 前端构建 | `npm run build` | 通过（tsc + vite） |
@@ -136,7 +136,7 @@ CI：`.github/workflows/ci.yml` 含 backend / frontend / e2e 三个 job。
 - [x] Server 配置/认证加密/启停/连通性测试/按 Agent 授权
 - [x] Streamable HTTP、旧版 HTTP+SSE、stdio 三种传输
 - [x] 工具级审计（服务器/工具/耗时/结果）
-- [~] 设计 MCP 专用链路（Figma → 结构化需求）：P2（通用 MCP 已可用）
+- [x] 设计链路：原型 → 需求草稿（Round 37）；Figma 解析经通用 MCP 工具由 Agent 执行
 
 ### 5.8 单用户协同（P0）
 
@@ -183,7 +183,7 @@ PRD 第 4 节：P2 = 后续演进，不阻塞 v1 验收。
 
 | 流式 token 输出（当前为一次性输出 + 中间步骤日志） | 引擎能力增强，P2 |
 | 多 Agent 并行协作（顺序交接/评审已支持） | P2 |
-| 设计 MCP 专用链路（Figma → 需求） | P2，通用 MCP 已可用 |
+
 | CI webhook 自动推送（当前动作触发） | P2 |
 | 完整生成式 API 客户端（当前生成 DTO + 薄 fetch 封装） | P2 工程化 |
 | 项目可见性、多用户/RBAC | 单用户产品范围外 |
