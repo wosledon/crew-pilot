@@ -3,6 +3,7 @@ using CrewPilot.Agents.Abstractions;
 using CrewPilot.Agents.Workflows;
 using CrewPilot.Core.Abstractions;
 using CrewPilot.Core.Agents;
+using CrewPilot.Core.Audit;
 using CrewPilot.Core.Collaboration;
 using CrewPilot.Core.Projects;
 using CrewPilot.Core.WorkItems;
@@ -110,10 +111,11 @@ public sealed class AgentRunExecutor
         await NotifyRunAsync(run, run.WorkItem?.ProjectId ?? Guid.Empty, ct);
 
         using var runCts = _cancellation.Register(run.Id, ct);
+        McpToolSession? mcpSession = null;
         try
         {
             // MCP 工具会话：绑定 Server 可用才注入，单个 Server 失败自动跳过
-            await using var mcpSession = await McpToolSession.ConnectAsync(
+            mcpSession = await McpToolSession.ConnectAsync(
                 run.Agent.McpServers, _secrets, ct);
 
             // 取消可能发生在状态落库与注册之间，注册后再确认一次
@@ -206,6 +208,55 @@ public sealed class AgentRunExecutor
         {
             _cancellation.Unregister(run.Id, runCts);
             await CleanupWorktreeAsync(run);
+            if (mcpSession is not null)
+            {
+                var calls = mcpSession.Calls;
+                await mcpSession.DisposeAsync();
+                await FlushMcpAuditAsync(run, calls, CancellationToken.None);
+            }
+        }
+    }
+
+    /// <summary>MCP 工具级审计：每次 tools/call 记录服务器、工具、耗时与结果（不含参数原文）。</summary>
+    private async Task FlushMcpAuditAsync(
+        AgentRun run,
+        IReadOnlyList<McpToolCallAudit> calls,
+        CancellationToken ct)
+    {
+        if (calls.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var call in calls)
+        {
+            _db.AuditLogs.Add(new AuditLog
+            {
+                ProjectId = run.WorkItem?.ProjectId,
+                Action = "mcp.tool.called",
+                TargetType = "mcp-tool",
+                TargetId = $"{call.ServerName}:{call.ToolName}",
+                Actor = "agent",
+                Detail = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    runId = run.Id,
+                    workItemId = run.WorkItemId,
+                    agent = run.Agent.Name,
+                    call.Succeeded,
+                    call.ElapsedMilliseconds,
+                    error = call.Error,
+                    call.CalledAt,
+                }),
+            });
+        }
+
+        try
+        {
+            await _db.SaveChangesAsync(ct);
+        }
+        catch (Exception)
+        {
+            // 审计落库失败不阻断运行收尾（状态/日志仍会保存）
         }
     }
 

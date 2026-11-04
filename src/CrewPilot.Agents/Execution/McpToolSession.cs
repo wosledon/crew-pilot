@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using System.Collections.Concurrent;
 using CrewPilot.Agents.Abstractions;
 using CrewPilot.Core.Abstractions;
 using CrewPilot.Core.Mcp;
@@ -10,15 +10,14 @@ namespace CrewPilot.Agents.Execution;
 /// 一次 AgentRun 的 MCP 工具会话：
 /// 按绑定的 MCP Server 建连、聚合工具（名称加服务器前缀避免冲突），运行结束释放连接。
 /// 单个 Server 连接失败只跳过该 Server，不影响 AgentRun。
+/// 所有工具调用记录到审计队列，由 <see cref="AgentRunExecutor"/> 在运行结束后统一落库。
 /// </summary>
 public sealed class McpToolSession : IAsyncDisposable
 {
-    private static readonly Regex InvalidToolNameChars = new(
-        "[^a-zA-Z0-9_-]", RegexOptions.Compiled);
-
     private readonly List<IMcpSession> _clients = [];
-    private readonly Dictionary<string, (IMcpSession Client, string RemoteName)> _routes =
+    private readonly Dictionary<string, McpRoute> _routes =
         new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentQueue<McpToolCallAudit> _calls = new();
 
     private McpToolSession()
     {
@@ -27,6 +26,9 @@ public sealed class McpToolSession : IAsyncDisposable
     public IReadOnlyList<McpToolDescriptor> Tools { get; private set; } = [];
 
     public IMcpToolInvoker? Invoker { get; private set; }
+
+    /// <summary>本次运行内已发生的 MCP 工具调用审计（调用发生顺序）。</summary>
+    public IReadOnlyList<McpToolCallAudit> Calls => _calls.ToArray();
 
     /// <summary>根据 Agent 绑定的 MCP Server 建立会话；无绑定/全部失败时返回空会话。</summary>
     public static async Task<McpToolSession> ConnectAsync(
@@ -66,13 +68,15 @@ public sealed class McpToolSession : IAsyncDisposable
 
                 foreach (var tool in client.Tools)
                 {
-                    var name = BuildToolName(server, tool.Name);
+                    var name = McpRouteInvoker.SanitizeToolName(
+                        $"mcp_{server.Name}_{tool.Name}");
                     if (session._routes.ContainsKey(name))
                     {
                         continue;
                     }
 
-                    session._routes[name] = (client, tool.Name);
+                    session._routes[name] = new McpRoute(
+                        client, tool.Name, server.Name, tool.Name);
                     descriptors.Add(new McpToolDescriptor(
                         name, tool.Description, tool.InputSchemaJson));
                 }
@@ -86,18 +90,10 @@ public sealed class McpToolSession : IAsyncDisposable
         session.Tools = descriptors;
         if (session._routes.Count > 0)
         {
-            session.Invoker = new RouteInvoker(session._routes);
+            session.Invoker = new McpRouteInvoker(session._routes, session._calls);
         }
 
         return session;
-    }
-
-    private static string BuildToolName(McpServer server, string toolName)
-    {
-        var serverSlug = InvalidToolNameChars.Replace(server.Name, "_");
-        var combined = $"mcp_{serverSlug}_{toolName}";
-        var sanitized = InvalidToolNameChars.Replace(combined, "_");
-        return sanitized.Length <= 64 ? sanitized : sanitized[..64];
     }
 
     public async ValueTask DisposeAsync()
@@ -111,18 +107,5 @@ public sealed class McpToolSession : IAsyncDisposable
         _routes.Clear();
         Tools = [];
         Invoker = null;
-    }
-
-    private sealed class RouteInvoker(
-        IReadOnlyDictionary<string, (IMcpSession Client, string RemoteName)> routes)
-        : IMcpToolInvoker
-    {
-        public Task<string> CallToolAsync(
-            string toolName, string? argumentsJson, CancellationToken cancellationToken = default)
-        {
-            return routes.TryGetValue(toolName, out var route)
-                ? route.Client.CallToolAsync(route.RemoteName, argumentsJson, cancellationToken)
-                : Task.FromResult($"未知 MCP 工具：{toolName}");
-        }
     }
 }
