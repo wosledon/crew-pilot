@@ -1,0 +1,21 @@
+{
+  "title": "Skills",
+  "description": "可复用能力包：提示词模板 + 工具白名单 + 脚本目录",
+  "create": "新建 Skill",
+  "createTitle": "新建 Skill",
+  "editTitle": "编辑 Skill",
+  "name": "名称",
+  "namePlaceholder": "如 PRD 撰写",
+  "descriptionLabel": "描述",
+  "promptContent": "提示词内容",
+  "promptPlaceholder": "将注入到 Agent 系统提示词的能力说明",
+  "tools": "工具白名单（JSON，可选）",
+  "scriptPath": "脚本目录（可选）",
+  "enabled": "启用",
+  "empty": "还没有 Skill",
+  "created": "Skill 已创建",
+  "updated": "Skill 已更新",
+  "deleted": "Skill 已删除",
+  "agentCount": "{{count}} 个 Agent 使用",
+  "deleteConfirm": "删除后已装配的 Agent 将立即失去该能力。"
+}

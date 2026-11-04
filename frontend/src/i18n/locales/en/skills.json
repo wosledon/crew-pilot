@@ -1,0 +1,21 @@
+{
+  "title": "Skills",
+  "description": "Reusable capability packs: prompt template + tool whitelist + script folder",
+  "create": "New Skill",
+  "createTitle": "New Skill",
+  "editTitle": "Edit Skill",
+  "name": "Name",
+  "namePlaceholder": "e.g. PRD writing",
+  "descriptionLabel": "Description",
+  "promptContent": "Prompt content",
+  "promptPlaceholder": "Capability text injected into the Agent system prompt",
+  "tools": "Tool whitelist (JSON, optional)",
+  "scriptPath": "Script folder (optional)",
+  "enabled": "Enabled",
+  "empty": "No skills yet",
+  "created": "Skill created",
+  "updated": "Skill updated",
+  "deleted": "Skill deleted",
+  "agentCount": "{{count}} Agents use it",
+  "deleteConfirm": "Agents using this skill will lose the capability immediately."
+}

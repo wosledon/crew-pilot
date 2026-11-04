@@ -15,5 +15,12 @@
     "task": "任务"
   },
   "hours": "小时",
-  "loggedOfEstimated": "{{logged}} / {{estimated}} h"
+  "loggedOfEstimated": "{{logged}} / {{estimated}} h",
+  "costTitle": "Token 成本",
+  "costDescription": "AgentRun token × 模型单价（USD）",
+  "costTotal": "总成本",
+  "costPromptTokens": "输入 Token",
+  "costCompletionTokens": "输出 Token",
+  "costByModel": "按模型",
+  "costEmpty": "暂无成本数据"
 }

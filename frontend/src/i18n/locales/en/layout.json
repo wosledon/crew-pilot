@@ -3,7 +3,10 @@
     "projects": "Projects",
     "prototype": "Prototype Studio",
     "providers": "Providers",
-    "agents": "Agents"
+    "agents": "Agents",
+    "skills": "Skills",
+    "mcp": "MCP",
+    "audit": "Audit"
   },
   "theme": {
     "toggle": "Toggle light/dark theme"

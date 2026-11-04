@@ -34,7 +34,10 @@
     "description": "该 Agent 的执行记录将一并删除，且不可恢复。"
   },
   "created": "Agent 已创建",
+  "updated": "Agent 已更新",
   "deleted": "Agent 已删除",
+  "capabilities": "能力装配",
+  "capabilitiesTitle": "能力装配（Skills / MCP）",
   "previewStarted": "试运行已入队",
   "empty": "还没有 Agent，先创建供应商再新建 Agent",
   "noProviders": "还没有模型供应商，请先到「供应商」页创建"

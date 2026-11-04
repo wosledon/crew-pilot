@@ -15,5 +15,12 @@
     "task": "Task"
   },
   "hours": "h",
-  "loggedOfEstimated": "{{logged}} / {{estimated}} h"
+  "loggedOfEstimated": "{{logged}} / {{estimated}} h",
+  "costTitle": "Token cost",
+  "costDescription": "AgentRun tokens × model price (USD)",
+  "costTotal": "Total cost",
+  "costPromptTokens": "Prompt tokens",
+  "costCompletionTokens": "Completion tokens",
+  "costByModel": "By model",
+  "costEmpty": "No cost data"
 }

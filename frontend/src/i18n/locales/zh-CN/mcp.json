@@ -1,0 +1,27 @@
+{
+  "title": "MCP",
+  "description": "Model Context Protocol Server：认证加密、按 Agent 授权",
+  "create": "新建 MCP Server",
+  "createTitle": "新建 MCP Server",
+  "editTitle": "编辑 MCP Server",
+  "name": "名称",
+  "endpoint": "端点 / 启动命令",
+  "transport": "传输方式",
+  "transports": {
+    "http": "HTTP",
+    "sse": "SSE",
+    "stdio": "stdio"
+  },
+  "token": "认证 Token",
+  "tokenKeep": "留空保留现有 Token",
+  "enabled": "启用",
+  "empty": "还没有 MCP Server",
+  "created": "MCP Server 已创建",
+  "updated": "MCP Server 已更新",
+  "deleted": "MCP Server 已删除",
+  "test": "测试连接",
+  "testOk": "端点可达",
+  "testFailed": "端点不可达",
+  "agentCount": "{{count}} 个 Agent 已授权",
+  "deleteConfirm": "删除后 Agent 将失去该 MCP 服务。"
+}

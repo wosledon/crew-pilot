@@ -1,0 +1,12 @@
+{
+  "title": "Audit log",
+  "description": "Sensitive operations trail (read-only)",
+  "empty": "No audit records",
+  "action": "Action",
+  "target": "Target",
+  "actor": "Actor",
+  "detail": "Detail",
+  "createdAt": "Time",
+  "allProjects": "All projects",
+  "filterProject": "Filter by project"
+}

@@ -1,0 +1,27 @@
+{
+  "title": "MCP",
+  "description": "Model Context Protocol servers: encrypted auth, per-Agent authorization",
+  "create": "New MCP server",
+  "createTitle": "New MCP server",
+  "editTitle": "Edit MCP server",
+  "name": "Name",
+  "endpoint": "Endpoint / launch command",
+  "transport": "Transport",
+  "transports": {
+    "http": "HTTP",
+    "sse": "SSE",
+    "stdio": "stdio"
+  },
+  "token": "Auth token",
+  "tokenKeep": "Leave empty to keep the current token",
+  "enabled": "Enabled",
+  "empty": "No MCP servers yet",
+  "created": "MCP server created",
+  "updated": "MCP server updated",
+  "deleted": "MCP server deleted",
+  "test": "Test connection",
+  "testOk": "Endpoint reachable",
+  "testFailed": "Endpoint unreachable",
+  "agentCount": "{{count}} Agents authorized",
+  "deleteConfirm": "Agents will lose access to this MCP server."
+}

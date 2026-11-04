@@ -13,6 +13,9 @@ import { PrototypeStudioPage } from "@/features/prototype/PrototypeStudioPage";
 import { ProvidersPage } from "@/features/agents/ProvidersPage";
 import { AgentsPage } from "@/features/agents/AgentsPage";
 import { BlockersPage } from "@/features/workflows/BlockersPage";
+import { SkillsPage } from "@/features/platform/SkillsPage";
+import { McpPage } from "@/features/platform/McpPage";
+import { AuditPage } from "@/features/platform/AuditPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,6 +44,9 @@ export default function App() {
                 <Route path="projects/:projectId/blockers" element={<BlockersPage />} />
                 <Route path="providers" element={<ProvidersPage />} />
                 <Route path="agents" element={<AgentsPage />} />
+                <Route path="skills" element={<SkillsPage />} />
+                <Route path="mcp" element={<McpPage />} />
+                <Route path="audit" element={<AuditPage />} />
                 <Route path="prototypes" element={<PrototypeStudioPage />} />
               </Route>
             </Routes>

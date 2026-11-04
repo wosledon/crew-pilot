@@ -3,7 +3,10 @@
     "projects": "项目",
     "prototype": "原型工坊",
     "providers": "供应商",
-    "agents": "Agent"
+    "agents": "Agent",
+    "skills": "Skills",
+    "mcp": "MCP",
+    "audit": "审计"
   },
   "theme": {
     "toggle": "切换深浅色主题"

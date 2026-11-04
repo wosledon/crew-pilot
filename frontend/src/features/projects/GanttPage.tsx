@@ -20,6 +20,7 @@ import {
 } from "./api";
 import { priorityTone, statusTone } from "./statusFlow";
 import type { Milestone, WorkItemListItem } from "@/lib/types";
+import { CostCard } from "@/features/platform/CostCard";
 import { cn } from "@/lib/cn";
 
 /** 甘特图：迭代时间线 + 工作项截止日标记（工时维度），纯 CSS 定位自绘 */
@@ -267,6 +268,8 @@ export function GanttPage() {
         report={report.data}
         onRetry={() => void report.refetch()}
       />
+
+      <CostCard projectId={projectId} />
 
       <Dialog
         open={milestoneOpen}

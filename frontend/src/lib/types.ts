@@ -245,6 +245,8 @@ export interface AgentDetail {
   tools: string | null;
   commandWhitelist: string | null;
   enabled: boolean;
+  skillIds: string[];
+  mcpServerIds: string[];
 }
 
 export type AgentRunStatus =
@@ -423,6 +425,57 @@ export interface ReleaseResult {
   tag: string;
   url: string | null;
   message: string;
+}
+
+/** M5：Skills / MCP / 审计 / 成本 */
+export interface Skill {
+  id: string;
+  name: string;
+  description: string | null;
+  promptContent: string;
+  tools: string | null;
+  scriptPath: string | null;
+  enabled: boolean;
+  agentCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface McpServer {
+  id: string;
+  name: string;
+  endpoint: string;
+  transport: string;
+  hasToken: boolean;
+  enabled: boolean;
+  agentCount: number;
+  updatedAt: string;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  projectId: string | null;
+  action: string;
+  targetType: string;
+  targetId: string | null;
+  actor: string;
+  detail: string | null;
+  createdAt: string;
+}
+
+export interface CostByModel {
+  provider: string;
+  model: string;
+  promptTokens: number;
+  completionTokens: number;
+  cost: number;
+}
+
+export interface CostReport {
+  totalPromptTokens: number;
+  totalCompletionTokens: number;
+  totalCost: number;
+  byModel: CostByModel[];
 }
 
 /** API 错误（携带 ProblemDetails 状态码） */

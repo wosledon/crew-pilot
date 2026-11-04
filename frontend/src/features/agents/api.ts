@@ -100,8 +100,30 @@ export function useCreateAgent() {
       systemPrompt: string;
       tools?: string;
       commandWhitelist?: string;
+      skillIds?: string[];
+      mcpServerIds?: string[];
     }) => api.post<AgentDetail>("/agents", body),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: agentKeys.agents }),
+  });
+}
+
+export function useUpdateAgent(agentId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      name: string;
+      job: string;
+      systemPrompt: string;
+      tools?: string | null;
+      commandWhitelist?: string | null;
+      enabled: boolean;
+      skillIds?: string[];
+      mcpServerIds?: string[];
+    }) => api.put<AgentDetail>(`/agents/${agentId}`, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: agentKeys.agents });
+      void queryClient.invalidateQueries({ queryKey: agentKeys.agentDetail(agentId) });
+    },
   });
 }
 

@@ -34,7 +34,10 @@
     "description": "Its run history will be deleted as well. This cannot be undone."
   },
   "created": "Agent created",
+  "updated": "Agent updated",
   "deleted": "Agent deleted",
+  "capabilities": "Capabilities",
+  "capabilitiesTitle": "Capabilities (Skills / MCP)",
   "previewStarted": "Preview queued",
   "empty": "No agents yet — create a provider first",
   "noProviders": "No model providers yet — create one on the Providers page"

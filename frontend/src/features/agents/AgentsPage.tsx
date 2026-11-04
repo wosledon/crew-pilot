@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Bot, Play, Plus, Trash2 } from "lucide-react";
+import { Bot, Play, Plus, Sparkles, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -11,6 +11,8 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { api } from "@/lib/api";
+import { useMcpServers, useSkills } from "@/features/platform/api";
+import { AgentCapabilitiesDialog } from "./components/AgentCapabilitiesDialog";
 import {
   useAgent,
   useAgents,
@@ -30,6 +32,8 @@ export function AgentsPage() {
   const { t } = useTranslation(["agents", "common"]);
   const agents = useAgents();
   const providers = useProviders();
+  const skills = useSkills();
+  const mcpServers = useMcpServers();
   const createAgent = useCreateAgent();
   const deleteAgent = useDeleteAgent();
   const confirm = useConfirm();
@@ -42,6 +46,9 @@ export function AgentsPage() {
   const [systemPrompt, setSystemPrompt] = useState("");
   const [tools, setTools] = useState(defaultTools);
   const [commandWhitelist, setCommandWhitelist] = useState(defaultWhitelist);
+  const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
+  const [selectedMcpServerIds, setSelectedMcpServerIds] = useState<string[]>([]);
+  const [capsAgentId, setCapsAgentId] = useState<string | null>(null);
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewAgentId, setPreviewAgentId] = useState<string | null>(null);
@@ -60,12 +67,16 @@ export function AgentsPage() {
         systemPrompt,
         tools,
         commandWhitelist,
+        skillIds: selectedSkillIds,
+        mcpServerIds: selectedMcpServerIds,
       });
       toast.success(t("agents:created"));
       setDialogOpen(false);
       setName("");
       setSystemPrompt("");
       setModel("");
+      setSelectedSkillIds([]);
+      setSelectedMcpServerIds([]);
     } catch (error) {
       toast.error(errorMessage(error));
     }
@@ -152,7 +163,7 @@ export function AgentsPage() {
                 <p className="text-xs text-muted-foreground">
                   {t("agents:runCount", { count: agent.runCount })}
                 </p>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button
                     size="sm"
                     variant="outline"
@@ -164,6 +175,10 @@ export function AgentsPage() {
                   >
                     <Play className="h-3.5 w-3.5" />
                     {t("agents:preview")}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setCapsAgentId(agent.id)}>
+                    <Sparkles className="h-3.5 w-3.5" />
+                    {t("agents:capabilities")}
                   </Button>
                   <Button
                     size="sm"
@@ -258,6 +273,44 @@ export function AgentsPage() {
             </span>
           </label>
 
+          <div className="space-y-2">
+            <p className="text-sm font-medium">{t("agents:capabilitiesTitle")}</p>
+            <div className="flex flex-wrap gap-2">
+              {(skills.data ?? []).map((skill) => (
+                <Button
+                  key={skill.id}
+                  size="sm"
+                  variant={selectedSkillIds.includes(skill.id) ? "primary" : "outline"}
+                  onClick={() =>
+                    setSelectedSkillIds((previous) =>
+                      previous.includes(skill.id)
+                        ? previous.filter((id) => id !== skill.id)
+                        : [...previous, skill.id],
+                    )
+                  }
+                >
+                  {skill.name}
+                </Button>
+              ))}
+              {(mcpServers.data ?? []).map((server) => (
+                <Button
+                  key={server.id}
+                  size="sm"
+                  variant={selectedMcpServerIds.includes(server.id) ? "primary" : "outline"}
+                  onClick={() =>
+                    setSelectedMcpServerIds((previous) =>
+                      previous.includes(server.id)
+                        ? previous.filter((id) => id !== server.id)
+                        : [...previous, server.id],
+                    )
+                  }
+                >
+                  MCP · {server.name}
+                </Button>
+              ))}
+            </div>
+          </div>
+
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               {t("common:cancel")}
@@ -290,6 +343,17 @@ export function AgentsPage() {
           agentId={previewAgentId}
           prompt={previewPrompt}
           onPromptChange={setPreviewPrompt}
+        />
+      ) : null}
+      {capsAgentId !== null ? (
+        <AgentCapabilitiesDialog
+          open
+          agentId={capsAgentId}
+          onOpenChange={(open) => {
+            if (!open) {
+              setCapsAgentId(null);
+            }
+          }}
         />
       ) : null}
     </div>
