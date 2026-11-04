@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 123 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 128 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -174,7 +174,7 @@
 
 ### 4.9 权限与审计（P0/P1）
 
-- [ ] 唯一 Owner 账号 / 认证
+- [x] 单用户 Owner 密码认证（可选启用，Cookie 登录；Round 17）
 - [x] 敏感操作审计日志（Round 6：删除/集成/发布等留痕 + 查询页）
 - [x] 机密加密存储且不出现在响应（DPAPI）
 - [ ] 密钥查看/轮换界面
@@ -268,7 +268,7 @@
 - [ ] SignalR
 - [ ] PostgreSQL
 - [x] 审计日志（Round 6）
-- [ ] 认证
+- [ ] 多用户 / RBAC（单用户产品不在范围）
 - [x] CSP（原型，Round 11）
 
 ## 3. 已知缺陷 / 安全债
@@ -289,9 +289,17 @@
 | 12 | Task 状态流转 400、父子关系无法设置 | `WorkItemsController` | ✅ Round 3 |
 | 13 | 前端手写 API 类型，未用 OpenAPI 生成 | `frontend/src/lib/types.ts` | OpenAPI 已生成并逐步迁移 |
 | 14 | 无 PostgreSQL provider，连接串切换无效 | `Program.cs` | P5 |
-| 15 | 无认证 / 审计日志缺失 | 全局 | 审计 ✅ Round 6；认证 P5 |
+| 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 17（2026-11-04）
+
+- 单用户认证（PRD 4.9 收尾）：`Auth:Password` 启用后 Cookie 登录（HttpOnly / SameSite=Strict / 7 天滑动过期）；`AuthGateMiddleware` 保护除 login/status/health/openapi 外的全部 API；常量时间密码比较；登录/退出/状态 API
+- 前端：认证门禁 + 登录页（配置启用时才出现）；401 自动回到登录页；侧边栏退出按钮
+- 测试：123 → 128（认证关闭默认放行、启用后 401/登录 Cookie/退出、密码比较 3 项等），`dotnet test` 全绿；E2E 2 条仍通过（默认认证关闭）
+- 默认保持关闭：未配置密码时行为与之前完全一致（自托管开箱即用）
+- 验证：`dotnet test`、`npm run lint` / `format:check` / `test:run` / `test:e2e` / `build` 全绿
 
 ### Round 16（2026-11-04）
 

@@ -33,6 +33,10 @@ docker compose up -d --build
 | `Database__AutoMigrate` | `true`（容器内） | 启动时自动迁移（SQLite / PostgreSQL 各自迁移程序集） |
 | `Attachments__RootPath` | `/app/App_Data/attachments` | 附件存储目录 |
 | `Secrets__KeyPath` | `/app/App_Data/secrets.key` | 非 Windows 下 AES-GCM 机密保护密钥文件 |
+| `Auth__Password` | 空（关闭） | 设置后启用单用户 Cookie 登录 |
+
+> 启用认证：`Auth__Password=your-password`。浏览器首次访问会显示登录页；
+> 推荐配合 HTTPS 反向代理使用（Cookie 会按请求协议设置 Secure）。
 
 > 健康检查：`GET /health` 返回 `{ status: "ok", database: "Sqlite|PostgreSql" }`。
 > 生产环境日志为 JSON console（UTC 时间戳、Scope），适合 `docker logs` / Loki / ELK 采集；
