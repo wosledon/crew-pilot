@@ -249,6 +249,7 @@ public sealed class AgentRunExecutor
         AddAutoWorkLog(run, "AgentRun 自动折算");
         AddPrUrlIfFound(run, output);
         AddRunActivity(run, succeeded ? "agentrun.succeeded" : "agentrun.failed", promptTokens, completionTokens);
+        await AddMentionReplyAsync(run);
 
         await _db.SaveChangesAsync(ct);
     }
@@ -330,6 +331,61 @@ public sealed class AgentRunExecutor
                 duration = run.Duration?.ToString(),
                 promptTokens,
                 completionTokens,
+            }),
+            ActorKind = MemberKind.Agent,
+        });
+    }
+
+    /// <summary>评论 @Agent 触发的运行：把输出（或错误）作为 Agent 回复写入评论线程。</summary>
+    private async Task AddMentionReplyAsync(AgentRun run)
+    {
+        if (run.Trigger != "mention" || run.WorkItem is null)
+        {
+            return;
+        }
+
+        var content = run.Status == AgentRunStatus.Succeeded ? run.Output : run.Error;
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return;
+        }
+
+        if (content.Length > 16_000)
+        {
+            content = content[..16_000];
+        }
+
+        var projectId = run.WorkItem.ProjectId;
+        var member = await _db.Members.FirstOrDefaultAsync(
+            m => m.ProjectId == projectId && m.DisplayName == run.Agent.Name);
+        if (member is null)
+        {
+            member = new ProjectMember
+            {
+                ProjectId = projectId,
+                Kind = MemberKind.Agent,
+                Role = ProjectRole.Developer,
+                DisplayName = run.Agent.Name,
+            };
+            _db.Members.Add(member);
+        }
+
+        _db.Comments.Add(new Comment
+        {
+            WorkItemId = run.WorkItem.Id,
+            Author = member,
+            AuthorKind = MemberKind.Agent,
+            Content = content,
+        });
+        _db.Activities.Add(new Activity
+        {
+            ProjectId = projectId,
+            WorkItemId = run.WorkItem.Id,
+            EventType = "comment.added",
+            Payload = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                author = run.Agent.Name,
+                trigger = "mention",
             }),
             ActorKind = MemberKind.Agent,
         });

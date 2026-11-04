@@ -27,5 +27,10 @@ public class Iteration : Entity
 
     public IterationStatus Status { get; set; } = IterationStatus.Planned;
 
+    /// <summary>所属里程碑（甘特图时间锚点，可选）。</summary>
+    public Guid? MilestoneId { get; set; }
+
+    public Milestone? Milestone { get; set; }
+
     public ICollection<WorkItems.WorkItem> WorkItems { get; set; } = new List<WorkItems.WorkItem>();
 }

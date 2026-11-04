@@ -24,6 +24,7 @@ public sealed class IterationsController(CrewPilotDbContext db) : ControllerBase
                 i.StartDate,
                 i.EndDate,
                 i.Status,
+                i.MilestoneId,
                 Count = i.WorkItems.Count,
                 Estimated = i.WorkItems.Sum(w => (decimal?)w.EstimatedHours) ?? 0m,
             })
@@ -42,7 +43,7 @@ public sealed class IterationsController(CrewPilotDbContext db) : ControllerBase
             .Select(r => new IterationListItemDto(
                 r.Id, r.Name, r.Goal, r.StartDate, r.EndDate,
                 r.Status.ToString().ToLowerInvariant(), r.Count, r.Estimated,
-                logged.TryGetValue(r.Id, out var hours) ? hours : 0m))
+                logged.TryGetValue(r.Id, out var hours) ? hours : 0m, r.MilestoneId))
             .ToList();
         return Ok(items);
     }
@@ -62,6 +63,7 @@ public sealed class IterationsController(CrewPilotDbContext db) : ControllerBase
                 i.StartDate,
                 i.EndDate,
                 i.Status,
+                i.MilestoneId,
                 Count = i.WorkItems.Count,
             })
             .FirstOrDefaultAsync(ct);
@@ -70,7 +72,7 @@ public sealed class IterationsController(CrewPilotDbContext db) : ControllerBase
             ? Problem(detail: "迭代不存在", statusCode: 404)
             : new IterationDetailDto(
                 row.Id, row.ProjectId, row.Name, row.Goal, row.StartDate, row.EndDate,
-                row.Status.ToString().ToLowerInvariant(), row.Count);
+                row.Status.ToString().ToLowerInvariant(), row.Count, row.MilestoneId);
     }
 
     [HttpPost("api/projects/{projectId:guid}/iterations")]
@@ -93,6 +95,11 @@ public sealed class IterationsController(CrewPilotDbContext db) : ControllerBase
             return Problem(detail: "项目不存在", statusCode: 404);
         }
 
+        if (!await IsMilestoneAssignableAsync(projectId, request.MilestoneId, ct))
+        {
+            return Problem(detail: "里程碑不存在或不属于该项目", statusCode: 400);
+        }
+
         var iteration = new Iteration
         {
             ProjectId = projectId,
@@ -100,13 +107,14 @@ public sealed class IterationsController(CrewPilotDbContext db) : ControllerBase
             Goal = request.Goal,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
+            MilestoneId = await ResolveMilestoneAsync(projectId, request.MilestoneId, ct),
         };
         db.Iterations.Add(iteration);
         await db.SaveChangesAsync(ct);
 
         var dto = new IterationDetailDto(
             iteration.Id, projectId, iteration.Name, iteration.Goal,
-            iteration.StartDate, iteration.EndDate, "planned", 0);
+            iteration.StartDate, iteration.EndDate, "planned", 0, iteration.MilestoneId);
         return Created($"/api/iterations/{iteration.Id}", dto);
     }
 
@@ -130,17 +138,23 @@ public sealed class IterationsController(CrewPilotDbContext db) : ControllerBase
             return Problem(detail: "迭代不存在", statusCode: 404);
         }
 
+        if (!await IsMilestoneAssignableAsync(iteration.ProjectId, request.MilestoneId, ct))
+        {
+            return Problem(detail: "里程碑不存在或不属于该项目", statusCode: 400);
+        }
+
         iteration.Name = request.Name.Trim();
         iteration.Goal = request.Goal;
         iteration.StartDate = request.StartDate;
         iteration.EndDate = request.EndDate;
+        iteration.MilestoneId = await ResolveMilestoneAsync(iteration.ProjectId, request.MilestoneId, ct);
         await db.SaveChangesAsync(ct);
 
         var count = await db.WorkItems.CountAsync(w => w.IterationId == id, ct);
         return new IterationDetailDto(
             iteration.Id, iteration.ProjectId, iteration.Name, iteration.Goal,
             iteration.StartDate, iteration.EndDate,
-            iteration.Status.ToString().ToLowerInvariant(), count);
+            iteration.Status.ToString().ToLowerInvariant(), count, iteration.MilestoneId);
     }
 
     [HttpDelete("api/iterations/{id:guid}")]
@@ -178,7 +192,7 @@ public sealed class IterationsController(CrewPilotDbContext db) : ControllerBase
         var count = await db.WorkItems.CountAsync(w => w.IterationId == id, ct);
         return new IterationDetailDto(
             iteration.Id, iteration.ProjectId, iteration.Name, iteration.Goal,
-            iteration.StartDate, iteration.EndDate, "active", count);
+            iteration.StartDate, iteration.EndDate, "active", count, iteration.MilestoneId);
     }
 
     /// <summary>完成迭代：active → completed。</summary>
@@ -202,7 +216,33 @@ public sealed class IterationsController(CrewPilotDbContext db) : ControllerBase
         var count = await db.WorkItems.CountAsync(w => w.IterationId == id, ct);
         return new IterationDetailDto(
             iteration.Id, iteration.ProjectId, iteration.Name, iteration.Goal,
-            iteration.StartDate, iteration.EndDate, "completed", count);
+            iteration.StartDate, iteration.EndDate, "completed", count, iteration.MilestoneId);
+    }
+
+    /// <summary>里程碑必须存在且属于同一项目。</summary>
+    private async Task<bool> IsMilestoneAssignableAsync(
+        Guid projectId, Guid? milestoneId, CancellationToken ct)
+    {
+        if (milestoneId is null || milestoneId == Guid.Empty)
+        {
+            return true;
+        }
+
+        return await db.Milestones.AnyAsync(
+            m => m.Id == milestoneId && m.ProjectId == projectId, ct);
+    }
+
+    private async Task<Guid?> ResolveMilestoneAsync(
+        Guid projectId, Guid? milestoneId, CancellationToken ct)
+    {
+        if (milestoneId is null || milestoneId == Guid.Empty)
+        {
+            return null;
+        }
+
+        var exists = await db.Milestones.AnyAsync(
+            m => m.Id == milestoneId && m.ProjectId == projectId, ct);
+        return exists ? milestoneId : null;
     }
 
     /// <summary>迭代燃尽图：按工时的剩余量 vs 理想线（1:1 折算，不加权）。</summary>

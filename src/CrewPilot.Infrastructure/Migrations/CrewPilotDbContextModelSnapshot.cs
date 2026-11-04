@@ -295,6 +295,9 @@ namespace CrewPilot.Infrastructure.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("MilestoneId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -312,6 +315,8 @@ namespace CrewPilot.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MilestoneId");
 
                     b.HasIndex("ProjectId");
 
@@ -845,11 +850,18 @@ namespace CrewPilot.Infrastructure.Migrations
 
             modelBuilder.Entity("CrewPilot.Core.Iterations.Iteration", b =>
                 {
+                    b.HasOne("CrewPilot.Core.Iterations.Milestone", "Milestone")
+                        .WithMany("Iterations")
+                        .HasForeignKey("MilestoneId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("CrewPilot.Core.Projects.Project", "Project")
                         .WithMany("Iterations")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Milestone");
 
                     b.Navigation("Project");
                 });
@@ -961,6 +973,11 @@ namespace CrewPilot.Infrastructure.Migrations
             modelBuilder.Entity("CrewPilot.Core.Iterations.Iteration", b =>
                 {
                     b.Navigation("WorkItems");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Iterations.Milestone", b =>
+                {
+                    b.Navigation("Iterations");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.Projects.Project", b =>

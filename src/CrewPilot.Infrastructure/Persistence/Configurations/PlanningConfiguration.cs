@@ -13,6 +13,11 @@ public class IterationConfiguration : IEntityTypeConfiguration<Iteration>
         builder.Property(i => i.Name).HasMaxLength(200).IsRequired();
         builder.Property(i => i.Goal).HasMaxLength(2000);
         builder.Property(i => i.Status).HasConversion<string>().HasMaxLength(32);
+        builder.HasOne(i => i.Milestone)
+            .WithMany(m => m.Iterations)
+            .HasForeignKey(i => i.MilestoneId)
+            .OnDelete(DeleteBehavior.SetNull);
+        builder.HasIndex(i => i.MilestoneId);
     }
 }
 

@@ -494,3 +494,6 @@ dist/
 *.log
 appsettings.*.local.json
 
+
+# 附件存储与本地运行数据
+App_Data/

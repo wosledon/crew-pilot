@@ -17,6 +17,8 @@ public sealed class CrewPilotApiFactory : WebApplicationFactory<Program>
 {
     // 每个工厂实例使用独立的内存库，避免 xUnit 并行测试类之间的 SQLite 锁竞争
     private readonly string _databaseName = "crewpilot_it_" + Guid.NewGuid().ToString("N");
+    private readonly string _attachmentRoot = Path.Combine(
+        Path.GetTempPath(), "crewpilot_attachments_" + Guid.NewGuid().ToString("N"));
     private readonly SqliteConnection _connection;
 
     public CrewPilotApiFactory()
@@ -24,11 +26,13 @@ public sealed class CrewPilotApiFactory : WebApplicationFactory<Program>
         _connection = new SqliteConnection($"DataSource=file:{_databaseName}?mode=memory&cache=shared");
         // 保持连接打开，共享内存数据库随工厂生命周期存在
         _connection.Open();
+        Directory.CreateDirectory(_attachmentRoot);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
+        builder.UseSetting("Attachments:RootPath", _attachmentRoot);
 
         builder.ConfigureServices(services =>
         {
@@ -49,5 +53,16 @@ public sealed class CrewPilotApiFactory : WebApplicationFactory<Program>
     {
         base.Dispose(disposing);
         _connection.Dispose();
+        try
+        {
+            if (Directory.Exists(_attachmentRoot))
+            {
+                Directory.Delete(_attachmentRoot, recursive: true);
+            }
+        }
+        catch
+        {
+            // 临时目录清理失败不影响测试结果
+        }
     }
 }

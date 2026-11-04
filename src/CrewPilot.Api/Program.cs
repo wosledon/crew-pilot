@@ -4,6 +4,7 @@ using CrewPilot.Agents.Execution;
 using CrewPilot.Core.Abstractions;
 using CrewPilot.Infrastructure.Persistence;
 using CrewPilot.Infrastructure.Security;
+using CrewPilot.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +28,15 @@ builder.Services.AddSingleton<AgentRunCancellationRegistry>();
 builder.Services.AddHostedService<AgentRunWorker>();
 builder.Services.AddScoped<AgentRunExecutor>();
 builder.Services.AddHttpClient("models.dev");
+
+// 附件存储：本地目录（可用 Attachments:RootPath 覆盖）
+var attachmentRoot = builder.Configuration["Attachments:RootPath"];
+if (string.IsNullOrWhiteSpace(attachmentRoot))
+{
+    attachmentRoot = Path.Combine(builder.Environment.ContentRootPath, "App_Data", "attachments");
+}
+
+builder.Services.AddSingleton<IAttachmentStorage>(new LocalAttachmentStorage(attachmentRoot));
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();

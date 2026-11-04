@@ -14,4 +14,6 @@ public class Milestone : Entity
     public string? Description { get; set; }
 
     public DateOnly Date { get; set; }
+
+    public ICollection<Iteration> Iterations { get; set; } = new List<Iteration>();
 }

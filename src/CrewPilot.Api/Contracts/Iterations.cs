@@ -9,7 +9,8 @@ public sealed record IterationListItemDto(
     string Status,
     int WorkItemCount,
     decimal EstimatedHours,
-    decimal LoggedHours);
+    decimal LoggedHours,
+    Guid? MilestoneId);
 
 public sealed record IterationDetailDto(
     Guid Id,
@@ -19,11 +20,22 @@ public sealed record IterationDetailDto(
     DateOnly StartDate,
     DateOnly EndDate,
     string Status,
-    int WorkItemCount);
+    int WorkItemCount,
+    Guid? MilestoneId);
 
-public sealed record CreateIterationRequest(string Name, string? Goal, DateOnly StartDate, DateOnly EndDate);
+public sealed record CreateIterationRequest(
+    string Name,
+    string? Goal,
+    DateOnly StartDate,
+    DateOnly EndDate,
+    Guid? MilestoneId = null);
 
-public sealed record UpdateIterationRequest(string Name, string? Goal, DateOnly StartDate, DateOnly EndDate);
+public sealed record UpdateIterationRequest(
+    string Name,
+    string? Goal,
+    DateOnly StartDate,
+    DateOnly EndDate,
+    Guid? MilestoneId = null);
 
 /// <summary>燃尽图数据点：某日的剩余工时与理想剩余工时。</summary>
 public sealed record BurndownPointDto(DateOnly Date, decimal RemainingHours, decimal IdealHours);
