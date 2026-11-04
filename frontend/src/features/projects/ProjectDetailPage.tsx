@@ -438,6 +438,7 @@ export function ProjectDetailPage() {
         <WorkItemDetailDialog
           open
           workItemId={detailTarget.id}
+          projectId={projectId}
           onOpenChange={(open) => {
             if (!open) {
               setDetailTarget(null);

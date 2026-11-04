@@ -102,5 +102,7 @@
   "batchResult": "批量操作完成：成功 {{succeeded}}，失败 {{failed}}",
   "batchPartial": "部分成功：成功 {{succeeded}}，失败 {{failed}}",
   "relatedRequirement": "关联需求",
-  "relatedRequirementNone": "不关联需求"
+  "relatedRequirementNone": "不关联需求",
+  "linkedDefects": "关联缺陷",
+  "noLinkedDefects": "暂无关联缺陷"
 }

@@ -73,7 +73,12 @@ export function useSetDefaultTeam(projectId: string) {
   });
 }
 
-export function useWorkItems(projectId: string | undefined, type?: string, tag?: string) {
+export function useWorkItems(
+  projectId: string | undefined,
+  type?: string,
+  tag?: string,
+  relatedRequirementId?: string,
+) {
   const search = new URLSearchParams();
   if (type) {
     search.set("type", type);
@@ -81,10 +86,13 @@ export function useWorkItems(projectId: string | undefined, type?: string, tag?:
   if (tag) {
     search.set("tag", tag);
   }
+  if (relatedRequirementId) {
+    search.set("relatedRequirementId", relatedRequirementId);
+  }
   const suffix = search.size > 0 ? `?${search.toString()}` : "";
 
   return useQuery({
-    queryKey: projectKeys.workItems(projectId ?? "", type, tag),
+    queryKey: [...projectKeys.workItems(projectId ?? "", type, tag), relatedRequirementId ?? ""],
     queryFn: () => api.get<WorkItemListItem[]>(`/projects/${projectId}/workitems${suffix}`),
     enabled: projectId !== undefined,
   });
@@ -264,10 +272,22 @@ export function useBurndown(iterationId: string | undefined) {
   });
 }
 
-export function useActivities(projectId: string | undefined) {
+export function useActivities(
+  projectId: string | undefined,
+  workItemId?: string,
+  eventType?: string,
+) {
+  const search = new URLSearchParams({ take: "30" });
+  if (workItemId) {
+    search.set("workItemId", workItemId);
+  }
+  if (eventType) {
+    search.set("eventType", eventType);
+  }
+
   return useQuery({
-    queryKey: projectKeys.activities(projectId ?? ""),
-    queryFn: () => api.get<Activity[]>(`/projects/${projectId}/activities?take=30`),
+    queryKey: [...projectKeys.activities(projectId ?? ""), workItemId ?? "", eventType ?? ""],
+    queryFn: () => api.get<Activity[]>(`/projects/${projectId}/activities?${search.toString()}`),
     enabled: projectId !== undefined,
   });
 }

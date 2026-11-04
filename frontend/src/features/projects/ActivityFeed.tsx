@@ -1,23 +1,45 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Select } from "@/components/ui/Select";
 import { ErrorState, LoadingState } from "@/components/ui/States";
 import { formatDateTime } from "@/lib/format";
 import { useActivities } from "./api";
 
 export interface ActivityFeedProps {
   projectId: string;
+  workItemId?: string;
 }
 
-/** 项目活动流：状态变更、评论、附件、AgentRun、里程碑等事件的统一时间线。 */
-export function ActivityFeed({ projectId }: ActivityFeedProps) {
+/** 项目活动流：状态变更、评论、附件、AgentRun、里程碑等事件的统一时间线，可按事件类型过滤。 */
+export function ActivityFeed({ projectId, workItemId }: ActivityFeedProps) {
   const { t } = useTranslation(["collaboration", "common"]);
-  const activities = useActivities(projectId);
+  const [eventType, setEventType] = useState("");
+  const all = useActivities(projectId, workItemId);
+  const activities = useActivities(projectId, workItemId, eventType === "" ? undefined : eventType);
+
+  const eventTypes = [...new Set((all.data ?? []).map((event) => event.eventType))].sort((a, b) =>
+    a.localeCompare(b),
+  );
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex-row items-center justify-between gap-2">
         <CardTitle>{t("collaboration:activity")}</CardTitle>
+        <Select
+          value={eventType}
+          onValueChange={setEventType}
+          options={[
+            { value: "", label: t("collaboration:allEvents") },
+            ...eventTypes.map((value) => ({
+              value,
+              label: t(`collaboration:events.${value}`, { defaultValue: value }),
+            })),
+          ]}
+          ariaLabel={t("collaboration:filterEventType")}
+          className="w-48"
+        />
       </CardHeader>
       <CardContent>
         {activities.isPending ? (

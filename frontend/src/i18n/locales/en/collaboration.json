@@ -43,5 +43,7 @@
     "agentrun.canceled": "Agent run canceled",
     "milestone.created": "created a milestone",
     "milestone.deleted": "deleted a milestone"
-  }
+  },
+  "allEvents": "All events",
+  "filterEventType": "Filter event type"
 }

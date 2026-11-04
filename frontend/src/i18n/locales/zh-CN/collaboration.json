@@ -43,5 +43,7 @@
     "agentrun.canceled": "Agent 执行已取消",
     "milestone.created": "创建了里程碑",
     "milestone.deleted": "删除了里程碑"
-  }
+  },
+  "allEvents": "全部事件",
+  "filterEventType": "按事件类型过滤"
 }

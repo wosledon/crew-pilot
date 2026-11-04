@@ -27,19 +27,22 @@ import {
   useDeleteWorkItem,
   useUploadAttachment,
   useWorkItem,
+  useWorkItems,
   useWorkLogs,
 } from "../api";
 
 export interface WorkItemDetailDialogProps {
   workItemId: string;
+  projectId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEdit: (item: WorkItemDetail) => void;
 }
 
-/** 工作项详情：描述/验收标准、工时记录、评论（可 @Agent）、附件。 */
+/** 工作项详情：描述/验收标准、关联缺陷、工时记录、评论（可 @Agent）、附件。 */
 export function WorkItemDetailDialog({
   workItemId,
+  projectId,
   open,
   onOpenChange,
   onEdit,
@@ -49,6 +52,13 @@ export function WorkItemDetailDialog({
   const workLogs = useWorkLogs(workItemId);
   const comments = useComments(workItemId);
   const attachments = useAttachments(workItemId);
+  const detail = item.data;
+  const linkedDefects = useWorkItems(
+    detail?.type === "requirement" ? projectId : undefined,
+    "defect",
+    undefined,
+    detail?.type === "requirement" ? detail.id : undefined,
+  );
   const agents = useAgents();
   const addComment = useAddComment();
   const deleteComment = useDeleteComment();
@@ -210,7 +220,6 @@ export function WorkItemDetailDialog({
     }
   };
 
-  const detail = item.data;
   const agentOptions = (agents.data ?? [])
     .filter((agent) => agent.enabled)
     .map((agent) => ({ value: agent.id, label: `@${agent.name}` }));
@@ -271,6 +280,32 @@ export function WorkItemDetailDialog({
               <p className="mt-1 text-sm text-muted-foreground">
                 {detail.relatedRequirementTitle ?? t("workitems:relatedRequirementNone")}
               </p>
+            </section>
+          ) : null}
+
+          {detail.type === "requirement" ? (
+            <section>
+              <h4 className="text-sm font-medium">{t("workitems:linkedDefects")}</h4>
+              {linkedDefects.isPending ? (
+                <LoadingState />
+              ) : (linkedDefects.data ?? []).length === 0 ? (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {t("workitems:noLinkedDefects")}
+                </p>
+              ) : (
+                <ul className="mt-1 space-y-1 text-sm">
+                  {(linkedDefects.data ?? []).map((defect) => (
+                    <li key={defect.id} className="flex items-center justify-between gap-2">
+                      <span className="truncate">{defect.title}</span>
+                      <Badge tone="neutral">
+                        {t(`workitems:defectStatuses.${defect.status}`, {
+                          defaultValue: defect.status,
+                        })}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
           ) : null}
 

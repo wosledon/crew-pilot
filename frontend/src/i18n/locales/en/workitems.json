@@ -102,5 +102,7 @@
   "batchResult": "Batch finished: {{succeeded}} succeeded, {{failed}} failed",
   "batchPartial": "Partial success: {{succeeded}} succeeded, {{failed}} failed",
   "relatedRequirement": "Linked requirement",
-  "relatedRequirementNone": "No linked requirement"
+  "relatedRequirementNone": "No linked requirement",
+  "linkedDefects": "Linked defects",
+  "noLinkedDefects": "No linked defects"
 }
