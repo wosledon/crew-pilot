@@ -1,4 +1,6 @@
+using CrewPilot.Agents.Execution;
 using CrewPilot.Api.Contracts;
+using CrewPilot.Core.Agents;
 using CrewPilot.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +8,9 @@ using Microsoft.EntityFrameworkCore;
 namespace CrewPilot.Api.Controllers;
 
 [ApiController]
-public sealed class ReportsController(CrewPilotDbContext db) : ControllerBase
+public sealed class ReportsController(
+    CrewPilotDbContext db,
+    AgentRunQueue queue) : ControllerBase
 {
     /// <summary>项目工时报表：总计 + 按类型/指派人/登记成员分组（预估 vs 已耗），可按迭代/日期过滤。</summary>
     [HttpGet("api/projects/{projectId:guid}/hours-report")]
@@ -220,6 +224,164 @@ public sealed class ReportsController(CrewPilotDbContext db) : ControllerBase
             items.Count,
             rows.Sum(r => r.OverrunCount),
             rows);
+    }
+
+    /// <summary>项目周报：近 N 天完成/进行中工作项、工时、Agent 执行、卡点与风险汇总。</summary>
+    [HttpGet("api/projects/{projectId:guid}/weekly-report")]
+    public async Task<ActionResult<WeeklyReportDto>> WeeklyReport(
+        Guid projectId, [FromQuery] int days = 7, CancellationToken ct = default)
+    {
+        var project = await db.Projects.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == projectId, ct);
+        if (project is null)
+        {
+            return Problem(detail: "项目不存在", statusCode: 404);
+        }
+
+        var span = Math.Clamp(days, 1, 30);
+        var to = DateOnly.FromDateTime(DateTime.UtcNow);
+        var from = to.AddDays(-(span - 1));
+        var windowStart = new DateTimeOffset(
+            from.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+
+        var requirements = await db.WorkItems.OfType<Core.WorkItems.Requirement>()
+            .AsNoTracking()
+            .Where(w => w.ProjectId == projectId)
+            .Select(w => new
+            {
+                w.Id, w.Title, w.Status, w.UpdatedAt, w.DueDate,
+                Assignee = w.Assignee != null ? w.Assignee.DisplayName : null,
+            })
+            .ToListAsync(ct);
+        var defects = await db.WorkItems.OfType<Core.WorkItems.Defect>()
+            .AsNoTracking()
+            .Where(w => w.ProjectId == projectId)
+            .Select(w => new
+            {
+                w.Id, w.Title, w.Status, w.UpdatedAt, w.DueDate,
+                Assignee = w.Assignee != null ? w.Assignee.DisplayName : null,
+            })
+            .ToListAsync(ct);
+        var tasks = await db.WorkItems.OfType<Core.WorkItems.TaskItem>()
+            .AsNoTracking()
+            .Where(w => w.ProjectId == projectId)
+            .Select(w => new { w.Id, w.Title, w.IsDone, w.UpdatedAt })
+            .ToListAsync(ct);
+
+        var completed = requirements
+            .Where(w => w.Status == Core.WorkItems.RequirementStatus.Done &&
+                        w.UpdatedAt >= windowStart)
+            .Select(w => $"需求「{w.Title}」")
+            .Concat(defects
+                .Where(w => w.Status == Core.WorkItems.DefectStatus.Closed &&
+                            w.UpdatedAt >= windowStart)
+                .Select(w => $"缺陷「{w.Title}」"))
+            .Concat(tasks
+                .Where(w => w.IsDone && w.UpdatedAt >= windowStart)
+                .Select(w => $"任务「{w.Title}」"))
+            .ToList();
+        var active = requirements
+            .Where(w => w.Status is Core.WorkItems.RequirementStatus.InProgress
+                or Core.WorkItems.RequirementStatus.InReview)
+            .Select(w => $"需求「{w.Title}」({w.Status})")
+            .Concat(defects
+                .Where(w => w.Status is Core.WorkItems.DefectStatus.Fixing
+                    or Core.WorkItems.DefectStatus.PendingVerification)
+                .Select(w => $"缺陷「{w.Title}」({w.Status})"))
+            .ToList();
+
+        var logs = await db.WorkLogs.AsNoTracking()
+            .Where(l => l.WorkItem.ProjectId == projectId &&
+                        l.Date >= from && l.Date <= to)
+            .Select(l => l.Hours)
+            .ToListAsync(ct);
+        var runRows = await db.AgentRuns.AsNoTracking()
+            .Where(r => r.WorkItem != null && r.WorkItem.ProjectId == projectId)
+            .Select(r => new { r.Status, r.PromptTokens, r.CompletionTokens, r.CreatedAt })
+            .ToListAsync(ct);
+        var runs = runRows.Where(r => r.CreatedAt >= windowStart).ToList();
+        var openBlockers = await db.Blockers.AsNoTracking()
+            .Where(b => b.ProjectId == projectId &&
+                        b.Status == Core.Workflows.BlockerStatus.Open)
+            .CountAsync(ct);
+        var overdue = requirements.Count(w =>
+                          w.DueDate is DateOnly due &&
+                          due < to &&
+                          w.Status != Core.WorkItems.RequirementStatus.Done) +
+                      defects.Count(w =>
+                          w.DueDate is DateOnly due &&
+                          due < to &&
+                          w.Status != Core.WorkItems.DefectStatus.Closed);
+
+        var builder = new System.Text.StringBuilder();
+        builder.AppendLine($"# {project.Name} 项目周报（{from:yyyy-MM-dd} ~ {to:yyyy-MM-dd}）");
+        builder.AppendLine();
+        builder.AppendLine("## 概览");
+        builder.AppendLine($"- 本周完成：{completed.Count} 项");
+        builder.AppendLine($"- 进行中：{active.Count} 项");
+        builder.AppendLine($"- 登记工时：{logs.Sum().ToString("0.##")}h");
+        builder.AppendLine($"- Agent 执行：{runs.Count} 次，完成 {runs.Count(r => r.Status == AgentRunStatus.Succeeded)} 次");
+        builder.AppendLine($"- 未解决卡点：{openBlockers} 个");
+        builder.AppendLine();
+        builder.AppendLine("## 已完成");
+        builder.AppendLine(completed.Count == 0 ? "- 暂无" : string.Join('\n', completed.Select(c => $"- {c}")));
+        builder.AppendLine();
+        builder.AppendLine("## 进行中");
+        builder.AppendLine(active.Count == 0 ? "- 暂无" : string.Join('\n', active.Select(c => $"- {c}")));
+        builder.AppendLine();
+        builder.AppendLine("## 风险与关注");
+        builder.AppendLine(openBlockers > 0 ? $"- {openBlockers} 个卡点待处理" : "- 无未解决卡点");
+        if (overdue > 0)
+        {
+            builder.AppendLine($"- {overdue} 项工作项近一周无更新");
+        }
+
+        var report = builder.ToString();
+        return Ok(new WeeklyReportDto(
+            from, to, report, completed.Count, active.Count, openBlockers));
+    }
+
+    /// <summary>把周报数据交给 PM Agent（岗位 Manager）生成文字版周报。</summary>
+    [HttpPost("api/projects/{projectId:guid}/weekly-report/agent")]
+    public async Task<ActionResult<AgentRunListItemDto>> WeeklyReportAgent(
+        Guid projectId, [FromQuery] int days = 7, CancellationToken ct = default)
+    {
+        var report = await WeeklyReport(projectId, days, ct);
+        if (report.Result is not OkObjectResult { Value: WeeklyReportDto value })
+        {
+            return report.Result ?? Problem(detail: "周报生成失败", statusCode: 400);
+        }
+
+        var agent = await db.Agents
+            .AsNoTracking()
+            .Where(a => a.Enabled && a.Job == AgentJob.Manager)
+            .OrderBy(a => a.Name)
+            .FirstOrDefaultAsync(ct);
+        if (agent is null)
+        {
+            return Problem(detail: "没有可用的 PM Agent（岗位 manager）", statusCode: 404);
+        }
+
+        var prompt = $"""
+            你是项目经理。请基于以下项目数据，生成一份简洁的中文项目周报：
+            包含本周进展、关键风险、下周建议；不要编造数据。
+
+            {value.Markdown}
+            """;
+        var run = new AgentRun
+        {
+            AgentId = agent.Id,
+            Trigger = "weekly-report",
+            Prompt = prompt,
+            Status = AgentRunStatus.Queued,
+        };
+        db.AgentRuns.Add(run);
+        await db.SaveChangesAsync(ct);
+        await queue.EnqueueAsync(run.Id);
+
+        return Created($"/api/agent-runs/{run.Id}", new AgentRunListItemDto(
+            run.Id, agent.Name, null, null, run.Trigger, "queued", null,
+            run.CreatedAt, null, null, null, null));
     }
 
     /// <summary>成本报表：AgentRun token × 模型单价，可按迭代/日期过滤。</summary>

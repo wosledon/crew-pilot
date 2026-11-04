@@ -87,3 +87,12 @@ public sealed record EstimateDeviationReportDto(
     int ItemCount,
     int OverrunCount,
     IReadOnlyList<EstimateDeviationRowDto> ByType);
+
+/// <summary>项目周报（数据汇总，可直接展示或交给 PM Agent 生成文字版）。</summary>
+public sealed record WeeklyReportDto(
+    DateOnly From,
+    DateOnly To,
+    string Markdown,
+    int CompletedCount,
+    int ActiveCount,
+    int OpenBlockers);
