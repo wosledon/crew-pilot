@@ -62,5 +62,8 @@
     "filterStatus": "状态",
     "all": "全部",
     "notFound": "项目不存在"
-  }
+  },
+  "hourlyRate": "时薪",
+  "hourlyRatePlaceholder": "时薪",
+  "invalidRate": "时薪必须是非负数字"
 }

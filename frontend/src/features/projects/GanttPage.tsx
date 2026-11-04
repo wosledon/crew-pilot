@@ -22,6 +22,8 @@ import {
 import { priorityTone, statusTone } from "./statusFlow";
 import type { Milestone, WorkItemListItem } from "@/lib/types";
 import { CostCard } from "@/features/platform/CostCard";
+import { HumanCostCard } from "./components/HumanCostCard";
+import { EstimateDeviationCard } from "./components/EstimateDeviationCard";
 import { cn } from "@/lib/cn";
 
 /** 甘特图：迭代时间线 + 工作项截止日标记（工时维度），纯 CSS 定位自绘 */
@@ -331,6 +333,11 @@ export function GanttPage() {
       />
 
       <CostCard projectId={projectId} filters={reportFilters} />
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <HumanCostCard projectId={projectId} />
+        <EstimateDeviationCard projectId={projectId} />
+      </div>
 
       <Dialog
         open={milestoneOpen}

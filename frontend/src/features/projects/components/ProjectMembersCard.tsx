@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
@@ -42,6 +43,7 @@ export function ProjectMembersCard({ projectId }: ProjectMembersCardProps) {
   const removeMember = useDeleteProjectMember(projectId);
   const confirm = useConfirm();
   const [agentId, setAgentId] = useState("");
+  const [rateDrafts, setRateDrafts] = useState<Record<string, string>>({});
 
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
@@ -75,6 +77,32 @@ export function ProjectMembersCard({ projectId }: ProjectMembersCardProps) {
         id: member.id,
         displayName: member.displayName,
         role,
+      });
+      toast.success(t("projects:memberUpdated"));
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
+  const handleRateChange = async (member: ProjectMember) => {
+    const draft = rateDrafts[member.id];
+    if (draft === undefined) {
+      return;
+    }
+    const parsed = draft.trim() === "" ? null : Number(draft);
+    if (parsed !== null && (!Number.isFinite(parsed) || parsed < 0)) {
+      toast.error(t("projects:invalidRate"));
+      return;
+    }
+    if (parsed === (member.hourlyRate ?? null)) {
+      return;
+    }
+    try {
+      await updateMember.mutateAsync({
+        id: member.id,
+        displayName: member.displayName,
+        role: member.role,
+        hourlyRate: parsed ?? undefined,
       });
       toast.success(t("projects:memberUpdated"));
     } catch (error) {
@@ -126,6 +154,22 @@ export function ProjectMembersCard({ projectId }: ProjectMembersCardProps) {
                   <span className="truncate text-sm font-medium">{member.displayName}</span>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
+                  <Input
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={rateDrafts[member.id] ?? String(member.hourlyRate ?? "")}
+                    onChange={(event) =>
+                      setRateDrafts((previous) => ({
+                        ...previous,
+                        [member.id]: event.target.value,
+                      }))
+                    }
+                    onBlur={() => void handleRateChange(member)}
+                    placeholder={t("projects:hourlyRatePlaceholder")}
+                    aria-label={t("projects:hourlyRate")}
+                    className="w-24"
+                  />
                   <Select
                     value={member.role}
                     onValueChange={(role) => void handleRoleChange(member, role)}

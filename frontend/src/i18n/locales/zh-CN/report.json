@@ -22,5 +22,18 @@
   "costPromptTokens": "输入 Token",
   "costCompletionTokens": "输出 Token",
   "costByModel": "按模型",
-  "costEmpty": "暂无成本数据"
+  "costEmpty": "暂无成本数据",
+  "humanCostTitle": "人力成本",
+  "humanCostDescription": "工时 × 成员时薪（未设置时薪按 0 计）",
+  "humanCostTotal": "总成本",
+  "humanCostEmpty": "暂无人力成本数据",
+  "hourlyRate": "时薪",
+  "rateMissing": "未设置",
+  "deviationTitle": "估算偏差",
+  "deviationDescription": "预估 vs 已耗工时，标记超支项",
+  "deviationEmpty": "暂无估算数据",
+  "estimated": "预估",
+  "logged": "已耗",
+  "deviation": "偏差",
+  "overruns": "超支项"
 }

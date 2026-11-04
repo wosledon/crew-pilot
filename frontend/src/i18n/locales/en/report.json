@@ -22,5 +22,18 @@
   "costPromptTokens": "Prompt tokens",
   "costCompletionTokens": "Completion tokens",
   "costByModel": "By model",
-  "costEmpty": "No cost data"
+  "costEmpty": "No cost data",
+  "humanCostTitle": "Human cost",
+  "humanCostDescription": "Hours × member hourly rate (0 when unset)",
+  "humanCostTotal": "Total cost",
+  "humanCostEmpty": "No human cost data",
+  "hourlyRate": "Rate/h",
+  "rateMissing": "Unset",
+  "deviationTitle": "Estimate deviation",
+  "deviationDescription": "Estimated vs logged hours, flagging overruns",
+  "deviationEmpty": "No estimate data",
+  "estimated": "Estimated",
+  "logged": "Logged",
+  "deviation": "Deviation",
+  "overruns": "Overruns"
 }

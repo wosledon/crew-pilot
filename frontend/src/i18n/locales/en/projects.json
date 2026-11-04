@@ -62,5 +62,8 @@
     "filterStatus": "Status",
     "all": "All",
     "notFound": "Project not found"
-  }
+  },
+  "hourlyRate": "Hourly rate",
+  "hourlyRatePlaceholder": "Rate/h",
+  "invalidRate": "Hourly rate must be a non-negative number"
 }

@@ -212,6 +212,43 @@ export interface HoursReport {
   byMember: HoursByGroup[];
 }
 
+/** 人力成本报表 */
+export interface HumanCostByMember {
+  key: string;
+  label: string;
+  hours: number;
+  hourlyRate: number | null;
+  cost: number;
+}
+
+export interface HumanCostReport {
+  totalHours: number;
+  totalCost: number;
+  byMember: HumanCostByMember[];
+}
+
+/** 估算偏差报表 */
+export interface EstimateDeviationRow {
+  key: string;
+  label: string;
+  estimatedHours: number;
+  loggedHours: number;
+  deviationHours: number;
+  deviationPercent: number | null;
+  itemCount: number;
+  overrunCount: number;
+}
+
+export interface EstimateDeviationReport {
+  estimatedHours: number;
+  loggedHours: number;
+  deviationHours: number;
+  deviationPercent: number | null;
+  itemCount: number;
+  overrunCount: number;
+  byType: EstimateDeviationRow[];
+}
+
 export interface ProjectMember {
   id: string;
   projectId: string;
@@ -219,6 +256,7 @@ export interface ProjectMember {
   role: string;
   displayName: string;
   createdAt: string;
+  hourlyRate: number | null;
 }
 
 export interface Activity {

@@ -6,7 +6,9 @@ import type {
   BatchWorkItemsResult,
   Burndown,
   Comment,
+  EstimateDeviationReport,
   HoursReport,
+  HumanCostReport,
   IterationDetail,
   IterationListItem,
   Milestone,
@@ -40,6 +42,8 @@ export const projectKeys = {
       filters?.from ?? "",
       filters?.to ?? "",
     ] as const,
+  humanCost: (projectId: string) => ["projects", projectId, "human-cost-report"] as const,
+  estimateDeviation: (projectId: string) => ["projects", projectId, "estimate-deviation"] as const,
 };
 
 export function useProjects() {
@@ -298,6 +302,22 @@ export function useHoursReport(projectId: string | undefined, filters?: ReportFi
   });
 }
 
+export function useHumanCostReport(projectId: string | undefined) {
+  return useQuery({
+    queryKey: projectKeys.humanCost(projectId ?? ""),
+    queryFn: () => api.get<HumanCostReport>(`/projects/${projectId}/human-cost-report`),
+    enabled: projectId !== undefined,
+  });
+}
+
+export function useEstimateDeviation(projectId: string | undefined) {
+  return useQuery({
+    queryKey: projectKeys.estimateDeviation(projectId ?? ""),
+    queryFn: () => api.get<EstimateDeviationReport>(`/projects/${projectId}/estimate-deviation`),
+    enabled: projectId !== undefined,
+  });
+}
+
 export function useStartIteration() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -416,15 +436,25 @@ export function useAddProjectMember(projectId: string) {
 export function useUpdateProjectMember(projectId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (variables: { id: string; displayName: string; role: string }) =>
+    mutationFn: (variables: {
+      id: string;
+      displayName: string;
+      role: string;
+      hourlyRate?: number;
+    }) =>
       api.put<ProjectMember>(`/members/${variables.id}`, {
         displayName: variables.displayName,
         role: variables.role,
+        hourlyRate: variables.hourlyRate,
       }),
-    onSuccess: () =>
+    onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: ["projects", projectId, "members"] as const,
-      }),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "human-cost-report"] as const,
+      });
+    },
   });
 }
 
