@@ -84,7 +84,8 @@
 - [x] SignalR 实时推送（工作项状态 / AgentRun 进度 / 卡点，Round 7）
 - [x] PostgreSQL 支持（Npgsql + provider 切换 + 独立迁移程序集 + compose 覆盖；Round 10）
 - [x] CI（GitHub Actions：build/test/lint）+ Dockerfile + compose + 部署文档（Round 7）
-- [~] OpenAPI 生成前端客户端：已导出 `docs/openapi.json` + 生成 `api-schema.d.ts` + 契约别名（Round 15），手写类型逐步迁移中
+- [x] OpenAPI 前端类型：spec 导出 + `api-schema.d.ts` 生成 + 核心 DTO 全部由契约派生（Round 23）；请求体表单类型仍在前端定义
+- [ ] OpenAPI 生成完整客户端（替换手写 fetch 封装）
 - [x] 前端测试：Vitest（13 项）+ Playwright E2E 起步（Round 16，2 条主链路）
 - [ ] 测试补齐：真实 MAF 适配层、取消、沙箱、worktree、安全用例
 - [ ] 文档更新：README 进度、AGENTS 现状、README.en
@@ -287,11 +288,19 @@
 | 10 | 工时登记人缺失 | `WorkItemsController.AddWorkLog` | ✅ Round 3 |
 | 11 | `UpdateWorkItemRequest` 无法改指派人/缺陷字段 | `Contracts/WorkItems.cs` | ✅ Round 3 |
 | 12 | Task 状态流转 400、父子关系无法设置 | `WorkItemsController` | ✅ Round 3 |
-| 13 | 前端手写 API 类型，未用 OpenAPI 生成 | `frontend/src/lib/types.ts` | OpenAPI 已生成并逐步迁移 |
+| 13 | 前端手写 API 类型，未用 OpenAPI 生成 | `frontend/src/lib/types.ts` | ✅ Round 23：响应 DTO 由契约派生 |
 | 14 | 无 PostgreSQL provider，连接串切换无效 | `Program.cs` | P5 |
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 23（2026-11-04）
+
+- OpenAPI 契约迁移（P5 收尾）：重新导出 `docs/openapi.json`（含认证/人力成本/关联需求/Agent 活动等新 DTO）
+- `api-schema.d.ts` 数字类型收敛脚本（`number | string` → `number`，与 .NET 默认 JSON 序列化一致），`npm run api:types` 一条命令完成生成 + 归一
+- `frontend/src/lib/types.ts` 全量改为从生成契约派生：Project/WorkItem/Iteration/Prototype/Comment/Report/Provider/Agent/Run/Workflow/Blocker/Team/CI/技能/MCP/审计/成本；仅保留领域联合类型（状态枚举）与前端错误类
+- 测试：后端 139 项不变；前端 lint / format / test:run（13）/ build 全绿；生成结果可复现（CI 校验依旧）
+- 验证：`npm run api:types` 无 diff、`npm run lint` / `format:check` / `test:run` / `build` 全绿
 
 ### Round 22（2026-11-04）
 

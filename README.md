@@ -91,7 +91,7 @@ docs/PRD.md                 # 产品需求（事实来源）
 - [x] M3 核心：工作流编排、审批策略、卡点队列、失败重试、三条内置模板、Agent 团队实体
 - [x] M4 主体：项目 CI/CD 集成（Token 加密）、gh/glab PR/MR/CI/Release、合并自动流转、发布面板
 - [x] M5 主体：Skills 装配与运行时注入、MCP 配置/授权/HTTP+旧版 SSE+stdio 运行时工具/工具级审计、Token 成本报表
-- [x] OpenAPI：导出 spec、生成前端契约类型、CI 校验生成结果
+- [x] OpenAPI：导出 spec、生成前端契约类型、核心 DTO 由契约派生、CI 校验生成结果
 - [x] P5 部分：SignalR 实时推送、GitHub Actions CI、Docker/compose（SQLite/PostgreSQL 双 provider）、结构化 JSON 日志 + 关联 ID、前后端测试
 - [x] 原型工坊：HTML 编辑 + 严格 CSP 沙箱预览、URL/图片/MCP 引用、图片上传、版本历史与恢复、需求关联
 - [x] 工作项视图：卡片/列表切换、多选批量流转/指派/删除、看板标签筛选
@@ -102,4 +102,4 @@ docs/PRD.md                 # 产品需求（事实来源）
 - [x] 看板 Agent 实时状态（最近 Run/进行中徽标）、缺陷↔需求关联
 - [x] 报表：工时/成本按迭代与日期过滤、人力成本（工时×时薪）、估算偏差与超支项
 - [x] 运行监控：执行记录详情（日志时间线/提示词/输出/耗时/token，运行中 2s 自动刷新）
-- [ ] 剩余：手写类型逐步迁移到生成契约、流式 token 输出
+- [ ] 剩余：OpenAPI 完整客户端替换手写 fetch、流式 token 输出
