@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 139 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 140 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -62,7 +62,7 @@
 - [x] 工作项 ↔ PR/MR 关联与 CI 状态回写（合并后自动流转 Done/Closed）
 - [x] 发布流模板（Round 4）+ 直接发布 API（tag → Release）
 - [x] 前端：集成配置卡、PR/CI 状态展示与同步、发布面板
-- [ ] CI 状态实时推送（当前手动同步 / 轮询；SignalR 阶段补齐）
+- [x] CI 状态实时推送：PR 创建/同步/合并后经 SignalR 广播工作项状态（Round 24；无 webhook，依赖同步动作）
 
 ### P4 M5 打磨（Round 6 完成主体）
 
@@ -251,7 +251,7 @@
 - [x] 看板卡片显示 Agent 头像/实时状态（Round 18：最近 Run 徽标 + 5s 刷新/SignalR）
 - [x] 工作流完成时自动流转工作项状态（InProgress→InReview / Fixing→PendingVerification）
 - [ ] Agent 作为项目成员/指派人
-- [ ] PR 创建与合并（当前仅从输出正则抓链接）
+- [x] PR 创建与合并（Round 24：创建/同步已有，新增 `POST .../pull-request/merge` + 前端确认合并）
 - [ ] 失败重试
 
 ### 6. CI/CD（P1 · Round 5）
@@ -259,8 +259,8 @@
 - [x] GitHub `gh` 封装（PR 创建/状态/合并/Release）
 - [x] GitLab `glab` 封装（MR 创建/状态/合并/Release）
 - [x] 发布流（模板 + 直接 Release API）
-- [x] CI 状态回写（手动同步，合并自动流转）
-- [ ] CI 状态实时推送（SignalR 阶段）
+- [x] CI 状态回写（手动同步，合并自动流转）+ PR 合并 API/UI（Round 24）
+- [x] CI 状态实时推送（SignalR 阶段）
 
 ### 8. 架构与安全
 
@@ -293,6 +293,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 24（2026-11-04）
+
+- PR 合并（PRD 5.9 / M4）：新增 `POST /api/workitems/{id}/pull-request/merge` —— 调 gh/glab 合并、回拉状态/CI、合并后自动推进工作项（需求→Done / 缺陷→Closed）、写活动流
+- CI 实时推送：PR 创建/同步/合并成功后经 `IRealtimeNotifier.WorkItemChangedAsync` 广播（前端 SignalR 已按事件刷新）
+- 前端：PR 区域新增「合并 PR」按钮（ConfirmDialog 二次确认、状态徽标刷新）
+- 测试：139 → 140（真实合并调用 + 状态回写 + 自动流转），`dotnet test` 全绿；前端 lint / format / test:run / build / E2E 全绿
 
 ### Round 23（2026-11-04）
 
