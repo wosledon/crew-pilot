@@ -28,11 +28,47 @@ docker compose up -d --build
 | 变量 | 默认 | 说明 |
 | --- | --- | --- |
 | `ASPNETCORE_ENVIRONMENT` | `Production` | 运行环境；`Development` 时额外暴露 OpenAPI |
+| `Database__Provider` | `Sqlite` | `Sqlite` 或 `PostgreSql` |
 | `ConnectionStrings__CrewPilot` | `Data Source=/app/App_Data/crewpilot.db` | 数据库连接串 |
-| `Database__AutoMigrate` | `true`（容器内） | 启动时自动迁移 |
+| `Database__AutoMigrate` | `true`（容器内） | 启动时自动迁移（SQLite / PostgreSQL 各自迁移程序集） |
 | `Attachments__RootPath` | `/app/App_Data/attachments` | 附件存储目录 |
+| `Secrets__KeyPath` | `/app/App_Data/secrets.key` | 非 Windows 下 AES-GCM 机密保护密钥文件 |
 
-## 2. 手动部署（Windows / Linux）
+> 健康检查：`GET /health` 返回 `{ status: "ok", database: "Sqlite|PostgreSql" }`。
+
+## 2. PostgreSQL
+
+默认使用 SQLite（开发开箱即用）；生产可切换 PostgreSQL：
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.postgres.yml up -d --build
+```
+
+覆盖配置会启动 `postgres:17` 并设置 `Database__Provider=PostgreSql`。
+PostgreSQL 迁移位于独立程序集 `CrewPilot.Infrastructure.PostgreSql`（与 SQLite 迁移互不干扰），
+容器启动时由 `Database__AutoMigrate=true` 自动应用。
+
+手动运行 API：
+
+```bash
+Database__Provider=PostgreSql \
+ConnectionStrings__CrewPilot="Host=localhost;Port=5432;Database=crewpilot;Username=crewpilot;Password=crewpilot" \
+Database__AutoMigrate=true \
+dotnet run --project src/CrewPilot.Api
+```
+
+生成/更新 PostgreSQL 迁移：
+
+```bash
+dotnet ef migrations add <Name> \
+  -p src/CrewPilot.Infrastructure.PostgreSql \
+  -s src/CrewPilot.Infrastructure.PostgreSql
+```
+
+密钥文件 `secrets.key` 与数据库同样重要：Docker 部署时随 `App_Data` 卷备份；
+丢失密钥将无法解密已保存的模型 API Key / MCP Token / CI/CD Token，需要重新录入。
+
+## 3. 手动部署（Windows / Linux）
 
 后端：
 
@@ -58,22 +94,18 @@ nginx 参考配置见 `frontend/nginx.conf`。
 
 > 前端与 API 同源部署可避免 CORS；若跨域，需在 `Program.cs` 的 `FrontendDev` 策略中补充来源。
 
-## 3. 数据与进程隔离
+## 4. 数据与进程隔离
 
 - Agent 执行依赖 `Project.LocalPath` 指向的本地 git 仓库；容器化部署时需将仓库目录挂载进 api 容器，并保证 `git` / `gh` / `glab` 可用。
 - `gh` / `glab` 在容器内默认未安装；如使用 M4 CI/CD，请在镜像中安装 CLI 或改为在宿主机运行 API。
 - 每个开发 AgentRun 会在工作项独立 git worktree 中执行，结束时清理（成功保留分支/PR）。
-
-## 4. PostgreSQL（规划中）
-
-PRD 目标为生产 PostgreSQL、开发 SQLite。当前迁移脚本按 SQLite 生成；切换 provider 需补充 PostgreSQL 迁移与验证，尚未纳入本指南。
 
 ## 5. CI
 
 GitHub Actions：`.github/workflows/ci.yml`
 
 - backend：`dotnet restore/build/test`（Release）
-- frontend：`npm ci` + `lint` + `format:check` + `build`
+- frontend：`npm ci` + `lint` + `format:check` + `test:run` + `build`
 
 ## 6. 常见问题
 

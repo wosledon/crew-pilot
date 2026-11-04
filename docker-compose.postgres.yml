@@ -1,0 +1,27 @@
+# PostgreSQL 覆盖配置：docker compose -f docker-compose.yml -f docker-compose.postgres.yml up -d --build
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: crewpilot
+      POSTGRES_USER: crewpilot
+      POSTGRES_PASSWORD: crewpilot
+    volumes:
+      - crewpilot-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crewpilot -d crewpilot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    environment:
+      Database__Provider: PostgreSql
+      ConnectionStrings__CrewPilot: "Host=db;Port=5432;Database=crewpilot;Username=crewpilot;Password=crewpilot"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  crewpilot-pgdata:
