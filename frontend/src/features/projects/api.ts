@@ -3,6 +3,7 @@ import { api } from "@/lib/api";
 import type {
   Activity,
   Attachment,
+  BatchWorkItemsResult,
   Burndown,
   Comment,
   HoursReport,
@@ -20,8 +21,8 @@ import type {
 export const projectKeys = {
   all: ["projects"] as const,
   iterations: (projectId: string) => ["projects", projectId, "iterations"] as const,
-  workItems: (projectId: string, type?: string) =>
-    ["projects", projectId, "workitems", type ?? "all"] as const,
+  workItems: (projectId: string, type?: string, tag?: string) =>
+    ["projects", projectId, "workitems", type ?? "all", tag ?? "all"] as const,
   workItem: (workItemId: string) => ["workitems", workItemId] as const,
   workLogs: (workItemId: string) => ["workitems", workItemId, "worklogs"] as const,
   comments: (workItemId: string) => ["workitems", workItemId, "comments"] as const,
@@ -48,12 +49,42 @@ export function useProject(projectId: string | undefined) {
   });
 }
 
-export function useWorkItems(projectId: string | undefined, type?: string) {
+export function useWorkItems(projectId: string | undefined, type?: string, tag?: string) {
+  const search = new URLSearchParams();
+  if (type) {
+    search.set("type", type);
+  }
+  if (tag) {
+    search.set("tag", tag);
+  }
+  const suffix = search.size > 0 ? `?${search.toString()}` : "";
+
   return useQuery({
-    queryKey: projectKeys.workItems(projectId ?? "", type),
-    queryFn: () =>
-      api.get<WorkItemListItem[]>(`/projects/${projectId}/workitems${type ? `?type=${type}` : ""}`),
+    queryKey: projectKeys.workItems(projectId ?? "", type, tag),
+    queryFn: () => api.get<WorkItemListItem[]>(`/projects/${projectId}/workitems${suffix}`),
     enabled: projectId !== undefined,
+  });
+}
+
+export interface BatchWorkItemsBody {
+  ids: string[];
+  action: "status" | "assign" | "delete";
+  toStatus?: string;
+  assigneeName?: string;
+}
+
+export function useBatchWorkItems(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: BatchWorkItemsBody) =>
+      api.post<BatchWorkItemsResult>("/workitems/batch", body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "workitems"],
+      });
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+      void queryClient.invalidateQueries({ queryKey: ["workitems"] });
+    },
   });
 }
 

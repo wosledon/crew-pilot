@@ -69,6 +69,19 @@ export interface WorkItemDetail {
   parentWorkItemId: string | null;
 }
 
+/** 批量操作结果 */
+export interface BatchItemResult {
+  id: string;
+  ok: boolean;
+  error: string | null;
+}
+
+export interface BatchWorkItemsResult {
+  succeeded: number;
+  failed: number;
+  results: BatchItemResult[];
+}
+
 export interface WorkLog {
   id: string;
   hours: number;

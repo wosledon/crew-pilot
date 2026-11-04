@@ -1,6 +1,8 @@
 {
   "title": "Kanban",
   "filterType": "Type",
+  "filterTag": "Tag",
+  "allTags": "All tags",
   "types": {
     "requirement": "Requirement",
     "defect": "Defect"

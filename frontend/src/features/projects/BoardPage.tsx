@@ -60,6 +60,9 @@ function DraggableCard({ item }: { item: WorkItemListItem }) {
       {item.assigneeName ? (
         <p className="mt-1 text-xs text-muted-foreground">@{item.assigneeName}</p>
       ) : null}
+      {item.tags ? (
+        <p className="mt-1 truncate text-xs text-muted-foreground">#{item.tags}</p>
+      ) : null}
     </div>
   );
 }
@@ -98,9 +101,20 @@ export function BoardPage() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(["kanban", "workitems", "common"]);
   const [type, setType] = useState<WorkItemType>("requirement");
+  const [tag, setTag] = useState("");
   const [activeId, setActiveId] = useState<string | null>(null);
-  const workItems = useWorkItems(projectId, type);
+  const allWorkItems = useWorkItems(projectId, type);
+  const workItems = useWorkItems(projectId, type, tag || undefined);
   const transitionWorkItem = useTransitionWorkItem();
+
+  const tags = [
+    ...new Set(
+      (allWorkItems.data ?? [])
+        .flatMap((item) => item.tags?.split(",") ?? [])
+        .map((value) => value.trim())
+        .filter((value) => value !== ""),
+    ),
+  ].sort((a, b) => a.localeCompare(b));
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -143,16 +157,32 @@ export function BoardPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">{t("kanban:title")}</h1>
-        <Select
-          value={type}
-          onValueChange={(value) => setType(value as WorkItemType)}
-          options={[
-            { value: "requirement", label: t("kanban:types.requirement") },
-            { value: "defect", label: t("kanban:types.defect") },
-          ]}
-          ariaLabel={t("kanban:filterType")}
-          className="w-36"
-        />
+        <div className="flex items-center gap-2">
+          <Select
+            value={tag}
+            onValueChange={setTag}
+            options={[
+              { value: "", label: t("kanban:allTags") },
+              ...tags.map((value) => ({ value, label: value })),
+            ]}
+            placeholder={t("kanban:filterTag")}
+            ariaLabel={t("kanban:filterTag")}
+            className="w-40"
+          />
+          <Select
+            value={type}
+            onValueChange={(value) => {
+              setType(value as WorkItemType);
+              setTag("");
+            }}
+            options={[
+              { value: "requirement", label: t("kanban:types.requirement") },
+              { value: "defect", label: t("kanban:types.defect") },
+            ]}
+            ariaLabel={t("kanban:filterType")}
+            className="w-36"
+          />
+        </div>
       </div>
 
       {workItems.isPending ? (
