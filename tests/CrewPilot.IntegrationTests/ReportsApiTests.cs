@@ -41,6 +41,59 @@ public sealed class ReportsApiTests(CrewPilotApiFactory factory) : IClassFixture
     }
 
     [Fact]
+    public async Task HoursReport_FiltersByIterationAndDateRange()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var iterationResponse = await client.PostAsJsonAsync(
+            $"/api/projects/{project.Id}/iterations", new
+            {
+                name = "过滤迭代",
+                startDate = today.AddDays(-10),
+                endDate = today.AddDays(10),
+            });
+        var iteration = await iterationResponse.Content.ReadFromJsonAsync<IterationDetailDto>();
+
+        var scoped = await CreateWorkItemAsync(client, project.Id, new
+        {
+            type = "requirement",
+            title = "迭代内需求",
+            estimatedHours = 4m,
+            iterationId = iteration!.Id,
+        });
+        var unscoped = await CreateWorkItemAsync(client, project.Id, new
+        {
+            type = "requirement",
+            title = "迭代外需求",
+            estimatedHours = 2m,
+        });
+
+        await client.PostAsJsonAsync($"/api/workitems/{scoped.Id}/worklogs", new
+        {
+            hours = 1m,
+            date = today,
+        });
+        await client.PostAsJsonAsync($"/api/workitems/{scoped.Id}/worklogs", new
+        {
+            hours = 2m,
+            date = today.AddDays(-30),
+        });
+        await client.PostAsJsonAsync($"/api/workitems/{unscoped.Id}/worklogs", new
+        {
+            hours = 5m,
+            date = today,
+        });
+
+        var report = await client.GetFromJsonAsync<HoursReportDto>(
+            $"/api/projects/{project.Id}/hours-report" +
+            $"?iterationId={iteration.Id}&from={today.AddDays(-7):yyyy-MM-dd}&to={today:yyyy-MM-dd}");
+
+        report!.TotalEstimatedHours.Should().Be(4m);
+        report.TotalLoggedHours.Should().Be(1m);
+    }
+
+    [Fact]
     public async Task Burndown_ReturnsDailyPoints()
     {
         var client = factory.CreateClient();

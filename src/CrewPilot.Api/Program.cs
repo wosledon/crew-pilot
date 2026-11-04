@@ -15,6 +15,18 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 生产环境输出结构化 JSON 日志（便于容器日志采集 / 检索）
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Logging.ClearProviders();
+    builder.Logging.AddJsonConsole(options =>
+    {
+        options.IncludeScopes = true;
+        options.UseUtcTimestamp = true;
+        options.TimestampFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
+    });
+}
+
 // 数据访问：开发默认 SQLite；Database:Provider=PostgreSql 切换 PostgreSQL（独立迁移程序集）
 var databaseProvider = builder.Configuration["Database:Provider"] ?? "Sqlite";
 var usePostgreSql = databaseProvider.Equals("PostgreSql", StringComparison.OrdinalIgnoreCase) ||
@@ -109,6 +121,14 @@ if (autoMigrate)
 }
 
 app.UseExceptionHandler();
+
+// 请求关联 ID：响应头返回，日志/排查可串联
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Correlation-Id"] = context.TraceIdentifier;
+    await next();
+});
+
 app.UseCors("FrontendDev");
 
 if (app.Environment.IsDevelopment())

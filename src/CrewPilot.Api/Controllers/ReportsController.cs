@@ -8,13 +8,24 @@ namespace CrewPilot.Api.Controllers;
 [ApiController]
 public sealed class ReportsController(CrewPilotDbContext db) : ControllerBase
 {
-    /// <summary>项目工时报表：总计 + 按类型/指派人/登记成员分组（预估 vs 已耗）。</summary>
+    /// <summary>项目工时报表：总计 + 按类型/指派人/登记成员分组（预估 vs 已耗），可按迭代/日期过滤。</summary>
     [HttpGet("api/projects/{projectId:guid}/hours-report")]
-    public async Task<ActionResult<HoursReportDto>> HoursReport(Guid projectId, CancellationToken ct)
+    public async Task<ActionResult<HoursReportDto>> HoursReport(
+        Guid projectId,
+        [FromQuery] Guid? iterationId,
+        [FromQuery] DateOnly? from,
+        [FromQuery] DateOnly? to,
+        CancellationToken ct)
     {
-        var items = await db.WorkItems
+        var itemQuery = db.WorkItems
             .AsNoTracking()
-            .Where(w => w.ProjectId == projectId)
+            .Where(w => w.ProjectId == projectId);
+        if (iterationId is Guid scopeIterationId)
+        {
+            itemQuery = itemQuery.Where(w => w.IterationId == scopeIterationId);
+        }
+
+        var items = await itemQuery
             .Select(w => new
             {
                 w.Id,
@@ -38,6 +49,12 @@ public sealed class ReportsController(CrewPilotDbContext db) : ControllerBase
                     MemberName = l.Member != null ? l.Member.DisplayName : null,
                 })
                 .ToListAsync(ct);
+
+        // 日期范围在内存过滤（DateOnly 比较；SQLite provider 下推支持有限）
+        logs = logs
+            .Where(l => (from is null || l.Date >= from.Value) &&
+                        (to is null || l.Date <= to.Value))
+            .ToList();
 
         // SQLite 不支持 DateTimeOffset 排序，这里按 DateOnly 排序（DateOnly 可下推）
         var logged = logs
@@ -95,23 +112,44 @@ public sealed class ReportsController(CrewPilotDbContext db) : ControllerBase
             byMember);
     }
 
-    /// <summary>成本报表：AgentRun token × 模型单价（models.dev / 手动目录价格）。</summary>
+    /// <summary>成本报表：AgentRun token × 模型单价，可按迭代/日期过滤。</summary>
     [HttpGet("api/projects/{projectId:guid}/cost-report")]
     public async Task<ActionResult<CostReportDto>> CostReport(
-        Guid projectId, CancellationToken ct)
+        Guid projectId,
+        [FromQuery] Guid? iterationId,
+        [FromQuery] DateOnly? from,
+        [FromQuery] DateOnly? to,
+        CancellationToken ct)
     {
-        var runs = await db.AgentRuns
+        var runQuery = db.AgentRuns
             .AsNoTracking()
-            .Where(r => r.WorkItem != null && r.WorkItem.ProjectId == projectId)
+            .Where(r => r.WorkItem != null && r.WorkItem.ProjectId == projectId);
+        if (iterationId is Guid scopeIterationId)
+        {
+            runQuery = runQuery.Where(r => r.WorkItem!.IterationId == scopeIterationId);
+        }
+
+        var runs = await runQuery
             .Select(r => new
             {
                 r.PromptTokens,
                 r.CompletionTokens,
+                r.CreatedAt,
                 r.Agent.ProviderId,
                 r.Agent.Model,
                 ProviderName = r.Agent.Provider.Name,
             })
             .ToListAsync(ct);
+
+        // 日期范围在内存过滤（DateTimeOffset 在 SQLite 下排序/比较不可下推）
+        runs = runs
+            .Where(r =>
+            {
+                var date = DateOnly.FromDateTime(r.CreatedAt.LocalDateTime);
+                return (from is null || date >= from.Value) &&
+                       (to is null || date <= to.Value);
+            })
+            .ToList();
 
         if (runs.Count == 0)
         {

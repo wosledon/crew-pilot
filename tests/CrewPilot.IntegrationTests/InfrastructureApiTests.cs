@@ -16,6 +16,7 @@ public sealed class InfrastructureApiTests(CrewPilotApiFactory factory)
         var response = await client.GetAsync("/health");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Headers.GetValues("X-Correlation-Id").Should().NotBeEmpty();
         var payload = await response.Content.ReadFromJsonAsync<HealthPayload>();
         payload!.Status.Should().Be("ok");
         payload.Database.Should().Be("Sqlite");
