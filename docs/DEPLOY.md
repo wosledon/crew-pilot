@@ -35,6 +35,8 @@ docker compose up -d --build
 | `Secrets__KeyPath` | `/app/App_Data/secrets.key` | 非 Windows 下 AES-GCM 机密保护密钥文件 |
 
 > 健康检查：`GET /health` 返回 `{ status: "ok", database: "Sqlite|PostgreSql" }`。
+> 生产环境日志为 JSON console（UTC 时间戳、Scope），适合 `docker logs` / Loki / ELK 采集；
+> 响应头 `X-Correlation-Id` 可用于串联请求与日志。
 
 ## 2. PostgreSQL
 
