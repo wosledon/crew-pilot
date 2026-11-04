@@ -79,6 +79,20 @@ public sealed record UpdateWorkItemRequest(
 
 public sealed record TransitionRequest(string ToStatus);
 
+/// <summary>批量操作：status（流转）/ assign（指派）/ delete（删除）。</summary>
+public sealed record BatchWorkItemsRequest(
+    IReadOnlyList<Guid> Ids,
+    string Action,
+    string? ToStatus = null,
+    string? AssigneeName = null);
+
+public sealed record BatchItemResultDto(Guid Id, bool Ok, string? Error);
+
+public sealed record BatchWorkItemsResultDto(
+    int Succeeded,
+    int Failed,
+    IReadOnlyList<BatchItemResultDto> Results);
+
 public sealed record WorkLogDto(
     Guid Id,
     decimal Hours,

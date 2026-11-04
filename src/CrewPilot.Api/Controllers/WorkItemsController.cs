@@ -201,62 +201,117 @@ public sealed class WorkItemsController(
         }
 
         var to = (request.ToStatus ?? string.Empty).Trim();
-        string from;
-        string toStatus;
-        try
+        var result = ApplyTransition(workItem, to);
+        if (!result.Ok)
         {
-            switch (workItem)
-            {
-                case Requirement requirement:
-                    if (!Enum.TryParse<RequirementStatus>(to, ignoreCase: true, out var rTarget))
-                    {
-                        return Problem(detail: $"无效的需求状态 {to}", statusCode: 400);
-                    }
-
-                    from = requirement.Status.ToString();
-                    WorkItemStateMachine.Transition(requirement, rTarget);
-                    toStatus = requirement.Status.ToString();
-                    break;
-
-                case Defect defect:
-                    if (!Enum.TryParse<DefectStatus>(to, ignoreCase: true, out var dTarget))
-                    {
-                        return Problem(detail: $"无效的缺陷状态 {to}", statusCode: 400);
-                    }
-
-                    from = defect.Status.ToString();
-                    WorkItemStateMachine.Transition(defect, dTarget);
-                    toStatus = defect.Status.ToString();
-                    break;
-
-                case TaskItem task:
-                    if (!string.Equals(to, "todo", StringComparison.OrdinalIgnoreCase) &&
-                        !string.Equals(to, "done", StringComparison.OrdinalIgnoreCase))
-                    {
-                        return Problem(detail: $"无效的任务状态 {to}（todo/done）", statusCode: 400);
-                    }
-
-                    from = WorkItemStateMachine.ToStatus(task);
-                    WorkItemStateMachine.Transition(task, string.Equals(to, "done", StringComparison.OrdinalIgnoreCase));
-                    toStatus = WorkItemStateMachine.ToStatus(task);
-                    break;
-
-                default:
-                    return Problem(detail: "不支持的工作项类型", statusCode: 400);
-            }
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Problem(detail: ex.Message, statusCode: 400);
+            return Problem(detail: result.Error, statusCode: 400);
         }
 
         workItem.UpdatedAt = DateTimeOffset.UtcNow;
-        await AddActivityAsync(workItem.ProjectId, workItem.Id, "workitem.status.changed", new { from, to = toStatus }, ct);
+        await AddActivityAsync(
+            workItem.ProjectId, workItem.Id, "workitem.status.changed",
+            new { from = result.From, to = result.To }, ct);
         await db.SaveChangesAsync(ct);
 
         var dto = await GetDetailAsync(id, ct);
-        await realtime.WorkItemChangedAsync(workItem.ProjectId, workItem.Id, toStatus, ct);
+        await realtime.WorkItemChangedAsync(workItem.ProjectId, workItem.Id, result.To, ct);
         return Ok(dto);
+    }
+
+    /// <summary>批量操作：状态流转 / 指派 / 删除（逐项返回结果，失败不中断其余项）。</summary>
+    [HttpPost("api/workitems/batch")]
+    public async Task<ActionResult<BatchWorkItemsResultDto>> Batch(
+        [FromBody] BatchWorkItemsRequest request, CancellationToken ct)
+    {
+        var ids = (request.Ids ?? []).Distinct().ToList();
+        if (ids.Count == 0)
+        {
+            return Problem(detail: "请选择工作项", statusCode: 400);
+        }
+
+        if (ids.Count > 100)
+        {
+            return Problem(detail: "单次最多操作 100 个工作项", statusCode: 400);
+        }
+
+        var action = (request.Action ?? string.Empty).Trim().ToLowerInvariant();
+        if (action is not ("status" or "assign" or "delete"))
+        {
+            return Problem(detail: "批量动作无效（status/assign/delete）", statusCode: 400);
+        }
+
+        var items = await db.WorkItems
+            .Where(w => ids.Contains(w.Id))
+            .ToListAsync(ct);
+        var byId = items.ToDictionary(w => w.Id);
+        var results = new List<BatchItemResultDto>();
+        var changed = new List<(Guid ProjectId, Guid Id, string Status)>();
+
+        foreach (var id in ids)
+        {
+            if (!byId.TryGetValue(id, out var item))
+            {
+                results.Add(new BatchItemResultDto(id, false, "工作项不存在"));
+                continue;
+            }
+
+            switch (action)
+            {
+                case "status":
+                {
+                    var result = ApplyTransition(item, (request.ToStatus ?? string.Empty).Trim());
+                    if (!result.Ok)
+                    {
+                        results.Add(new BatchItemResultDto(id, false, result.Error));
+                        break;
+                    }
+
+                    item.UpdatedAt = DateTimeOffset.UtcNow;
+                    await AddActivityAsync(
+                        item.ProjectId, item.Id, "workitem.status.changed",
+                        new { from = result.From, to = result.To, batch = true }, ct);
+                    results.Add(new BatchItemResultDto(id, true, null));
+                    changed.Add((item.ProjectId, item.Id, result.To));
+                    break;
+                }
+
+                case "assign":
+                {
+                    item.Assignee = await ResolveAssigneeAsync(
+                        item.ProjectId, request.AssigneeName, ct);
+                    item.UpdatedAt = DateTimeOffset.UtcNow;
+                    await AddActivityAsync(
+                        item.ProjectId, item.Id, "workitem.status.changed",
+                        new { assignee = request.AssigneeName, batch = true }, ct);
+                    results.Add(new BatchItemResultDto(id, true, null));
+                    changed.Add((item.ProjectId, item.Id, "updated"));
+                    break;
+                }
+
+                default:
+                {
+                    db.WorkItems.Remove(item);
+                    results.Add(new BatchItemResultDto(id, true, null));
+                    changed.Add((item.ProjectId, item.Id, "deleted"));
+                    break;
+                }
+            }
+        }
+
+        await db.SaveChangesAsync(ct);
+
+        foreach (var (projectId, itemId, status) in changed)
+        {
+            await realtime.WorkItemChangedAsync(projectId, itemId, status, ct);
+            if (status == "deleted")
+            {
+                await audit.LogAsync(
+                    "workitem.batch.delete", "workitem", itemId.ToString(), projectId, ct: ct);
+            }
+        }
+
+        var succeeded = results.Count(r => r.Ok);
+        return Ok(new BatchWorkItemsResultDto(succeeded, results.Count - succeeded, results));
     }
 
     [HttpDelete("api/workitems/{id:guid}")]
@@ -714,6 +769,55 @@ public sealed class WorkItemsController(
         };
         db.Members.Add(member);
         return member;
+    }
+
+    private static (bool Ok, string? Error, string From, string To) ApplyTransition(
+        WorkItem workItem, string to)
+    {
+        try
+        {
+            switch (workItem)
+            {
+                case Requirement requirement:
+                    if (!Enum.TryParse<RequirementStatus>(to, ignoreCase: true, out var rTarget))
+                    {
+                        return (false, $"无效的需求状态 {to}", string.Empty, string.Empty);
+                    }
+
+                    var rFrom = requirement.Status.ToString();
+                    WorkItemStateMachine.Transition(requirement, rTarget);
+                    return (true, null, rFrom, requirement.Status.ToString());
+
+                case Defect defect:
+                    if (!Enum.TryParse<DefectStatus>(to, ignoreCase: true, out var dTarget))
+                    {
+                        return (false, $"无效的缺陷状态 {to}", string.Empty, string.Empty);
+                    }
+
+                    var dFrom = defect.Status.ToString();
+                    WorkItemStateMachine.Transition(defect, dTarget);
+                    return (true, null, dFrom, defect.Status.ToString());
+
+                case TaskItem task:
+                    if (!string.Equals(to, "todo", StringComparison.OrdinalIgnoreCase) &&
+                        !string.Equals(to, "done", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return (false, $"无效的任务状态 {to}（todo/done）", string.Empty, string.Empty);
+                    }
+
+                    var tFrom = WorkItemStateMachine.ToStatus(task);
+                    WorkItemStateMachine.Transition(
+                        task, string.Equals(to, "done", StringComparison.OrdinalIgnoreCase));
+                    return (true, null, tFrom, WorkItemStateMachine.ToStatus(task));
+
+                default:
+                    return (false, "不支持的工作项类型", string.Empty, string.Empty);
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            return (false, ex.Message, string.Empty, string.Empty);
+        }
     }
 
     private async Task AddActivityAsync(
