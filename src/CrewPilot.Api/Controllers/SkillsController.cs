@@ -1,9 +1,11 @@
+using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using CrewPilot.Api.Contracts;
 using CrewPilot.Core.Skills;
 using CrewPilot.Infrastructure.Audit;
 using CrewPilot.Infrastructure.Persistence;
+using CrewPilot.Infrastructure.Storage;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +15,7 @@ namespace CrewPilot.Api.Controllers;
 [ApiController]
 public sealed class SkillsController(
     CrewPilotDbContext db,
+    SkillStorage storage,
     AuditLogger audit) : ControllerBase
 {
     [HttpGet("api/skills")]
@@ -101,6 +104,7 @@ public sealed class SkillsController(
 
         db.Skills.Remove(skill);
         await db.SaveChangesAsync(ct);
+        storage.Delete(id);
         await audit.LogAsync("skill.delete", "skill", id.ToString(), ct: ct);
         return NoContent();
     }
@@ -168,6 +172,128 @@ public sealed class SkillsController(
         db.Skills.Add(skill);
         await db.SaveChangesAsync(ct);
         await audit.LogAsync("skill.import", "skill", skill.Id.ToString(), ct: ct);
+        return Created($"/api/skills/{skill.Id}", ToDto(skill));
+    }
+
+    /// <summary>下载资源包 zip（SKILL.md + scripts/ + resources/）。</summary>
+    [HttpGet("api/skills/{id:guid}/bundle")]
+    public async Task<IActionResult> ExportBundle(Guid id, CancellationToken ct)
+    {
+        var skill = await db.Skills.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id, ct);
+        if (skill is null)
+        {
+            return Problem(detail: "Skill 不存在", statusCode: 404);
+        }
+
+        var bytes = storage.BuildBundle(id, ToSkillMarkdown(skill));
+        var safeName = string.Concat(skill.Name.Select(
+            ch => Path.GetInvalidFileNameChars().Contains(ch) ? '_' : ch));
+        return File(bytes, "application/zip", $"{safeName}.skill.zip");
+    }
+
+    /// <summary>Skill 资源目录中的文件列表（scripts/、resources/）。</summary>
+    [HttpGet("api/skills/{id:guid}/files")]
+    public async Task<ActionResult<IReadOnlyList<string>>> ListFiles(
+        Guid id, CancellationToken ct)
+    {
+        var exists = await db.Skills.AnyAsync(s => s.Id == id, ct);
+        return exists
+            ? Ok(storage.ListFiles(id))
+            : Problem(detail: "Skill 不存在", statusCode: 404);
+    }
+
+    /// <summary>导入 Skill 资源包 zip：SKILL.md 定义元数据，scripts/resources 落盘。</summary>
+    [HttpPost("api/skills/import-bundle")]
+    [RequestSizeLimit(SkillStorage.MaxBundleBytes)]
+    public async Task<ActionResult<SkillDto>> ImportBundle(
+        [FromForm] IFormFile? file, CancellationToken ct)
+    {
+        if (file is null || file.Length == 0)
+        {
+            return Problem(detail: "资源包文件必填", statusCode: 400);
+        }
+
+        if (file.Length > SkillStorage.MaxBundleBytes)
+        {
+            return Problem(detail: "资源包不能超过 10MB", statusCode: 400);
+        }
+
+        using var buffer = new MemoryStream();
+        await using (var upload = file.OpenReadStream())
+        {
+            await upload.CopyToAsync(buffer, ct);
+        }
+
+        buffer.Position = 0;
+        string? markdown = null;
+        try
+        {
+            using (var archive = new ZipArchive(buffer, ZipArchiveMode.Read, leaveOpen: true))
+            {
+                var entry = archive.Entries.FirstOrDefault(e =>
+                    string.Equals(
+                        Path.GetFileName(e.FullName), "SKILL.md",
+                        StringComparison.OrdinalIgnoreCase));
+                if (entry is not null)
+                {
+                    using var reader = new StreamReader(entry.Open(), Encoding.UTF8);
+                    markdown = await reader.ReadToEndAsync(ct);
+                }
+            }
+        }
+        catch (InvalidDataException)
+        {
+            return Problem(detail: "不是合法的 zip 资源包", statusCode: 400);
+        }
+
+        if (markdown is null)
+        {
+            return Problem(detail: "资源包缺少 SKILL.md", statusCode: 400);
+        }
+
+        var parsed = ParseSkillMarkdown(markdown);
+        if (parsed is null)
+        {
+            return Problem(detail: "SKILL.md 格式无效", statusCode: 400);
+        }
+
+        var name = parsed.Value.Meta.GetValueOrDefault("name", string.Empty);
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return Problem(detail: "front matter 缺少 name", statusCode: 400);
+        }
+
+        if (await db.Skills.AnyAsync(s => s.Name == name, ct))
+        {
+            return Problem(detail: $"Skill {name} 已存在", statusCode: 409);
+        }
+
+        var skill = new Skill
+        {
+            Name = name,
+            Description = parsed.Value.Meta.GetValueOrDefault("description"),
+            PromptContent = parsed.Value.Body,
+            Tools = NormalizeTools(parsed.Value.Meta.GetValueOrDefault("tools")),
+            ScriptPath = parsed.Value.Meta.GetValueOrDefault("scriptPath"),
+            Enabled = !string.Equals(
+                parsed.Value.Meta.GetValueOrDefault("enabled"), "false",
+                StringComparison.OrdinalIgnoreCase),
+        };
+
+        try
+        {
+            buffer.Position = 0;
+            await storage.ExtractAsync(skill.Id, buffer, ct);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or InvalidDataException)
+        {
+            storage.Delete(skill.Id);
+            return Problem(detail: ex.Message, statusCode: 400);
+        }
+
+        db.Skills.Add(skill);
+        await db.SaveChangesAsync(ct);
+        await audit.LogAsync("skill.importBundle", "skill", skill.Id.ToString(), ct: ct);
         return Created($"/api/skills/{skill.Id}", ToDto(skill));
     }
 

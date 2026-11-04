@@ -90,6 +90,15 @@ if (string.IsNullOrWhiteSpace(attachmentRoot))
 
 builder.Services.AddSingleton<IAttachmentStorage>(new LocalAttachmentStorage(attachmentRoot));
 
+// Skill 资源目录（scripts/ + resources/）：可用 Skills:RootPath 覆盖
+var skillsRoot = builder.Configuration["Skills:RootPath"];
+if (string.IsNullOrWhiteSpace(skillsRoot))
+{
+    skillsRoot = Path.Combine(builder.Environment.ContentRootPath, "App_Data", "skills");
+}
+
+builder.Services.AddSingleton(new SkillStorage(skillsRoot));
+
 // CI/CD：gh / glab CLI 封装（Token 由项目集成配置加密存储）
 builder.Services.AddSingleton<IGitCliService, GitCliService>();
 

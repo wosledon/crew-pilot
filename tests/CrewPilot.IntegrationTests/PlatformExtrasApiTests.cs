@@ -102,6 +102,95 @@ public sealed class PlatformExtrasApiTests(CrewPilotApiFactory factory)
     }
 
     [Fact]
+    public async Task SkillBundle_ImportsResourcesAndExportsZip()
+    {
+        var client = factory.CreateClient();
+        var name = "资源包技能" + Guid.NewGuid().ToString("N")[..6];
+        using var archiveStream = new MemoryStream();
+        using (var archive = new System.IO.Compression.ZipArchive(
+                   archiveStream, System.IO.Compression.ZipArchiveMode.Create, true))
+        {
+            WriteEntry(archive, "SKILL.md", $"""
+                ---
+                name: {name}
+                description: 资源包测试
+                tools: read_file
+                scriptPath: scripts/run.ps1
+                ---
+
+                读取资源后执行脚本。
+                """);
+            WriteEntry(archive, "scripts/run.ps1", "Write-Output 'ok'");
+            WriteEntry(archive, "resources/notes.txt", "resource note");
+        }
+
+        archiveStream.Position = 0;
+        using var form = new MultipartFormDataContent
+        {
+            {
+                new ByteArrayContent(archiveStream.ToArray()),
+                "file",
+                "skill.zip"
+            },
+        };
+        var imported = await client.PostAsync("/api/skills/import-bundle", form);
+        imported.StatusCode.Should().Be(HttpStatusCode.Created);
+        var skill = await imported.Content.ReadFromJsonAsync<SkillDto>();
+        skill!.Name.Should().Be(name);
+        skill.ScriptPath.Should().Be("scripts/run.ps1");
+
+        var files = await client.GetFromJsonAsync<List<string>>(
+            $"/api/skills/{skill.Id}/files");
+        files.Should().BeEquivalentTo(["scripts/run.ps1", "resources/notes.txt"]);
+
+        var bundle = await client.GetByteArrayAsync($"/api/skills/{skill.Id}/bundle");
+        using var downloaded = new System.IO.Compression.ZipArchive(
+            new MemoryStream(bundle), System.IO.Compression.ZipArchiveMode.Read);
+        downloaded.Entries.Select(e => e.FullName).Should().Contain([
+            "SKILL.md", "scripts/run.ps1", "resources/notes.txt",
+        ]);
+    }
+
+    [Fact]
+    public async Task SkillBundle_RejectsZipSlip()
+    {
+        var client = factory.CreateClient();
+        using var archiveStream = new MemoryStream();
+        using (var archive = new System.IO.Compression.ZipArchive(
+                   archiveStream, System.IO.Compression.ZipArchiveMode.Create, true))
+        {
+            WriteEntry(archive, "SKILL.md", """
+                ---
+                name: 越权技能
+                ---
+
+                内容
+                """);
+            WriteEntry(archive, "resources/../escape.txt", "evil");
+        }
+
+        archiveStream.Position = 0;
+        using var form = new MultipartFormDataContent
+        {
+            {
+                new ByteArrayContent(archiveStream.ToArray()),
+                "file",
+                "evil.zip"
+            },
+        };
+        var response = await client.PostAsync("/api/skills/import-bundle", form);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    private static void WriteEntry(
+        System.IO.Compression.ZipArchive archive, string path, string content)
+    {
+        var entry = archive.CreateEntry(path);
+        using var writer = new StreamWriter(entry.Open());
+        writer.Write(content);
+    }
+
+    [Fact]
     public async Task AgentBinding_InjectsSkillIntoSystemPrompt()
     {
         var client = factory.CreateClient();
