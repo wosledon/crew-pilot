@@ -620,6 +620,9 @@ namespace CrewPilot.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal?>("HourlyRate")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Kind")
                         .IsRequired()
                         .HasMaxLength(16)

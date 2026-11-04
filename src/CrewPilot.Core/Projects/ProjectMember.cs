@@ -15,5 +15,8 @@ public class ProjectMember : Entity
 
     public string DisplayName { get; set; } = string.Empty;
 
+    /// <summary>时薪（可选，用于人力成本报表；币种由用户约定）。</summary>
+    public decimal? HourlyRate { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

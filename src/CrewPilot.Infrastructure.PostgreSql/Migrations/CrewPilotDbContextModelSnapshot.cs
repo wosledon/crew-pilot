@@ -625,6 +625,9 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<decimal?>("HourlyRate")
+                        .HasColumnType("numeric");
+
                     b.Property<string>("Kind")
                         .IsRequired()
                         .HasMaxLength(16)

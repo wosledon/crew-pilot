@@ -94,6 +94,45 @@ public sealed class ReportsApiTests(CrewPilotApiFactory factory) : IClassFixture
     }
 
     [Fact]
+    public async Task HumanCostAndEstimateDeviation_AreComputed()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var item = await CreateWorkItemAsync(client, project.Id, new
+        {
+            type = "requirement",
+            title = "人力成本需求",
+            estimatedHours = 4m,
+        });
+        await client.PostAsJsonAsync($"/api/workitems/{item.Id}/worklogs", new { hours = 6m });
+
+        var members = await client.GetFromJsonAsync<List<ProjectMemberDto>>(
+            $"/api/projects/{project.Id}/members");
+        var owner = members!.Single(m => m.DisplayName == "我");
+        var update = await client.PutAsJsonAsync($"/api/members/{owner.Id}", new
+        {
+            displayName = owner.DisplayName,
+            role = owner.Role,
+            hourlyRate = 100m,
+        });
+        update.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var humanCost = await client.GetFromJsonAsync<HumanCostReportDto>(
+            $"/api/projects/{project.Id}/human-cost-report");
+        humanCost!.TotalHours.Should().Be(6m);
+        humanCost.TotalCost.Should().Be(600m);
+        humanCost.ByMember.Should().Contain(m => m.Key == "我" && m.HourlyRate == 100m);
+
+        var deviation = await client.GetFromJsonAsync<EstimateDeviationReportDto>(
+            $"/api/projects/{project.Id}/estimate-deviation");
+        deviation!.EstimatedHours.Should().Be(4m);
+        deviation.LoggedHours.Should().Be(6m);
+        deviation.DeviationHours.Should().Be(2m);
+        deviation.DeviationPercent.Should().Be(50m);
+        deviation.OverrunCount.Should().Be(1);
+    }
+
+    [Fact]
     public async Task Burndown_ReturnsDailyPoints()
     {
         var client = factory.CreateClient();

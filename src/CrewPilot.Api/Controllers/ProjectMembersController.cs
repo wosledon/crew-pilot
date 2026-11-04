@@ -27,7 +27,8 @@ public sealed class ProjectMembersController(CrewPilotDbContext db) : Controller
             .Where(m => m.ProjectId == projectId)
             .Select(m => new ProjectMemberDto(
                 m.Id, m.ProjectId, m.Kind.ToString().ToLowerInvariant(),
-                m.Role.ToString().ToLowerInvariant(), m.DisplayName, m.CreatedAt))
+                m.Role.ToString().ToLowerInvariant(), m.DisplayName, m.CreatedAt,
+                m.HourlyRate))
             .ToListAsync(ct);
 
         return Ok(rows
@@ -78,12 +79,18 @@ public sealed class ProjectMembersController(CrewPilotDbContext db) : Controller
         }
 
         var role = ParseRole(request.Role, ProjectRole.Developer);
+        if (request.HourlyRate is < 0)
+        {
+            return Problem(detail: "时薪不能为负", statusCode: 400);
+        }
+
         var member = new ProjectMember
         {
             ProjectId = projectId,
             Kind = kind,
             Role = role,
             DisplayName = displayName,
+            HourlyRate = request.HourlyRate,
         };
         db.Members.Add(member);
         AddActivity(projectId, "member.added", new { member = displayName, kind = kind.ToString() });
@@ -114,8 +121,14 @@ public sealed class ProjectMembersController(CrewPilotDbContext db) : Controller
             return Problem(detail: "项目必须有 Owner，不能变更 Owner 的角色", statusCode: 400);
         }
 
+        if (request.HourlyRate is < 0)
+        {
+            return Problem(detail: "时薪不能为负", statusCode: 400);
+        }
+
         member.DisplayName = displayName;
         member.Role = role;
+        member.HourlyRate = request.HourlyRate;
         AddActivity(member.ProjectId, "member.updated", new { member = displayName, role = role.ToString() });
         await db.SaveChangesAsync(ct);
 
@@ -165,5 +178,6 @@ public sealed class ProjectMembersController(CrewPilotDbContext db) : Controller
 
     private static ProjectMemberDto ToDto(ProjectMember member) => new(
         member.Id, member.ProjectId, member.Kind.ToString().ToLowerInvariant(),
-        member.Role.ToString().ToLowerInvariant(), member.DisplayName, member.CreatedAt);
+        member.Role.ToString().ToLowerInvariant(), member.DisplayName, member.CreatedAt,
+        member.HourlyRate);
 }

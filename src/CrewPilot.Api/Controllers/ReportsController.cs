@@ -112,6 +112,116 @@ public sealed class ReportsController(CrewPilotDbContext db) : ControllerBase
             byMember);
     }
 
+    /// <summary>人力成本报表：工时 × 成员时薪（未设置时薪按 0 计）。</summary>
+    [HttpGet("api/projects/{projectId:guid}/human-cost-report")]
+    public async Task<ActionResult<HumanCostReportDto>> HumanCostReport(
+        Guid projectId, CancellationToken ct)
+    {
+        var itemIds = await db.WorkItems
+            .AsNoTracking()
+            .Where(w => w.ProjectId == projectId)
+            .Select(w => w.Id)
+            .ToListAsync(ct);
+
+        var logs = itemIds.Count == 0
+            ? []
+            : await db.WorkLogs
+                .AsNoTracking()
+                .Where(l => itemIds.Contains(l.WorkItemId))
+                .Select(l => new
+                {
+                    l.Hours,
+                    MemberName = l.Member != null ? l.Member.DisplayName : null,
+                    MemberRate = l.Member != null ? l.Member.HourlyRate : null,
+                })
+                .ToListAsync(ct);
+
+        var byMember = logs
+            .GroupBy(l => l.MemberName ?? "system")
+            .Select(group =>
+            {
+                var hours = group.Sum(l => l.Hours);
+                var rate = group.First().MemberRate;
+                return new HumanCostByMemberDto(
+                    group.Key,
+                    group.Key == "system" ? "系统（未归属）" : group.Key,
+                    hours,
+                    rate,
+                    Math.Round(hours * (rate ?? 0m), 2));
+            })
+            .OrderByDescending(m => m.Cost)
+            .ToList();
+
+        return new HumanCostReportDto(
+            logs.Sum(l => l.Hours),
+            Math.Round(byMember.Sum(m => m.Cost), 2),
+            byMember);
+    }
+
+    /// <summary>估算偏差报表：按工作项类型对比预估与已耗工时，统计超支项。</summary>
+    [HttpGet("api/projects/{projectId:guid}/estimate-deviation")]
+    public async Task<ActionResult<EstimateDeviationReportDto>> EstimateDeviation(
+        Guid projectId, CancellationToken ct)
+    {
+        var items = await db.WorkItems
+            .AsNoTracking()
+            .Where(w => w.ProjectId == projectId)
+            .Select(w => new
+            {
+                w.Id,
+                Type = EF.Property<string>(w, "WorkItemType"),
+                w.EstimatedHours,
+            })
+            .ToListAsync(ct);
+
+        var ids = items.Select(i => i.Id).ToList();
+        var logs = ids.Count == 0
+            ? []
+            : await db.WorkLogs
+                .AsNoTracking()
+                .Where(l => ids.Contains(l.WorkItemId))
+                .Select(l => new { l.WorkItemId, l.Hours })
+                .ToListAsync(ct);
+        var loggedByItem = logs
+            .GroupBy(l => l.WorkItemId)
+            .ToDictionary(g => g.Key, g => g.Sum(l => l.Hours));
+        var loggedOf = (Guid id) => loggedByItem.GetValueOrDefault(id);
+
+        var rows = items
+            .GroupBy(i => i.Type)
+            .Select(group =>
+            {
+                var estimated = group.Sum(i => i.EstimatedHours ?? 0m);
+                var logged = group.Sum(i => loggedOf(i.Id));
+                var deviation = logged - estimated;
+                var overruns = group.Count(i => loggedOf(i.Id) > (i.EstimatedHours ?? 0m));
+                return new EstimateDeviationRowDto(
+                    group.Key,
+                    group.Key,
+                    estimated,
+                    logged,
+                    deviation,
+                    estimated > 0 ? Math.Round(deviation / estimated * 100m, 1) : null,
+                    group.Count(),
+                    overruns);
+            })
+            .OrderBy(r => r.Key)
+            .ToList();
+
+        var totalEstimated = rows.Sum(r => r.EstimatedHours);
+        var totalLogged = rows.Sum(r => r.LoggedHours);
+        return new EstimateDeviationReportDto(
+            totalEstimated,
+            totalLogged,
+            totalLogged - totalEstimated,
+            totalEstimated > 0
+                ? Math.Round((totalLogged - totalEstimated) / totalEstimated * 100m, 1)
+                : null,
+            items.Count,
+            rows.Sum(r => r.OverrunCount),
+            rows);
+    }
+
     /// <summary>成本报表：AgentRun token × 模型单价，可按迭代/日期过滤。</summary>
     [HttpGet("api/projects/{projectId:guid}/cost-report")]
     public async Task<ActionResult<CostReportDto>> CostReport(

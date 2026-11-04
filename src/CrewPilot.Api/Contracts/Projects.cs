@@ -41,13 +41,18 @@ public sealed record ProjectMemberDto(
     string Kind,
     string Role,
     string DisplayName,
-    DateTimeOffset CreatedAt);
+    DateTimeOffset CreatedAt,
+    decimal? HourlyRate);
 
 public sealed record AddProjectMemberRequest(
     string? DisplayName,
     string? Role,
-    Guid? AgentId = null);
+    Guid? AgentId = null,
+    decimal? HourlyRate = null);
 
-public sealed record UpdateProjectMemberRequest(string DisplayName, string Role);
+public sealed record UpdateProjectMemberRequest(
+    string DisplayName,
+    string Role,
+    decimal? HourlyRate = null);
 
 public sealed record SetProjectTeamRequest(Guid? TeamId);

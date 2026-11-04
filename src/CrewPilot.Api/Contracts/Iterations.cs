@@ -54,3 +54,36 @@ public sealed record HoursReportDto(
     IReadOnlyList<HoursByGroupDto> ByType,
     IReadOnlyList<HoursByGroupDto> ByAssignee,
     IReadOnlyList<HoursByGroupDto> ByMember);
+
+/// <summary>人力成本：工时 × 成员时薪。</summary>
+public sealed record HumanCostByMemberDto(
+    string Key,
+    string Label,
+    decimal Hours,
+    decimal? HourlyRate,
+    decimal Cost);
+
+public sealed record HumanCostReportDto(
+    decimal TotalHours,
+    decimal TotalCost,
+    IReadOnlyList<HumanCostByMemberDto> ByMember);
+
+/// <summary>估算偏差：已耗 vs 预估（按类型）。</summary>
+public sealed record EstimateDeviationRowDto(
+    string Key,
+    string Label,
+    decimal EstimatedHours,
+    decimal LoggedHours,
+    decimal DeviationHours,
+    decimal? DeviationPercent,
+    int ItemCount,
+    int OverrunCount);
+
+public sealed record EstimateDeviationReportDto(
+    decimal EstimatedHours,
+    decimal LoggedHours,
+    decimal DeviationHours,
+    decimal? DeviationPercent,
+    int ItemCount,
+    int OverrunCount,
+    IReadOnlyList<EstimateDeviationRowDto> ByType);
