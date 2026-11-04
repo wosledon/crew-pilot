@@ -19,16 +19,17 @@ public sealed class WorkItemsController(
     AuditLogger audit,
     IRealtimeNotifier realtime) : ControllerBase
 {
-    /// <summary>工作项列表，支持 type（requirement/defect/task）与 status 过滤。</summary>
+    /// <summary>工作项列表，支持 type/status/tag 与缺陷关联需求过滤。</summary>
     [HttpGet("api/projects/{projectId:guid}/workitems")]
     public async Task<ActionResult<IReadOnlyList<WorkItemListItemDto>>> List(
         Guid projectId,
         [FromQuery] string? type,
         [FromQuery] string? status,
         [FromQuery] string? tag,
+        [FromQuery] Guid? relatedRequirementId,
         CancellationToken ct)
     {
-        var rows = await QueryRowsAsync(projectId, type, ct);
+        var rows = await QueryRowsAsync(projectId, type, relatedRequirementId, ct);
 
         if (!string.IsNullOrWhiteSpace(status))
         {
@@ -475,13 +476,16 @@ public sealed class WorkItemsController(
     private const int MaxTagsLength = 500;
 
     /// <summary>跨 TPH 三类工作项查询（需求/缺陷各自带状态列，任务无状态）。</summary>
-    private async Task<List<WorkItemRow>> QueryRowsAsync(Guid projectId, string? typeFilter, CancellationToken ct)
+    private async Task<List<WorkItemRow>> QueryRowsAsync(
+        Guid projectId, string? typeFilter, Guid? relatedRequirementId, CancellationToken ct)
     {
         var rows = new List<WorkItemRow>();
         var wantAll = string.IsNullOrWhiteSpace(typeFilter);
         var type = typeFilter?.Trim().ToLowerInvariant();
+        // 关联需求过滤只针对缺陷，避免混入需求/任务
+        var onlyDefects = relatedRequirementId.HasValue;
 
-        if (wantAll || type == "requirement")
+        if (!onlyDefects && (wantAll || type == "requirement"))
         {
             var reqs = await db.WorkItems
                 .OfType<Requirement>()
@@ -521,7 +525,9 @@ public sealed class WorkItemsController(
             var defects = await db.WorkItems
                 .OfType<Defect>()
                 .AsNoTracking()
-                .Where(w => w.ProjectId == projectId)
+                .Where(w => w.ProjectId == projectId &&
+                            (relatedRequirementId == null ||
+                             w.RelatedRequirementId == relatedRequirementId))
                 .Select(w => new
                 {
                     w.Id,
@@ -555,7 +561,7 @@ public sealed class WorkItemsController(
                 x.Tags, null)));
         }
 
-        if (wantAll || type == "task")
+        if (!onlyDefects && (wantAll || type == "task"))
         {
             var tasks = await db.WorkItems
                 .OfType<TaskItem>()

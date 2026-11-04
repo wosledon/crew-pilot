@@ -58,6 +58,57 @@ public sealed class WorkItemsRelationsApiTests(CrewPilotApiFactory factory)
     }
 
     [Fact]
+    public async Task WorkItems_CanFilterDefectsByRelatedRequirement()
+    {
+        var client = factory.CreateClient();
+        var project = await ApiTestHelpers.CreateProjectAsync(client);
+        var requirement = await ApiTestHelpers.CreateRequirementAsync(client, project.Id);
+
+        var linked = await client.PostAsJsonAsync(
+            $"/api/projects/{project.Id}/workitems", new
+            {
+                type = "defect",
+                title = "关联缺陷",
+                relatedRequirementId = requirement.Id,
+            });
+        linked.EnsureSuccessStatusCode();
+        await client.PostAsJsonAsync(
+            $"/api/projects/{project.Id}/workitems", new
+            {
+                type = "defect",
+                title = "无关缺陷",
+            });
+
+        var defects = await client.GetFromJsonAsync<List<WorkItemListItemDto>>(
+            $"/api/projects/{project.Id}/workitems?relatedRequirementId={requirement.Id}");
+
+        defects.Should().ContainSingle();
+        defects![0].Title.Should().Be("关联缺陷");
+        defects[0].Type.Should().Be("defect");
+    }
+
+    [Fact]
+    public async Task Activities_CanFilterByWorkItemAndEventType()
+    {
+        var client = factory.CreateClient();
+        var project = await ApiTestHelpers.CreateProjectAsync(client);
+        var requirement = await ApiTestHelpers.CreateRequirementAsync(client, project.Id);
+
+        var byWorkItem = await client.GetFromJsonAsync<List<ActivityDto>>(
+            $"/api/projects/{project.Id}/activities?workItemId={requirement.Id}");
+        byWorkItem!.Should().NotBeEmpty();
+        byWorkItem.Should().OnlyContain(a => a.WorkItemId == requirement.Id);
+
+        var created = await client.GetFromJsonAsync<List<ActivityDto>>(
+            $"/api/projects/{project.Id}/activities?workItemId={requirement.Id}&eventType=workitem.created");
+        created.Should().ContainSingle();
+
+        var none = await client.GetFromJsonAsync<List<ActivityDto>>(
+            $"/api/projects/{project.Id}/activities?workItemId={requirement.Id}&eventType=workitem.deleted");
+        none.Should().BeEmpty();
+    }
+
+    [Fact]
     public async Task AgentActivity_ReportsLatestRunPerWorkItem()
     {
         var client = factory.CreateClient();
