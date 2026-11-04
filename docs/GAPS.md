@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 140 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 142 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -149,11 +149,11 @@
 
 - [x] 迭代 CRUD/开始/完成/删除、燃尽图
 - [x] 看板拖拽流转（前端状态表 + 后端状态机）
-- [ ] 迭代编辑 UI（后端 `PUT` 已有）
+- [x] 迭代编辑 UI（Round 25：编辑弹窗复用创建表单 + 后端 PUT）
 - [x] 工作项排入迭代的 UI（Round 3：编辑弹窗）
 - [x] Task 拆解（父子关系）/ 独立流转（Round 3）
-- [ ] 看板筛选（指派人/优先级/标签）、WIP 提示
-- [ ] 列表视图 + 批量操作
+- [x] 看板筛选（指派人/优先级/标签）、WIP 提示（Round 25：进行中列 5 项上限警示）
+- [x] 列表视图 + 批量操作（Round 12）
 - [ ] 500+ 卡片性能验证
 
 ### 4.7 甘特图（P1）
@@ -252,7 +252,7 @@
 - [x] 工作流完成时自动流转工作项状态（InProgress→InReview / Fixing→PendingVerification）
 - [ ] Agent 作为项目成员/指派人
 - [x] PR 创建与合并（Round 24：创建/同步已有，新增 `POST .../pull-request/merge` + 前端确认合并）
-- [ ] 失败重试
+- [x] 失败重试（Round 25：失败/取消 Run 一键重试，工作流 Run 走卡点重试）
 
 ### 6. CI/CD（P1 · Round 5）
 
@@ -293,6 +293,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 25（2026-11-04）
+
+- AgentRun 重试（PRD 5.9）：`POST /api/agent-runs/{id}/retry` —— 仅失败/已取消可重试（工作流 Run 走卡点重试），复制提示词创建新 Run 并入队，写活动流；前端执行记录新增「重试」按钮
+- 迭代编辑 UI（PRD 4.6）：新建/编辑共用弹窗，编辑回填名称/目标/日期/里程碑；后端 PUT 生效
+- 看板筛选与 WIP（PRD 4.6）：指派人/优先级/标签三筛选；进行中列显示 WIP 5 项上限，超限红色警示
+- 测试：140 → 142（重试成功链路、非失败状态 400），修正测试间 Fake 引擎失败计数竞态；前端 lint / format / test:run / build / E2E 全绿
 
 ### Round 24（2026-11-04）
 

@@ -35,7 +35,7 @@ npm run dev
 
 ```bash
 dotnet build CrewPilot.slnx      # 构建解决方案
-dotnet test                      # 运行全部测试（140 项）
+dotnet test                      # 运行全部测试（142 项）
 cd frontend && npm run build     # 前端生产构建（tsc + vite）
 cd frontend && npm run lint      # ESLint
 cd frontend && npm run test:run  # 前端 Vitest（13 项）
@@ -83,7 +83,7 @@ docs/PRD.md                 # 产品需求（事实来源）
 - [x] Agent 数字员工：岗位/模型/提示词/工具权限 CRUD + 试运行
 - [x] AgentEngine：Microsoft Agent Framework（MAF 1.27）落地，工具白名单 + worktree 隔离
 - [x] 认领闭环：指派 → 后台执行 → 日志/产物/token 留痕 → 工时 1:1 折算 → PR 回填 → 可取消接管
-- [x] 测试：140 项后端 + 13 项前端（Vitest）+ 2 条 Playwright E2E，全部绿
+- [x] 测试：142 项后端 + 13 项前端（Vitest）+ 2 条 Playwright E2E，全部绿
 - [x] 硬化：可取消的 AgentRun、工具白名单生效、路径沙箱、命令不经 shell、`LocalPath` 可配置
 - [x] 协作：评论（@Agent 触发执行并回写）、附件上传下载、活动流时间线
 - [x] 里程碑：CRUD + 迭代归属 + 甘特图标记
@@ -103,4 +103,5 @@ docs/PRD.md                 # 产品需求（事实来源）
 - [x] 报表：工时/成本按迭代与日期过滤、人力成本（工时×时薪）、估算偏差与超支项
 - [x] 运行监控：执行记录详情（日志时间线/提示词/输出/耗时/token，运行中 2s 自动刷新）
 - [x] M4：PR/MR 创建 + 同步 + 合并（gh/glab）、CI 状态回写与实时推送、发布流
-- [ ] 剩余：AgentRun 重试、迭代编辑/看板筛选增强、流式 token 输出、OpenAPI 完整客户端
+- [x] 工作项：看板/列表/甘特/迭代编辑、标签/指派人/优先级筛选、WIP 提示、批量操作
+- [ ] 剩余：流式 token 输出、OpenAPI 完整客户端、P2 扩展（甘特依赖/泳道、Skills 目录导入导出）
