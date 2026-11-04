@@ -25,5 +25,19 @@
   "allIterations": "全部迭代",
   "fromDate": "开始日期",
   "toDate": "结束日期",
-  "clearFilters": "清除过滤"
+  "clearFilters": "清除过滤",
+  "dependencies": "依赖关系",
+  "createDependency": "新建依赖",
+  "noDependencies": "暂无依赖关系",
+  "dependencyFrom": "前置工作项",
+  "dependencyTo": "后置工作项",
+  "dependencyType": "依赖类型",
+  "dependencyCreated": "依赖已创建",
+  "dependencyDeleted": "依赖已删除",
+  "criticalPath": "关键路径",
+  "criticalPathHours": "总工时 {{hours}}h",
+  "dependencyTypes": {
+    "finishToStart": "完成 → 开始（FS）",
+    "startToStart": "开始 → 开始（SS）"
+  }
 }

@@ -4149,6 +4149,148 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/projects/{projectId}/dependencies": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          projectId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["WorkItemDependencyDto"][];
+            "application/json": components["schemas"]["WorkItemDependencyDto"][];
+            "text/json": components["schemas"]["WorkItemDependencyDto"][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          projectId: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["CreateWorkItemDependencyRequest"];
+          "text/json": components["schemas"]["CreateWorkItemDependencyRequest"];
+          "application/*+json": components["schemas"]["CreateWorkItemDependencyRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["WorkItemDependencyDto"];
+            "application/json": components["schemas"]["WorkItemDependencyDto"];
+            "text/json": components["schemas"]["WorkItemDependencyDto"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/projects/{projectId}/critical-path": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          projectId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["CriticalPathDto"];
+            "application/json": components["schemas"]["CriticalPathDto"];
+            "text/json": components["schemas"]["CriticalPathDto"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/dependencies/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/projects/{projectId}/workitems": {
     parameters: {
       query?: never;
@@ -4800,6 +4942,13 @@ export interface components {
       description: null | string;
       steps: components["schemas"]["WorkflowStepRequest"][];
     };
+    CreateWorkItemDependencyRequest: {
+      /** Format: uuid */
+      fromWorkItemId: string;
+      /** Format: uuid */
+      toWorkItemId: string;
+      type: null | string;
+    };
     CreateWorkItemRequest: {
       type: string;
       title: string;
@@ -4832,6 +4981,11 @@ export interface components {
       /** Format: date */
       date: null | string;
       note: null | string;
+    };
+    CriticalPathDto: {
+      /** Format: double */
+      totalHours: number;
+      itemIds: string[];
     };
     EstimateDeviationReportDto: {
       /** Format: double */
@@ -5390,6 +5544,21 @@ export interface components {
       status: string;
       /** Format: date-time */
       updatedAt: string;
+    };
+    WorkItemDependencyDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      projectId: string;
+      /** Format: uuid */
+      fromWorkItemId: string;
+      fromTitle: string;
+      /** Format: uuid */
+      toWorkItemId: string;
+      toTitle: string;
+      type: string;
+      /** Format: date-time */
+      createdAt: string;
     };
     WorkItemDetailDto: {
       /** Format: uuid */

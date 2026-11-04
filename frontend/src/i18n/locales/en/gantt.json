@@ -25,5 +25,19 @@
   "allIterations": "All iterations",
   "fromDate": "From",
   "toDate": "To",
-  "clearFilters": "Clear filters"
+  "clearFilters": "Clear filters",
+  "dependencies": "Dependencies",
+  "createDependency": "Add dependency",
+  "noDependencies": "No dependencies",
+  "dependencyFrom": "Predecessor",
+  "dependencyTo": "Successor",
+  "dependencyType": "Dependency type",
+  "dependencyCreated": "Dependency created",
+  "dependencyDeleted": "Dependency deleted",
+  "criticalPath": "Critical path",
+  "criticalPathHours": "Total {{hours}}h",
+  "dependencyTypes": {
+    "finishToStart": "Finish → Start (FS)",
+    "startToStart": "Start → Start (SS)"
+  }
 }

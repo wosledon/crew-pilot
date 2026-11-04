@@ -6,6 +6,7 @@ import type {
   BatchWorkItemsResult,
   Burndown,
   Comment,
+  CriticalPath,
   EstimateDeviationReport,
   HoursReport,
   HumanCostReport,
@@ -15,6 +16,7 @@ import type {
   ProjectDetail,
   ProjectMember,
   ProjectSummary,
+  WorkItemDependency,
   WorkItemDetail,
   WorkItemListItem,
   WorkLog,
@@ -44,6 +46,8 @@ export const projectKeys = {
     ] as const,
   humanCost: (projectId: string) => ["projects", projectId, "human-cost-report"] as const,
   estimateDeviation: (projectId: string) => ["projects", projectId, "estimate-deviation"] as const,
+  dependencies: (projectId: string) => ["projects", projectId, "dependencies"] as const,
+  criticalPath: (projectId: string) => ["projects", projectId, "critical-path"] as const,
 };
 
 export function useProjects() {
@@ -361,6 +365,53 @@ export function useEstimateDeviation(projectId: string | undefined) {
     queryKey: projectKeys.estimateDeviation(projectId ?? ""),
     queryFn: () => api.get<EstimateDeviationReport>(`/projects/${projectId}/estimate-deviation`),
     enabled: projectId !== undefined,
+  });
+}
+
+export function useDependencies(projectId: string | undefined) {
+  return useQuery({
+    queryKey: projectKeys.dependencies(projectId ?? ""),
+    queryFn: () => api.get<WorkItemDependency[]>(`/projects/${projectId}/dependencies`),
+    enabled: projectId !== undefined,
+  });
+}
+
+export function useCriticalPath(projectId: string | undefined) {
+  return useQuery({
+    queryKey: projectKeys.criticalPath(projectId ?? ""),
+    queryFn: () => api.get<CriticalPath>(`/projects/${projectId}/critical-path`),
+    enabled: projectId !== undefined,
+  });
+}
+
+export function useCreateDependency(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { fromWorkItemId: string; toWorkItemId: string; type: string }) =>
+      api.post<WorkItemDependency>(`/projects/${projectId}/dependencies`, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: projectKeys.dependencies(projectId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: projectKeys.criticalPath(projectId),
+      });
+    },
+  });
+}
+
+export function useDeleteDependency(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/dependencies/${id}`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: projectKeys.dependencies(projectId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: projectKeys.criticalPath(projectId),
+      });
+    },
   });
 }
 

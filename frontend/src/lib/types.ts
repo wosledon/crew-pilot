@@ -37,6 +37,15 @@ export type BatchWorkItemsResult = Api["BatchWorkItemsResultDto"];
 
 export type WorkLog = Api["WorkLogDto"];
 
+/** 工作项依赖（甘特图 FS/SS） */
+export type DependencyType = "finishtostart" | "starttostart";
+
+export type WorkItemDependency = Omit<Api["WorkItemDependencyDto"], "type"> & {
+  type: DependencyType;
+};
+
+export type CriticalPath = Api["CriticalPathDto"];
+
 export type PrototypeType = "html" | "url" | "image" | "mcp";
 
 export type Prototype = Omit<Api["PrototypeDto"], "type"> & {

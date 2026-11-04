@@ -12,15 +12,19 @@ import { Select } from "@/components/ui/Select";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import {
+  useCreateDependency,
   useCreateMilestone,
+  useCriticalPath,
+  useDeleteDependency,
   useDeleteMilestone,
+  useDependencies,
   useHoursReport,
   useIterations,
   useMilestones,
   useWorkItems,
 } from "./api";
 import { priorityTone, statusTone } from "./statusFlow";
-import type { Milestone, WorkItemListItem } from "@/lib/types";
+import type { DependencyType, Milestone, WorkItemDependency, WorkItemListItem } from "@/lib/types";
 import { CostCard } from "@/features/platform/CostCard";
 import { HumanCostCard } from "./components/HumanCostCard";
 import { EstimateDeviationCard } from "./components/EstimateDeviationCard";
@@ -42,9 +46,17 @@ export function GanttPage() {
   };
   const report = useHoursReport(projectId, reportFilters);
   const milestones = useMilestones(projectId);
+  const dependencies = useDependencies(projectId);
+  const criticalPath = useCriticalPath(projectId);
+  const createDependency = useCreateDependency(projectId);
+  const deleteDependency = useDeleteDependency(projectId);
   const createMilestone = useCreateMilestone(projectId);
   const deleteMilestone = useDeleteMilestone(projectId);
   const confirm = useConfirm();
+  const [dependencyOpen, setDependencyOpen] = useState(false);
+  const [dependencyFrom, setDependencyFrom] = useState("");
+  const [dependencyTo, setDependencyTo] = useState("");
+  const [dependencyType, setDependencyType] = useState<DependencyType>("finishtostart");
   const [milestoneOpen, setMilestoneOpen] = useState(false);
   const [milestoneName, setMilestoneName] = useState("");
   const [milestoneDate, setMilestoneDate] = useState("");
@@ -88,6 +100,43 @@ export function GanttPage() {
     }
   };
 
+  const handleCreateDependency = async () => {
+    if (dependencyFrom === "" || dependencyTo === "") {
+      return;
+    }
+    try {
+      await createDependency.mutateAsync({
+        fromWorkItemId: dependencyFrom,
+        toWorkItemId: dependencyTo,
+        type: dependencyType,
+      });
+      toast.success(t("gantt:dependencyCreated"));
+      setDependencyOpen(false);
+      setDependencyFrom("");
+      setDependencyTo("");
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
+  const handleDeleteDependency = async (dependency: WorkItemDependency) => {
+    const approved = await confirm({
+      title: t("common:delete"),
+      description: `${dependency.fromTitle} → ${dependency.toTitle}`,
+      confirmText: t("common:delete"),
+      destructive: true,
+    });
+    if (!approved) {
+      return;
+    }
+    try {
+      await deleteDependency.mutateAsync(dependency.id);
+      toast.success(t("gantt:dependencyDeleted"));
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
   if (iterations.isPending || workItems.isPending) {
     return <LoadingState />;
   }
@@ -108,6 +157,10 @@ export function GanttPage() {
   const milestoneList = milestones.data ?? [];
   const datedItems = items.filter((item) => item.dueDate !== null);
   const undatedItems = items.filter((item) => item.dueDate === null);
+  const criticalIds = new Set(criticalPath.data?.itemIds ?? []);
+  const criticalTitles = (criticalPath.data?.itemIds ?? [])
+    .map((id) => items.find((item) => item.id === id)?.title)
+    .filter((title): title is string => title !== undefined);
 
   // 时间范围：迭代起止 + 工作项截止日 + 里程碑日期
   const dates: string[] = [
@@ -262,6 +315,7 @@ export function GanttPage() {
                 item={item}
                 percent={percent(item.dueDate as string)}
                 today={today}
+                critical={criticalIds.has(item.id)}
               />
             ))
           )}
@@ -269,6 +323,60 @@ export function GanttPage() {
             <p className="pt-2 text-xs text-muted-foreground">
               {t("gantt:undated")}：{undatedItems.length}
             </p>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>{t("gantt:dependencies")}</CardTitle>
+          <Button size="sm" variant="outline" onClick={() => setDependencyOpen(true)}>
+            <Plus className="h-3.5 w-3.5" />
+            {t("gantt:createDependency")}
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {dependencies.isPending ? (
+            <LoadingState />
+          ) : (dependencies.data ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t("gantt:noDependencies")}</p>
+          ) : (
+            <ul className="space-y-2">
+              {(dependencies.data ?? []).map((dependency) => (
+                <li
+                  key={dependency.id}
+                  className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2 text-sm"
+                >
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span className="truncate">{dependency.fromTitle}</span>
+                    <span className="text-muted-foreground">→</span>
+                    <span className="truncate">{dependency.toTitle}</span>
+                    <Badge tone="info">
+                      {dependency.type === "starttostart"
+                        ? t("gantt:dependencyTypes.startToStart")
+                        : t("gantt:dependencyTypes.finishToStart")}
+                    </Badge>
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={t("common:delete")}
+                    onClick={() => void handleDeleteDependency(dependency)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {criticalPath.data !== undefined && criticalPath.data.itemIds.length > 0 ? (
+            <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm">
+              <p className="font-medium">
+                {t("gantt:criticalPath")} ·{" "}
+                {t("gantt:criticalPathHours", { hours: criticalPath.data.totalHours })}
+              </p>
+              <p className="text-muted-foreground">{criticalTitles.join(" → ")}</p>
+            </div>
           ) : null}
         </CardContent>
       </Card>
@@ -384,6 +492,64 @@ export function GanttPage() {
           </div>
         </div>
       </Dialog>
+
+      <Dialog
+        open={dependencyOpen}
+        onOpenChange={setDependencyOpen}
+        title={t("gantt:createDependency")}
+        closeLabel={t("common:cancel")}
+      >
+        <div className="space-y-4">
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("gantt:dependencyFrom")}</span>
+            <Select
+              value={dependencyFrom}
+              onValueChange={setDependencyFrom}
+              options={items.map((item) => ({ value: item.id, label: item.title }))}
+              placeholder={t("gantt:dependencyFrom")}
+              ariaLabel={t("gantt:dependencyFrom")}
+            />
+          </label>
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("gantt:dependencyTo")}</span>
+            <Select
+              value={dependencyTo}
+              onValueChange={setDependencyTo}
+              options={items.map((item) => ({ value: item.id, label: item.title }))}
+              placeholder={t("gantt:dependencyTo")}
+              ariaLabel={t("gantt:dependencyTo")}
+            />
+          </label>
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("gantt:dependencyType")}</span>
+            <Select
+              value={dependencyType}
+              onValueChange={(value) => setDependencyType(value as DependencyType)}
+              options={[
+                { value: "finishtostart", label: t("gantt:dependencyTypes.finishToStart") },
+                { value: "starttostart", label: t("gantt:dependencyTypes.startToStart") },
+              ]}
+              ariaLabel={t("gantt:dependencyType")}
+            />
+          </label>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setDependencyOpen(false)}>
+              {t("common:cancel")}
+            </Button>
+            <Button
+              onClick={() => void handleCreateDependency()}
+              disabled={
+                createDependency.isPending ||
+                dependencyFrom === "" ||
+                dependencyTo === "" ||
+                dependencyFrom === dependencyTo
+              }
+            >
+              {t("common:create")}
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }
@@ -392,10 +558,12 @@ function WorkItemRow({
   item,
   percent,
   today,
+  critical,
 }: {
   item: WorkItemListItem;
   percent: number;
   today: string;
+  critical: boolean;
 }) {
   const { t } = useTranslation(["gantt", "workitems"]);
   const overdue =
@@ -407,9 +575,15 @@ function WorkItemRow({
   return (
     <div className="flex items-center gap-3">
       <span className="w-32 shrink-0 truncate text-sm" title={item.title}>
+        {critical ? "★ " : ""}
         {item.title}
       </span>
-      <div className="relative h-6 flex-1 rounded-md bg-muted/50">
+      <div
+        className={cn(
+          "relative h-6 flex-1 rounded-md bg-muted/50",
+          critical ? "ring-2 ring-destructive" : "",
+        )}
+      >
         <span
           className="absolute inset-y-0.5 flex items-center rounded px-1.5 text-[10px] text-primary-foreground"
           style={{ left: `${percent}%`, backgroundColor: "var(--primary)" }}
