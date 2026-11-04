@@ -38,3 +38,9 @@ public sealed record PullRequestCreatedDto(string Url);
 public sealed record CreateReleaseRequest(string Tag, string? Title, string? Notes);
 
 public sealed record ReleaseDto(string Tag, string? Url, string Message);
+
+/// <summary>CI/CD 平台 Webhook 推送（PR 状态 / CI 状态）。</summary>
+public sealed record IntegrationWebhookRequest(
+    string? PrUrl,
+    string? State,
+    string? CiStatus);

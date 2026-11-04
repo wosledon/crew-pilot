@@ -229,6 +229,64 @@ public sealed class IntegrationsApiTests(CrewPilotApiFactory factory) : IClassFi
         }
     }
 
+    [Fact]
+    public async Task IntegrationWebhook_UpdatesPrAndCiStatus()
+    {
+        var client = factory.CreateClient();
+        var directory = Directory.CreateTempSubdirectory("crewpilot_webhook_");
+        try
+        {
+            var project = await CreateProjectWithLocalPathAsync(client, directory.FullName);
+            await ConfigureIntegrationAsync(client, project.Id);
+            var item = await ApiTestHelpers.CreateRequirementAsync(client, project.Id);
+            var prUrl = "https://github.com/example/crew-pilot/pull/88";
+
+            var update = await client.PutAsJsonAsync($"/api/workitems/{item.Id}", new
+            {
+                title = item.Title,
+                prUrl,
+            });
+            update.EnsureSuccessStatusCode();
+
+            using var wrong = new HttpRequestMessage(
+                HttpMethod.Post, $"/api/projects/{project.Id}/integrations/webhook")
+            {
+                Content = JsonContent.Create(new
+                {
+                    prUrl,
+                    state = "merged",
+                    ciStatus = "success",
+                }),
+            };
+            wrong.Headers.Add("X-CrewPilot-Webhook-Token", "wrong-token");
+            (await client.SendAsync(wrong)).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+            using var request = new HttpRequestMessage(
+                HttpMethod.Post, $"/api/projects/{project.Id}/integrations/webhook")
+            {
+                Content = JsonContent.Create(new
+                {
+                    prUrl,
+                    state = "merged",
+                    ciStatus = "success",
+                }),
+            };
+            request.Headers.Add("X-CrewPilot-Webhook-Token", "ghp_test_token");
+            (await client.SendAsync(request)).StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+            using var scope = factory.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<CrewPilotDbContext>();
+            var stored = await db.WorkItems.AsNoTracking()
+                .FirstAsync(w => w.Id == item.Id);
+            stored.PrState.Should().Be("merged");
+            stored.CiStatus.Should().Be("success");
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
+    }
+
     private static async Task<ProjectDetailDto> CreateProjectWithLocalPathAsync(
         HttpClient client, string localPath)
     {
