@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Download, Pencil, Plus, Trash2, Upload } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -10,7 +10,7 @@ import { Input, Textarea } from "@/components/ui/Input";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import type { Skill } from "@/lib/types";
-import { useCreateSkill, useDeleteSkill, useSkills, useUpdateSkill } from "./api";
+import { useCreateSkill, useDeleteSkill, useImportSkill, useSkills, useUpdateSkill } from "./api";
 
 interface SkillForm {
   id?: string;
@@ -37,9 +37,12 @@ export function SkillsPage() {
   const createSkill = useCreateSkill();
   const updateSkill = useUpdateSkill();
   const deleteSkill = useDeleteSkill();
+  const importSkill = useImportSkill();
   const confirm = useConfirm();
 
   const [form, setForm] = useState<SkillForm | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importContent, setImportContent] = useState("");
 
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
@@ -107,6 +110,34 @@ export function SkillsPage() {
     }
   };
 
+  const handleImport = async () => {
+    if (importContent.trim() === "") {
+      return;
+    }
+    try {
+      const skill = await importSkill.mutateAsync(importContent);
+      toast.success(t("skills:imported", { name: skill.name }));
+      setImportOpen(false);
+      setImportContent("");
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
+  const handleExport = (skill: Skill) => {
+    const anchor = document.createElement("a");
+    anchor.href = `/api/skills/${skill.id}/export`;
+    anchor.download = `${skill.name}.SKILL.md`;
+    anchor.click();
+  };
+
+  const handleImportFile = async (file: File | undefined) => {
+    if (file === undefined) {
+      return;
+    }
+    setImportContent(await file.text());
+  };
+
   if (skills.isPending) {
     return <LoadingState />;
   }
@@ -124,10 +155,16 @@ export function SkillsPage() {
           <h1 className="text-xl font-semibold">{t("skills:title")}</h1>
           <p className="text-sm text-muted-foreground">{t("skills:description")}</p>
         </div>
-        <Button onClick={openCreate}>
-          <Plus className="h-4 w-4" />
-          {t("skills:create")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setImportOpen(true)}>
+            <Upload className="h-4 w-4" />
+            {t("skills:import")}
+          </Button>
+          <Button onClick={openCreate}>
+            <Plus className="h-4 w-4" />
+            {t("skills:create")}
+          </Button>
+        </div>
       </div>
 
       {items.length === 0 ? (
@@ -158,6 +195,15 @@ export function SkillsPage() {
                   </Button>
                   <Button
                     size="sm"
+                    variant="outline"
+                    aria-label={t("skills:export")}
+                    onClick={() => handleExport(skill)}
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    {t("skills:export")}
+                  </Button>
+                  <Button
+                    size="sm"
                     variant="ghost"
                     aria-label={t("common:delete")}
                     onClick={() => void handleDelete(skill)}
@@ -170,6 +216,47 @@ export function SkillsPage() {
           ))}
         </div>
       )}
+
+      <Dialog
+        open={importOpen}
+        onOpenChange={(open) => {
+          setImportOpen(open);
+          if (!open) {
+            setImportContent("");
+          }
+        }}
+        title={t("skills:importTitle")}
+        closeLabel={t("common:cancel")}
+        className="max-w-2xl"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">{t("skills:importHint")}</p>
+          <input
+            type="file"
+            accept=".md,.markdown,text/markdown"
+            aria-label={t("skills:importFile")}
+            onChange={(event) => void handleImportFile(event.target.files?.[0])}
+          />
+          <Textarea
+            value={importContent}
+            onChange={(event) => setImportContent(event.target.value)}
+            placeholder={t("skills:importPlaceholder")}
+            className="min-h-56 font-mono text-xs"
+          />
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setImportOpen(false)}>
+              {t("common:cancel")}
+            </Button>
+            <Button
+              onClick={() => void handleImport()}
+              disabled={importSkill.isPending || importContent.trim() === ""}
+            >
+              <Upload className="h-4 w-4" />
+              {t("skills:import")}
+            </Button>
+          </div>
+        </div>
+      </Dialog>
 
       <Dialog
         open={form !== null}

@@ -64,6 +64,14 @@ export function useUpdateSkill() {
   });
 }
 
+export function useImportSkill() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (content: string) => api.post<Skill>("/skills/import", { content }),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: platformKeys.skills }),
+  });
+}
+
 export function useDeleteSkill() {
   const queryClient = useQueryClient();
   return useMutation({

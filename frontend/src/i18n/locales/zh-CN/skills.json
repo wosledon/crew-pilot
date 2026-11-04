@@ -17,5 +17,12 @@
   "updated": "Skill 已更新",
   "deleted": "Skill 已删除",
   "agentCount": "{{count}} 个 Agent 使用",
-  "deleteConfirm": "删除后已装配的 Agent 将立即失去该能力。"
+  "deleteConfirm": "删除后已装配的 Agent 将立即失去该能力。",
+  "import": "导入 SKILL.md",
+  "importTitle": "从 SKILL.md 导入",
+  "importHint": "粘贴 SKILL.md 内容或选择文件；YAML front matter 定义 name/description/tools/scriptPath。",
+  "importFile": "选择 SKILL.md 文件",
+  "importPlaceholder": "---`nname: 我的技能`ndescription: 说明`ntools: read_file,write_file`n---`n`n技能提示词…",
+  "imported": "已导入技能 {{name}}",
+  "export": "导出"
 }

@@ -17,5 +17,12 @@
   "updated": "Skill updated",
   "deleted": "Skill deleted",
   "agentCount": "{{count}} Agents use it",
-  "deleteConfirm": "Agents using this skill will lose the capability immediately."
+  "deleteConfirm": "Agents using this skill will lose the capability immediately.",
+  "import": "Import SKILL.md",
+  "importTitle": "Import from SKILL.md",
+  "importHint": "Paste SKILL.md content or choose a file; YAML front matter defines name/description/tools/scriptPath.",
+  "importFile": "Choose SKILL.md file",
+  "importPlaceholder": "---`nname: My skill`ndescription: Notes`ntools: read_file,write_file`n---`n`nSkill prompt…",
+  "imported": "Imported skill {{name}}",
+  "export": "Export"
 }
