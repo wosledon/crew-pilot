@@ -592,6 +592,9 @@ namespace CrewPilot.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("ReleaseRequiresApproval")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("RepoUrl")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");

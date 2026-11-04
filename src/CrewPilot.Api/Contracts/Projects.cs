@@ -23,7 +23,8 @@ public sealed record ProjectDetailDto(
     Guid? DefaultTeamId,
     Guid? RequirementTeamId,
     Guid? DefectTeamId,
-    Guid? TaskTeamId);
+    Guid? TaskTeamId,
+    bool ReleaseRequiresApproval);
 
 public sealed record CreateProjectRequest(
     string Key,
@@ -65,3 +66,6 @@ public sealed record SetProjectTypeTeamsRequest(
     Guid? RequirementTeamId,
     Guid? DefectTeamId,
     Guid? TaskTeamId);
+
+/// <summary>发布审批开关。</summary>
+public sealed record SetReleaseApprovalRequest(bool Required);

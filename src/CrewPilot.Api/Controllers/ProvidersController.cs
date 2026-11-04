@@ -1,6 +1,7 @@
 using CrewPilot.Api.Contracts;
 using CrewPilot.Core.Abstractions;
 using CrewPilot.Core.Providers;
+using CrewPilot.Infrastructure.Audit;
 using CrewPilot.Infrastructure.Persistence;
 using CrewPilot.Infrastructure.Providers;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ namespace CrewPilot.Api.Controllers;
 public sealed class ProvidersController(
     CrewPilotDbContext db,
     ISecretProtector secrets,
+    AuditLogger audit,
     IHttpClientFactory httpClientFactory) : ControllerBase
 {
     [HttpGet("api/providers")]
@@ -121,13 +123,19 @@ public sealed class ProvidersController(
         provider.Name = request.Name.Trim();
         provider.BaseUrl = request.BaseUrl.TrimEnd('/');
         provider.Enabled = request.Enabled;
-        if (!string.IsNullOrWhiteSpace(request.ApiKey))
+        var rotatedKey = !string.IsNullOrWhiteSpace(request.ApiKey);
+        if (rotatedKey)
         {
-            provider.ApiKeyProtected = secrets.Protect(request.ApiKey);
+            provider.ApiKeyProtected = secrets.Protect(request.ApiKey!);
         }
 
         provider.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
+        if (rotatedKey)
+        {
+            await audit.LogAsync(
+                "provider.keyRotated", "provider", provider.Id.ToString(), ct: ct);
+        }
 
         return ToDto(provider);
     }

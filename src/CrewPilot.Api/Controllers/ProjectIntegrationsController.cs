@@ -138,6 +138,13 @@ public sealed class ProjectIntegrationsController(
             return error;
         }
 
+        if (project.ReleaseRequiresApproval)
+        {
+            return Problem(
+                detail: "发布需要审批：请通过发布工作流（审批策略）执行发布",
+                statusCode: 409);
+        }
+
         var title = string.IsNullOrWhiteSpace(request.Title) ? request.Tag.Trim() : request.Title.Trim();
         var (url, message) = await gitCli.CreateReleaseAsync(
             integration!.Platform, workingDirectory, token!, request.Tag.Trim(), title,

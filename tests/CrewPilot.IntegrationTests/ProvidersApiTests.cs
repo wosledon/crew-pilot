@@ -1,13 +1,59 @@
 using System.Net;
 using System.Net.Http.Json;
 using CrewPilot.Api.Contracts;
+using CrewPilot.Infrastructure.Persistence;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace CrewPilot.IntegrationTests;
 
 public sealed class ProvidersApiTests(CrewPilotApiFactory factory) : IClassFixture<CrewPilotApiFactory>
 {
+    [Fact]
+    public async Task ProviderKeyRotation_ReplacesSecret_AndWritesAudit()
+    {
+        var client = factory.CreateClient();
+        var name = "轮换供应商" + Guid.NewGuid().ToString("N")[..6];
+        var created = await client.PostAsJsonAsync("/api/providers", new
+        {
+            name,
+            baseUrl = "https://api.example.com/v1",
+            apiKey = "sk-before-rotation",
+        });
+        var provider = await created.Content.ReadFromJsonAsync<ProviderDetailDto>();
+
+        string protectedBefore;
+        using (var scope = factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<CrewPilotDbContext>();
+            protectedBefore = (await db.ModelProviders.AsNoTracking()
+                .FirstAsync(p => p.Id == provider!.Id)).ApiKeyProtected;
+        }
+
+        var rotated = await client.PutAsJsonAsync($"/api/providers/{provider!.Id}", new
+        {
+            name,
+            baseUrl = "https://api.example.com/v1",
+            enabled = true,
+            apiKey = "sk-after-rotation",
+        });
+        rotated.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await rotated.Content.ReadAsStringAsync()).Should().NotContain("sk-after-rotation");
+
+        using (var scope = factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<CrewPilotDbContext>();
+            var stored = await db.ModelProviders.AsNoTracking()
+                .FirstAsync(p => p.Id == provider.Id);
+            stored.ApiKeyProtected.Should().NotBe(protectedBefore);
+            (await db.AuditLogs.AnyAsync(a =>
+                a.Action == "provider.keyRotated" &&
+                a.TargetId == provider.Id.ToString())).Should().BeTrue();
+        }
+    }
+
     [Fact]
     public async Task CreateProvider_ReturnsCreated_WithoutLeakingApiKey()
     {

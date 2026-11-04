@@ -104,6 +104,35 @@ public sealed class IntegrationsApiTests(CrewPilotApiFactory factory) : IClassFi
     }
 
     [Fact]
+    public async Task ReleaseApprovalRequired_RejectsDirectRelease()
+    {
+        var client = factory.CreateClient();
+        var directory = Directory.CreateTempSubdirectory("crewpilot_cicd_approval_");
+        try
+        {
+            var project = await CreateProjectWithLocalPathAsync(client, directory.FullName);
+            await ConfigureIntegrationAsync(client, project.Id);
+
+            var setApproval = await client.PutAsJsonAsync(
+                $"/api/projects/{project.Id}/release-approval", new { required = true });
+            setApproval.StatusCode.Should().Be(HttpStatusCode.OK);
+            (await setApproval.Content.ReadFromJsonAsync<ProjectDetailDto>())!
+                .ReleaseRequiresApproval.Should().BeTrue();
+
+            var before = factory.GitCli.CreateReleaseCalls;
+            var response = await client.PostAsJsonAsync(
+                $"/api/projects/{project.Id}/releases", new { tag = "v2.0.0" });
+
+            response.StatusCode.Should().Be(HttpStatusCode.Conflict);
+            factory.GitCli.CreateReleaseCalls.Should().Be(before);
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task CreateRelease_UsesCliAndRecordsActivity()
     {
         var client = factory.CreateClient();

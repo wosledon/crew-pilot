@@ -597,6 +597,9 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<bool>("ReleaseRequiresApproval")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("RepoUrl")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");

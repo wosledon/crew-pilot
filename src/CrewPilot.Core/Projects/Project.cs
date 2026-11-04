@@ -32,6 +32,9 @@ public class Project : Entity
     /// <summary>任务类型默认团队（优先于项目默认团队）。</summary>
     public Guid? TaskTeamId { get; set; }
 
+    /// <summary>直接发布是否需要审批（开启后仅允许通过发布工作流审批发布）。</summary>
+    public bool ReleaseRequiresApproval { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;

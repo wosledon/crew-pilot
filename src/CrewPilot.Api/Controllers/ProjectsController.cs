@@ -125,6 +125,30 @@ public sealed class ProjectsController(
     }
 
     /// <summary>设置/清除项目默认 Agent 团队。</summary>
+    /// <summary>设置直接发布是否需要审批（开启后请通过发布工作流发布）。</summary>
+    [HttpPut("{id:guid}/release-approval")]
+    public async Task<ActionResult<ProjectDetailDto>> SetReleaseApproval(
+        Guid id, [FromBody] SetReleaseApprovalRequest request, CancellationToken ct)
+    {
+        var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == id, ct);
+        if (project is null)
+        {
+            return Problem(detail: "项目不存在", statusCode: 404);
+        }
+
+        project.ReleaseRequiresApproval = request.Required;
+        project.UpdatedAt = DateTimeOffset.UtcNow;
+        db.Activities.Add(new Activity
+        {
+            ProjectId = project.Id,
+            EventType = "project.releaseApproval.changed",
+            Payload = JsonSerializer.Serialize(new { required = request.Required }),
+            ActorKind = MemberKind.User,
+        });
+        await db.SaveChangesAsync(ct);
+        return Ok(await GetAsync(id, ct));
+    }
+
     /// <summary>按工作项类型设置默认团队（优先于项目默认团队）。</summary>
     [HttpPut("{id:guid}/type-teams")]
     public async Task<ActionResult<ProjectDetailDto>> SetTypeTeams(
@@ -314,6 +338,7 @@ public sealed class ProjectsController(
                 p.RequirementTeamId,
                 p.DefectTeamId,
                 p.TaskTeamId,
+                p.ReleaseRequiresApproval,
                 Count = p.WorkItems.Count,
                 p.CreatedAt,
                 p.UpdatedAt,
@@ -325,6 +350,7 @@ public sealed class ProjectsController(
             : new ProjectDetailDto(
                 row.Id, row.Key, row.Name, row.Description, row.RepoUrl, row.LocalPath,
                 row.Status.ToString().ToLowerInvariant(), row.Count, row.CreatedAt, row.UpdatedAt,
-                row.DefaultTeamId, row.RequirementTeamId, row.DefectTeamId, row.TaskTeamId);
+                row.DefaultTeamId, row.RequirementTeamId, row.DefectTeamId, row.TaskTeamId,
+                row.ReleaseRequiresApproval);
     }
 }
