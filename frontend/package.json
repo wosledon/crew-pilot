@@ -10,8 +10,9 @@
     "test": "vitest",
     "test:run": "vitest run",
     "api:types": "openapi-typescript ../docs/openapi.json -o src/lib/api-schema.d.ts",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,css,json}\"",
+    "test:e2e": "playwright test",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\" \"e2e/**/*.ts\" \"playwright.config.ts\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css,json}\" \"e2e/**/*.ts\" \"playwright.config.ts\"",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -43,6 +44,7 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/vite": "^4.0.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",

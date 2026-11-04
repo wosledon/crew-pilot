@@ -56,6 +56,9 @@
   "clearDefaultTeam": "Clear default",
   "defaultTeamSet": "Default team updated",
   "previewStarted": "Preview queued",
+  "previewContextProject": "Project (optional)",
+  "previewContextWorkItem": "Work item (inject context)",
+  "previewContextNone": "No work item",
   "empty": "No agents yet — create a provider first",
   "noProviders": "No model providers yet — create one on the Providers page"
 }

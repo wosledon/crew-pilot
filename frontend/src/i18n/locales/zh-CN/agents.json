@@ -56,6 +56,9 @@
   "clearDefaultTeam": "取消默认",
   "defaultTeamSet": "默认团队已更新",
   "previewStarted": "试运行已入队",
+  "previewContextProject": "关联项目（可选）",
+  "previewContextWorkItem": "关联工作项（注入上下文）",
+  "previewContextNone": "不关联工作项",
   "empty": "还没有 Agent，先创建供应商再新建 Agent",
   "noProviders": "还没有模型供应商，请先到「供应商」页创建"
 }

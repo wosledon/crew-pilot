@@ -12,6 +12,7 @@ import { toast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { api } from "@/lib/api";
 import { useMcpServers, useSkills } from "@/features/platform/api";
+import { useProjects, useWorkItems } from "@/features/projects/api";
 import { AgentCapabilitiesDialog } from "./components/AgentCapabilitiesDialog";
 import {
   useAgent,
@@ -414,12 +415,17 @@ function PreviewDialog({
 }) {
   const { t } = useTranslation(["agents", "agentruns", "common"]);
   const agent = useAgent(agentId);
+  const projects = useProjects();
+  const [projectId, setProjectId] = useState("");
+  const workItems = useWorkItems(projectId === "" ? undefined : projectId);
+  const [workItemId, setWorkItemId] = useState("");
   const [runId, setRunId] = useState<string | null>(null);
 
   const handleRun = async () => {
     try {
       const run = await api.post<{ id: string }>(`/agents/${agentId}/runs`, {
         prompt,
+        workItemId: workItemId === "" ? undefined : workItemId,
       });
       setRunId(run.id);
       toast.success(t("agents:previewStarted"));
@@ -436,6 +442,39 @@ function PreviewDialog({
       closeLabel={t("common:cancel")}
     >
       <div className="space-y-4">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("agents:previewContextProject")}</span>
+            <Select
+              value={projectId}
+              onValueChange={(value) => {
+                setProjectId(value);
+                setWorkItemId("");
+              }}
+              options={(projects.data ?? []).map((project) => ({
+                value: project.id,
+                label: project.name,
+              }))}
+              placeholder={t("agents:previewContextProject")}
+              ariaLabel={t("agents:previewContextProject")}
+            />
+          </label>
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("agents:previewContextWorkItem")}</span>
+            <Select
+              value={workItemId}
+              onValueChange={setWorkItemId}
+              options={[
+                { value: "", label: t("agents:previewContextNone") },
+                ...(workItems.data ?? []).map((item) => ({
+                  value: item.id,
+                  label: item.title,
+                })),
+              ]}
+              ariaLabel={t("agents:previewContextWorkItem")}
+            />
+          </label>
+        </div>
         <label className="block space-y-1.5 text-sm">
           <span className="font-medium">{t("agents:previewPrompt")}</span>
           <Textarea
