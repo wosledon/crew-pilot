@@ -61,5 +61,7 @@
   "releaseApprovalOn": "Require approval (release workflow)",
   "releaseApprovalHint": "When enabled, direct release API is rejected; use the release workflow",
   "releaseApprovalRequired": "Release approval enabled: direct release is disabled",
-  "releaseApprovalSaved": "Release approval updated"
+  "releaseApprovalSaved": "Release approval updated",
+  "webhook": "Webhook push",
+  "webhookHint": "Header X-CrewPilot-Webhook-Token must equal the integration token; JSON: { \"prUrl\": \"...\", \"state\": \"merged\", \"ciStatus\": \"success\" }"
 }

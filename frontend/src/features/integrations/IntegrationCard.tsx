@@ -120,6 +120,16 @@ export function IntegrationCard({ projectId }: IntegrationCardProps) {
               <p className="text-sm text-muted-foreground">{t("integrations:notConfigured")}</p>
             )}
 
+            {configured ? (
+              <div className="rounded-md border border-border bg-muted/40 p-2 text-xs">
+                <p className="font-medium">{t("integrations:webhook")}</p>
+                <code className="block break-all">
+                  POST /api/projects/{projectId}/integrations/webhook
+                </code>
+                <p className="mt-1 text-muted-foreground">{t("integrations:webhookHint")}</p>
+              </div>
+            ) : null}
+
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block space-y-1.5 text-sm">
                 <span className="font-medium">{t("integrations:platform")}</span>

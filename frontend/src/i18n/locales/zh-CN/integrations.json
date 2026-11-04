@@ -61,5 +61,7 @@
   "releaseApprovalOn": "需要审批（走发布工作流）",
   "releaseApprovalHint": "开启后直接发布 API 会被拒绝，请通过发布工作流审批执行",
   "releaseApprovalRequired": "已开启发布审批：当前面板不可直接发布",
-  "releaseApprovalSaved": "发布审批设置已更新"
+  "releaseApprovalSaved": "发布审批设置已更新",
+  "webhook": "Webhook 推送",
+  "webhookHint": "请求头 X-CrewPilot-Webhook-Token 填集成 Token；JSON：{ \"prUrl\": \"...\", \"state\": \"merged\", \"ciStatus\": \"success\" }"
 }

@@ -15,6 +15,7 @@ import {
   useMergePullRequest,
   useSyncPullRequest,
 } from "@/features/integrations/api";
+import { MarkdownView } from "@/components/ui/MarkdownView";
 import { formatDateTime } from "@/lib/format";
 import type { PullRequestStatus, WorkItemDetail } from "@/lib/types";
 import { priorityTone, statusTone } from "../statusFlow";
@@ -312,17 +313,16 @@ export function WorkItemDetailDialog({
           {detail.description ? (
             <section>
               <h4 className="text-sm font-medium">{t("workitems:description")}</h4>
-              <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
-                {detail.description}
-              </p>
+              <MarkdownView content={detail.description} className="mt-1" />
             </section>
           ) : null}
 
           <section>
             <h4 className="text-sm font-medium">{t("workitems:acceptanceCriteria")}</h4>
-            <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
-              {detail.acceptanceCriteria ?? t("workitems:acceptanceCriteriaEmpty")}
-            </p>
+            <MarkdownView
+              content={detail.acceptanceCriteria ?? t("workitems:acceptanceCriteriaEmpty")}
+              className="mt-1"
+            />
           </section>
 
           <section>
