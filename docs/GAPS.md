@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 146 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 148 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -202,7 +202,7 @@
 
 - [x] 实体 + 基础 API（Round 4）
 - [x] 团队管理 UI + 项目默认团队（工作流按岗位从默认团队解析 Agent，Round 13）
-- [ ] 工作项类型级默认团队（当前仅项目级）
+- [x] 工作项类型级默认团队（Round 28：需求/缺陷/任务各自团队，优先于项目默认）
 
 ### 5.4 工作流（P0 单步 → P1 编排）
 
@@ -294,6 +294,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 28（2026-11-04）
+
+- 工作项类型级默认团队（PRD 5.3）：Project 新增 `RequirementTeamId/DefectTeamId/TaskTeamId` + SQLite/PG 迁移；`PUT /api/projects/{id}/type-teams`（团队归属校验）
+- `WorkflowRunner` 按步骤岗位解析 Agent 时：工作项类型团队优先，回退项目默认团队，再回退全局同岗位 Agent
+- 前端团队卡新增「按工作项类型默认团队」三个下拉；OpenAPI 重新导出并生成类型
+- 测试：146 → 148（类型团队覆盖默认团队、跨项目团队 400），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 27（2026-11-04）
 
