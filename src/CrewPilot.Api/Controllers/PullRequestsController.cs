@@ -18,7 +18,8 @@ namespace CrewPilot.Api.Controllers;
 public sealed class PullRequestsController(
     CrewPilotDbContext db,
     ISecretProtector secrets,
-    IGitCliService gitCli) : ControllerBase
+    IGitCliService gitCli,
+    IRealtimeNotifier? realtime = null) : ControllerBase
 {
     [HttpPost("api/workitems/{workItemId:guid}/pull-request")]
     public async Task<ActionResult<PullRequestCreatedDto>> Create(
@@ -63,6 +64,7 @@ public sealed class PullRequestsController(
             ActorKind = MemberKind.Agent,
         });
         await db.SaveChangesAsync(ct);
+        await NotifyAsync(context.WorkItem, ct);
 
         return Created(url, new PullRequestCreatedDto(url));
     }
@@ -142,8 +144,70 @@ public sealed class PullRequestsController(
             ActorKind = MemberKind.User,
         });
         await db.SaveChangesAsync(ct);
+        await NotifyAsync(context.WorkItem, ct);
 
         return Ok(ToDto(status));
+    }
+
+    /// <summary>合并 PR/MR：成功后同步状态并自动推进工作项；真实合并动作由 gh/glab 执行。</summary>
+    [HttpPost("api/workitems/{workItemId:guid}/pull-request/merge")]
+    public async Task<ActionResult<PullRequestStatusDto>> Merge(
+        Guid workItemId, CancellationToken ct)
+    {
+        var context = await LoadContextAsync(workItemId, ct);
+        if (context.Error is not null)
+        {
+            return context.Error;
+        }
+
+        if (string.IsNullOrWhiteSpace(context.WorkItem!.PrUrl))
+        {
+            return Problem(detail: "工作项尚未关联 PR/MR", statusCode: 400);
+        }
+
+        var (ok, message) = await gitCli.MergePullRequestAsync(
+            context.Integration!.Platform,
+            context.WorkingDirectory!,
+            context.Token!,
+            context.WorkItem.PrUrl,
+            ct);
+        if (!ok)
+        {
+            return Problem(detail: message, statusCode: 400);
+        }
+
+        // 合并后再拉一次状态，拿到 CI 与 checks；CLI 查询失败时按已合并处理
+        var status = await gitCli.GetPullRequestAsync(
+            context.Integration!.Platform,
+            context.WorkingDirectory!,
+            context.Token!,
+            context.WorkItem.PrUrl,
+            ct);
+
+        context.WorkItem.PrState = status?.NormalizedState ?? "merged";
+        if (status is not null)
+        {
+            context.WorkItem.CiStatus = status.NormalizedCiStatus;
+        }
+
+        context.WorkItem.UpdatedAt = DateTimeOffset.UtcNow;
+        TryAdvanceMerged(context.WorkItem);
+        db.Activities.Add(new Activity
+        {
+            ProjectId = context.WorkItem.ProjectId,
+            WorkItemId = context.WorkItem.Id,
+            EventType = "pullrequest.merged",
+            Payload = JsonSerializer.Serialize(new { message, state = context.WorkItem.PrState }),
+            ActorKind = MemberKind.User,
+        });
+        await db.SaveChangesAsync(ct);
+        await NotifyAsync(context.WorkItem, ct);
+
+        return Ok(status is null
+            ? new PullRequestStatusDto(
+                "merged", context.WorkItem.CiStatus ?? "none", null,
+                context.WorkItem.PrUrl, [])
+            : ToDto(status));
     }
 
     private async Task<(
@@ -189,6 +253,25 @@ public sealed class PullRequestsController(
                 Problem(detail: "Token 解密失败，请重新配置", statusCode: 400));
         }
     }
+
+    private async Task NotifyAsync(WorkItem workItem, CancellationToken ct)
+    {
+        if (realtime is null)
+        {
+            return;
+        }
+
+        await realtime.WorkItemChangedAsync(
+            workItem.ProjectId, workItem.Id, StatusOf(workItem), ct);
+    }
+
+    private static string StatusOf(WorkItem workItem) => workItem switch
+    {
+        Requirement requirement => requirement.Status.ToString().ToLowerInvariant(),
+        Defect defect => defect.Status.ToString().ToLowerInvariant(),
+        TaskItem task => task.IsDone ? "done" : "todo",
+        _ => string.Empty,
+    };
 
     private static PullRequestStatusDto ToDto(PullRequestStatus status) => new(
         status.NormalizedState,

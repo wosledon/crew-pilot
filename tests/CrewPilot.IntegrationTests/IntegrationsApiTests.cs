@@ -152,6 +152,54 @@ public sealed class IntegrationsApiTests(CrewPilotApiFactory factory) : IClassFi
         }
     }
 
+    [Fact]
+    public async Task MergePullRequest_ExecutesMergeAndAdvancesWorkItem()
+    {
+        var client = factory.CreateClient();
+        var directory = Directory.CreateTempSubdirectory("crewpilot_cicd_merge_");
+        try
+        {
+            var project = await CreateProjectWithLocalPathAsync(client, directory.FullName);
+            await ConfigureIntegrationAsync(client, project.Id);
+            var item = await ApiTestHelpers.CreateRequirementAsync(client, project.Id);
+            await TransitionAsync(client, item.Id, "ready");
+            await TransitionAsync(client, item.Id, "inProgress");
+            await TransitionAsync(client, item.Id, "inReview");
+
+            var create = await client.PostAsJsonAsync(
+                $"/api/workitems/{item.Id}/pull-request",
+                new { branch = "feat/CP-2-merge", title = "合并示例" });
+            create.StatusCode.Should().Be(HttpStatusCode.Created);
+
+            factory.GitCli.Status = new PullRequestStatus(
+                "MERGED", true, [new CiCheck("build", "completed", "success", null)],
+                factory.GitCli.PullRequestUrl);
+
+            var merge = await client.PostAsync(
+                $"/api/workitems/{item.Id}/pull-request/merge", null);
+            merge.StatusCode.Should().Be(HttpStatusCode.OK);
+            factory.GitCli.MergeCalls.Should().Be(1);
+            var status = await merge.Content.ReadFromJsonAsync<PullRequestStatusDto>();
+            status!.State.Should().Be("merged");
+
+            using (var scope = factory.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<CrewPilotDbContext>();
+                var stored = await db.WorkItems.AsNoTracking()
+                    .FirstAsync(w => w.Id == item.Id);
+                stored.PrState.Should().Be("merged");
+            }
+
+            var after = await client.GetFromJsonAsync<WorkItemDetailDto>(
+                $"/api/workitems/{item.Id}");
+            after!.Status.Should().Be("done");
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
+    }
+
     private static async Task<ProjectDetailDto> CreateProjectWithLocalPathAsync(
         HttpClient client, string localPath)
     {
