@@ -100,5 +100,7 @@
   "batchDelete": "批量删除",
   "batchDeleteConfirm": "将删除 {{count}} 个工作项及其评论/附件/工时，且不可恢复。",
   "batchResult": "批量操作完成：成功 {{succeeded}}，失败 {{failed}}",
-  "batchPartial": "部分成功：成功 {{succeeded}}，失败 {{failed}}"
+  "batchPartial": "部分成功：成功 {{succeeded}}，失败 {{failed}}",
+  "relatedRequirement": "关联需求",
+  "relatedRequirementNone": "不关联需求"
 }

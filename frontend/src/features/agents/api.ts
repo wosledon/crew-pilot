@@ -9,6 +9,7 @@ import type {
   ModelDto,
   ProviderDetail,
   ProviderListItem,
+  WorkItemAgentActivity,
 } from "@/lib/types";
 
 export const agentKeys = {
@@ -137,6 +138,16 @@ export function useAgents() {
   return useQuery({
     queryKey: agentKeys.agents,
     queryFn: () => api.get<AgentListItem[]>("/agents"),
+  });
+}
+
+/** 项目看板：每个工作项最近一次 Agent 活动（5s 轮询 + SignalR 事件刷新）。 */
+export function useAgentActivity(projectId: string | undefined) {
+  return useQuery({
+    queryKey: ["projects", projectId ?? "", "agent-activity"] as const,
+    queryFn: () => api.get<WorkItemAgentActivity[]>(`/projects/${projectId}/agent-activity`),
+    enabled: projectId !== undefined,
+    refetchInterval: 5000,
   });
 }
 

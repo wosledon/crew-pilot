@@ -50,6 +50,7 @@ export function EditWorkItemDialog({
   const [environment, setEnvironment] = useState(item.environment ?? "");
   const [parentWorkItemId, setParentWorkItemId] = useState(item.parentWorkItemId ?? "");
   const [branchUrl, setBranchUrl] = useState(item.branchUrl ?? "");
+  const [relatedRequirementId, setRelatedRequirementId] = useState(item.relatedRequirementId ?? "");
 
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
@@ -75,6 +76,8 @@ export function EditWorkItemDialog({
           environment: item.type === "defect" ? environment.trim() || undefined : undefined,
           parentWorkItemId: item.type === "task" ? parentWorkItemId || undefined : undefined,
           branchUrl: branchUrl.trim() || undefined,
+          relatedRequirementId:
+            item.type === "defect" ? relatedRequirementId || undefined : undefined,
         },
       });
       toast.success(t("workitems:updated"));
@@ -227,6 +230,23 @@ export function EditWorkItemDialog({
 
         {item.type === "defect" ? (
           <>
+            <label className="block space-y-1.5 text-sm">
+              <span className="font-medium">{t("workitems:relatedRequirement")}</span>
+              <Select
+                value={relatedRequirementId}
+                onValueChange={setRelatedRequirementId}
+                options={[
+                  { value: "", label: t("workitems:relatedRequirementNone") },
+                  ...(workItems.data ?? [])
+                    .filter((candidate) => candidate.type === "requirement")
+                    .map((candidate) => ({
+                      value: candidate.id,
+                      label: candidate.title,
+                    })),
+                ]}
+                ariaLabel={t("workitems:relatedRequirement")}
+              />
+            </label>
             <label className="block space-y-1.5 text-sm">
               <span className="font-medium">{t("workitems:severity")}</span>
               <Select

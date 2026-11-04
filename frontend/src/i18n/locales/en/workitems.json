@@ -100,5 +100,7 @@
   "batchDelete": "Batch delete",
   "batchDeleteConfirm": "{{count}} work items and their comments/attachments/work logs will be deleted permanently.",
   "batchResult": "Batch finished: {{succeeded}} succeeded, {{failed}} failed",
-  "batchPartial": "Partial success: {{succeeded}} succeeded, {{failed}} failed"
+  "batchPartial": "Partial success: {{succeeded}} succeeded, {{failed}} failed",
+  "relatedRequirement": "Linked requirement",
+  "relatedRequirementNone": "No linked requirement"
 }

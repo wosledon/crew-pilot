@@ -74,6 +74,8 @@ export interface WorkItemDetail {
   updatedAt: string;
   tags: string | null;
   parentWorkItemId: string | null;
+  relatedRequirementId: string | null;
+  relatedRequirementTitle: string | null;
 }
 
 /** 批量操作结果 */
@@ -461,6 +463,15 @@ export interface ReleaseResult {
   tag: string;
   url: string | null;
   message: string;
+}
+
+/** 工作项最近一次 Agent 活动（看板实时状态） */
+export interface WorkItemAgentActivity {
+  workItemId: string;
+  agentRunId: string;
+  agentName: string;
+  status: AgentRunStatus;
+  updatedAt: string;
 }
 
 /** M5：Skills / MCP / 审计 / 成本 */

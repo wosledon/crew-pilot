@@ -13,14 +13,24 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { Badge } from "@/components/ui/Badge";
+import { Badge, type BadgeTone } from "@/components/ui/Badge";
 import { Select } from "@/components/ui/Select";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
+import { useAgentActivity } from "@/features/agents/api";
 import { useTransitionWorkItem, useWorkItems } from "./api";
 import { nextStatuses, priorityTone } from "./statusFlow";
-import type { WorkItemListItem, WorkItemType } from "@/lib/types";
+import type { WorkItemAgentActivity, WorkItemListItem, WorkItemType } from "@/lib/types";
 import { cn } from "@/lib/cn";
+
+const activityTones: Record<string, BadgeTone> = {
+  queued: "neutral",
+  running: "info",
+  waitingforhuman: "warning",
+  succeeded: "success",
+  failed: "danger",
+  canceled: "neutral",
+};
 
 const requirementColumns = ["backlog", "ready", "inProgress", "inReview", "done"];
 const defectColumns = ["new", "confirmed", "fixing", "pendingVerification", "closed"];
@@ -29,8 +39,14 @@ function columnsFor(type: WorkItemType): string[] {
   return type === "defect" ? defectColumns : requirementColumns;
 }
 
-function DraggableCard({ item }: { item: WorkItemListItem }) {
-  const { t } = useTranslation("workitems");
+function DraggableCard({
+  item,
+  activity,
+}: {
+  item: WorkItemListItem;
+  activity?: WorkItemAgentActivity;
+}) {
+  const { t } = useTranslation(["workitems", "agentruns"]);
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: item.id,
   });
@@ -63,11 +79,27 @@ function DraggableCard({ item }: { item: WorkItemListItem }) {
       {item.tags ? (
         <p className="mt-1 truncate text-xs text-muted-foreground">#{item.tags}</p>
       ) : null}
+      {activity ? (
+        <div className="mt-2 flex items-center gap-1.5">
+          <Badge tone={activityTones[activity.status] ?? "neutral"}>🤖 {activity.agentName}</Badge>
+          <span className="text-xs text-muted-foreground">
+            {t(`agentruns:statuses.${activity.status}`)}
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function Column({ status, items }: { status: string; items: WorkItemListItem[] }) {
+function Column({
+  status,
+  items,
+  activityByItem,
+}: {
+  status: string;
+  items: WorkItemListItem[];
+  activityByItem: Map<string, WorkItemAgentActivity>;
+}) {
   const { t } = useTranslation(["workitems", "kanban"]);
   const { setNodeRef, isOver } = useDroppable({ id: status });
 
@@ -90,7 +122,9 @@ function Column({ status, items }: { status: string; items: WorkItemListItem[] }
           {t("kanban:emptyColumn")}
         </p>
       ) : (
-        items.map((item) => <DraggableCard key={item.id} item={item} />)
+        items.map((item) => (
+          <DraggableCard key={item.id} item={item} activity={activityByItem.get(item.id)} />
+        ))
       )}
     </div>
   );
@@ -105,6 +139,8 @@ export function BoardPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const allWorkItems = useWorkItems(projectId, type);
   const workItems = useWorkItems(projectId, type, tag || undefined);
+  const activity = useAgentActivity(projectId);
+  const activityByItem = new Map((activity.data ?? []).map((entry) => [entry.workItemId, entry]));
   const transitionWorkItem = useTransitionWorkItem();
 
   const tags = [
@@ -204,6 +240,7 @@ export function BoardPage() {
                 key={status}
                 status={status}
                 items={items.filter((item) => item.status === status)}
+                activityByItem={activityByItem}
               />
             ))}
           </div>

@@ -457,6 +457,7 @@ export interface UpdateWorkItemBody {
   parentWorkItemId?: string;
   branchUrl?: string;
   prUrl?: string;
+  relatedRequirementId?: string;
 }
 
 export function useUpdateWorkItem() {

@@ -240,6 +240,15 @@ export function WorkItemDetailDialog({
             </div>
           </div>
 
+          {detail.type === "defect" ? (
+            <section>
+              <h4 className="text-sm font-medium">{t("workitems:relatedRequirement")}</h4>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {detail.relatedRequirementTitle ?? t("workitems:relatedRequirementNone")}
+              </p>
+            </section>
+          ) : null}
+
           {detail.description ? (
             <section>
               <h4 className="text-sm font-medium">{t("workitems:description")}</h4>
