@@ -1,6 +1,6 @@
 {
   "title": "MCP",
-  "description": "Model Context Protocol Server：认证加密、按 Agent 授权；运行时支持 Streamable HTTP / stdio",
+  "description": "Model Context Protocol Server：认证加密、按 Agent 授权；运行时支持 Streamable HTTP / 旧版 HTTP+SSE / stdio",
   "create": "新建 MCP Server",
   "createTitle": "新建 MCP Server",
   "editTitle": "编辑 MCP Server",
