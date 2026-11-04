@@ -1,5 +1,8 @@
+using CrewPilot.Agents.Execution;
 using CrewPilot.Api.Contracts;
 using CrewPilot.Core.Agents;
+using CrewPilot.Core.Collaboration;
+using CrewPilot.Core.Projects;
 using CrewPilot.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,10 +10,14 @@ using Microsoft.EntityFrameworkCore;
 namespace CrewPilot.Api.Controllers;
 
 [ApiController]
-public sealed class AgentRunsController(CrewPilotDbContext db) : ControllerBase
+public sealed class AgentRunsController(CrewPilotDbContext db, AgentRunQueue queue) : ControllerBase
 {
     [HttpGet("api/agent-runs")]
-    public async Task<ActionResult<IReadOnlyList<AgentRunListItemDto>>> List(        [FromQuery] Guid? projectId, [FromQuery] Guid? workItemId, [FromQuery] Guid? agentId, CancellationToken ct = default)
+    public async Task<ActionResult<IReadOnlyList<AgentRunListItemDto>>> List(
+        [FromQuery] Guid? projectId,
+        [FromQuery] Guid? workItemId,
+        [FromQuery] Guid? agentId,
+        CancellationToken ct = default)
     {
         var query = db.AgentRuns.AsNoTracking().AsQueryable();
         if (projectId.HasValue)
@@ -55,6 +62,66 @@ public sealed class AgentRunsController(CrewPilotDbContext db) : ControllerBase
                 r.CreatedAt, r.FinishedAt, r.Duration, r.PromptTokens, r.CompletionTokens))
             .ToList();
         return Ok(items);
+    }
+
+    /// <summary>重试失败/取消的 AgentRun：复制提示词与关联信息，新建一次排队执行。</summary>
+    [HttpPost("api/agent-runs/{id:guid}/retry")]
+    public async Task<ActionResult<AgentRunListItemDto>> Retry(Guid id, CancellationToken ct)
+    {
+        var run = await db.AgentRuns
+            .Include(r => r.Agent)
+            .Include(r => r.WorkItem)
+            .FirstOrDefaultAsync(r => r.Id == id, ct);
+        if (run is null)
+        {
+            return Problem(detail: "AgentRun 不存在", statusCode: 404);
+        }
+
+        if (run.Status is not (AgentRunStatus.Failed or AgentRunStatus.Canceled))
+        {
+            return Problem(detail: "仅失败或已取消的执行可以重试", statusCode: 400);
+        }
+
+        if (run.WorkflowRunId is not null)
+        {
+            return Problem(detail: "工作流执行请通过卡点/工作流重试处理", statusCode: 400);
+        }
+
+        var retry = new AgentRun
+        {
+            AgentId = run.AgentId,
+            WorkItemId = run.WorkItemId,
+            Trigger = "retry",
+            Prompt = run.Prompt,
+            Status = AgentRunStatus.Queued,
+        };
+        db.AgentRuns.Add(retry);
+
+        if (run.WorkItem is not null)
+        {
+            db.Activities.Add(new Activity
+            {
+                ProjectId = run.WorkItem.ProjectId,
+                WorkItemId = run.WorkItem.Id,
+                EventType = "agentrun.retried",
+                Payload = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    originalRunId = run.Id,
+                    retryRunId = retry.Id,
+                    agent = run.Agent.Name,
+                }),
+                ActorKind = MemberKind.User,
+            });
+        }
+
+        await db.SaveChangesAsync(ct);
+        await queue.EnqueueAsync(retry.Id);
+
+        return Created($"/api/agent-runs/{retry.Id}",
+            new AgentRunListItemDto(
+                retry.Id, run.Agent.Name, retry.WorkItemId,
+                run.WorkItem?.Title, retry.Trigger, "queued", null,
+                retry.CreatedAt, null, null, null, null));
     }
 
     /// <summary>项目内每个工作项最近一次 Agent 活动（优先进行中），供看板展示实时状态。</summary>

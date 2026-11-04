@@ -71,6 +71,57 @@ public sealed class AgentClaimTests(CrewPilotApiFactory factory) : IClassFixture
         dto.Status.Should().Be("queued");
     }
 
+    [Fact]
+    public async Task RetryFailedRun_CreatesNewQueuedRun()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var provider = await CreateProviderAsync(client);
+        var agent = await CreateAgentAsync(client, provider.Id);
+        var workItem = await CreateRequirementAsync(client, project.Id);
+        factory.Engine.FailNextRuns = 1;
+
+        var assign = await client.PostAsJsonAsync(
+            $"/api/workitems/{workItem.Id}/assign-agent", new { agentId = agent.Id });
+        assign.StatusCode.Should().Be(HttpStatusCode.Created);
+        var first = await assign.Content.ReadFromJsonAsync<AgentRunListItemDto>();
+        var failed = await WaitForTerminalAsync(client, first!.Id);
+        failed!.Status.Should().Be("failed");
+
+        var retry = await client.PostAsync($"/api/agent-runs/{first.Id}/retry", null);
+        retry.StatusCode.Should().Be(HttpStatusCode.Created);
+        var retried = await retry.Content.ReadFromJsonAsync<AgentRunListItemDto>();
+        retried!.Trigger.Should().Be("retry");
+        retried.Id.Should().NotBe(first.Id);
+
+        var succeeded = await WaitForTerminalAsync(client, retried.Id);
+        succeeded!.Status.Should().Be("succeeded");
+
+        var runs = await client.GetFromJsonAsync<List<AgentRunListItemDto>>(
+            $"/api/agent-runs?workItemId={workItem.Id}");
+        runs!.Should().HaveCount(2);
+        runs.Should().Contain(r => r.Id == first.Id && r.Status == "failed");
+    }
+
+    [Fact]
+    public async Task RetrySucceededRun_Returns400()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var provider = await CreateProviderAsync(client);
+        var agent = await CreateAgentAsync(client, provider.Id);
+        var workItem = await CreateRequirementAsync(client, project.Id);
+
+        var assign = await client.PostAsJsonAsync(
+            $"/api/workitems/{workItem.Id}/assign-agent", new { agentId = agent.Id });
+        var run = await assign.Content.ReadFromJsonAsync<AgentRunListItemDto>();
+        var terminal = await WaitForTerminalAsync(client, run!.Id);
+        terminal!.Status.Should().Be("succeeded");
+
+        var retry = await client.PostAsync($"/api/agent-runs/{run.Id}/retry", null);
+        retry.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
     private static async Task<AgentRunDetailDto?> WaitForTerminalAsync(
         HttpClient client, Guid runId)
     {
