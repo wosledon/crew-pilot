@@ -40,4 +40,6 @@ public class Prototype : Entity
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    public ICollection<PrototypeVersion> Versions { get; set; } = new List<PrototypeVersion>();
 }

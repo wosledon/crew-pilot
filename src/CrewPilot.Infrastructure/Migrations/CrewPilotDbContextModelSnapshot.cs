@@ -695,6 +695,43 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.ToTable("Prototypes", (string)null);
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.Prototypes.PrototypeVersion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1000000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedByName")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PrototypeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PrototypeId", "Version")
+                        .IsUnique();
+
+                    b.ToTable("PrototypeVersions", (string)null);
+                });
+
             modelBuilder.Entity("CrewPilot.Core.Providers.ModelCatalogEntry", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1457,6 +1494,17 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Navigation("Requirement");
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.Prototypes.PrototypeVersion", b =>
+                {
+                    b.HasOne("CrewPilot.Core.Prototypes.Prototype", "Prototype")
+                        .WithMany("Versions")
+                        .HasForeignKey("PrototypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Prototype");
+                });
+
             modelBuilder.Entity("CrewPilot.Core.Providers.ModelCatalogEntry", b =>
                 {
                     b.HasOne("CrewPilot.Core.Providers.ModelProvider", "Provider")
@@ -1647,6 +1695,11 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Navigation("Prototypes");
 
                     b.Navigation("WorkItems");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Prototypes.Prototype", b =>
+                {
+                    b.Navigation("Versions");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.Providers.ModelProvider", b =>

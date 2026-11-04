@@ -700,6 +700,43 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                     b.ToTable("Prototypes", (string)null);
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.Prototypes.PrototypeVersion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1000000)
+                        .HasColumnType("character varying(1000000)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("PrototypeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PrototypeId", "Version")
+                        .IsUnique();
+
+                    b.ToTable("PrototypeVersions", (string)null);
+                });
+
             modelBuilder.Entity("CrewPilot.Core.Providers.ModelCatalogEntry", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1462,6 +1499,17 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                     b.Navigation("Requirement");
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.Prototypes.PrototypeVersion", b =>
+                {
+                    b.HasOne("CrewPilot.Core.Prototypes.Prototype", "Prototype")
+                        .WithMany("Versions")
+                        .HasForeignKey("PrototypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Prototype");
+                });
+
             modelBuilder.Entity("CrewPilot.Core.Providers.ModelCatalogEntry", b =>
                 {
                     b.HasOne("CrewPilot.Core.Providers.ModelProvider", "Provider")
@@ -1652,6 +1700,11 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                     b.Navigation("Prototypes");
 
                     b.Navigation("WorkItems");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Prototypes.Prototype", b =>
+                {
+                    b.Navigation("Versions");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.Providers.ModelProvider", b =>

@@ -11,6 +11,24 @@ public sealed record PrototypeDto(
     string? CreatedByName,
     DateTimeOffset UpdatedAt);
 
-public sealed record CreatePrototypeRequest(string Name, string Type, string Content, Guid? RequirementId);
+public sealed record PrototypeVersionDto(
+    Guid Id,
+    Guid PrototypeId,
+    int Version,
+    string Name,
+    string Content,
+    string? CreatedByName,
+    DateTimeOffset CreatedAt);
 
-public sealed record UpdatePrototypeRequest(string Name, string Content);
+public sealed record PrototypeImageDto(string Path, string Url, long Size);
+
+public sealed record CreatePrototypeRequest(
+    string Name,
+    string Type,
+    string Content,
+    Guid? RequirementId);
+
+public sealed record UpdatePrototypeRequest(
+    string Name,
+    string Content,
+    Guid? RequirementId = null);

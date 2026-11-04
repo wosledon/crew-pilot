@@ -21,5 +21,22 @@ public class PrototypeConfiguration : IEntityTypeConfiguration<Prototype>
             .WithMany(r => r.Prototypes)
             .HasForeignKey(p => p.RequirementId)
             .OnDelete(DeleteBehavior.SetNull);
+        builder.HasMany(p => p.Versions)
+            .WithOne(v => v.Prototype)
+            .HasForeignKey(v => v.PrototypeId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class PrototypeVersionConfiguration : IEntityTypeConfiguration<PrototypeVersion>
+{
+    public void Configure(EntityTypeBuilder<PrototypeVersion> builder)
+    {
+        builder.ToTable("PrototypeVersions");
+        builder.HasKey(v => v.Id);
+        builder.Property(v => v.Name).HasMaxLength(200).IsRequired();
+        builder.Property(v => v.Content).HasMaxLength(1000000).IsRequired();
+        builder.Property(v => v.CreatedByName).HasMaxLength(100);
+        builder.HasIndex(v => new { v.PrototypeId, v.Version }).IsUnique();
     }
 }
