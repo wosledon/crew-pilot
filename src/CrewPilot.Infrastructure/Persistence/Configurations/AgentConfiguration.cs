@@ -49,6 +49,14 @@ public class AgentRunConfiguration : IEntityTypeConfiguration<AgentRun>
             .WithOne(l => l.AgentRun)
             .HasForeignKey(l => l.AgentRunId)
             .OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(r => r.WorkflowRun)
+            .WithMany()
+            .HasForeignKey(r => r.WorkflowRunId)
+            .OnDelete(DeleteBehavior.SetNull);
+        builder.HasOne(r => r.WorkflowStep)
+            .WithMany()
+            .HasForeignKey(r => r.WorkflowStepId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
 

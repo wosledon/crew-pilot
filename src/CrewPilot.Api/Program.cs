@@ -1,6 +1,7 @@
 using CrewPilot.Agents.Abstractions;
 using CrewPilot.Agents.Engine;
 using CrewPilot.Agents.Execution;
+using CrewPilot.Agents.Workflows;
 using CrewPilot.Core.Abstractions;
 using CrewPilot.Infrastructure.Persistence;
 using CrewPilot.Infrastructure.Security;
@@ -27,6 +28,7 @@ builder.Services.AddSingleton<AgentRunQueue>();
 builder.Services.AddSingleton<AgentRunCancellationRegistry>();
 builder.Services.AddHostedService<AgentRunWorker>();
 builder.Services.AddScoped<AgentRunExecutor>();
+builder.Services.AddScoped<WorkflowRunner>();
 builder.Services.AddHttpClient("models.dev");
 
 // 附件存储：本地目录（可用 Attachments:RootPath 覆盖）

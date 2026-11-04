@@ -1,6 +1,7 @@
 using CrewPilot.Agents.Abstractions;
 using CrewPilot.Agents.Engine;
 using CrewPilot.Agents.Execution;
+using CrewPilot.Agents.Workflows;
 using CrewPilot.Core.Abstractions;
 using CrewPilot.Core.Agents;
 using CrewPilot.Core.Projects;
@@ -10,6 +11,7 @@ using CrewPilot.Infrastructure.Persistence;
 using FluentAssertions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace CrewPilot.UnitTests;
@@ -217,7 +219,10 @@ public sealed class AgentRunCancellationTests
 
         var engine = new BlockingEngine();
         var registry = new AgentRunCancellationRegistry();
-        var executor = new AgentRunExecutor(db, engine, new PassThroughSecretProtector(), registry);
+        var workflowRunner = new WorkflowRunner(
+            db, new AgentRunQueue(), NullLogger<WorkflowRunner>.Instance);
+        var executor = new AgentRunExecutor(
+            db, engine, new PassThroughSecretProtector(), registry, workflowRunner);
         return (run, engine, executor, registry);
     }
 

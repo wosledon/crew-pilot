@@ -8,4 +8,7 @@ public enum AgentRunStatus
     Succeeded,
     Failed,
     Canceled,
+
+    /// <summary>输出已产生，但工作流卡点等待用户处理。</summary>
+    WaitingForHuman,
 }

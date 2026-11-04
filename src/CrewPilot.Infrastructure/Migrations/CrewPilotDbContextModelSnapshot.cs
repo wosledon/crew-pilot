@@ -123,6 +123,12 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Property<Guid?>("WorkItemId")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("WorkflowRunId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("WorkflowStepId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("WorkingDirectory")
                         .HasMaxLength(1000)
                         .HasColumnType("TEXT");
@@ -133,7 +139,65 @@ namespace CrewPilot.Infrastructure.Migrations
 
                     b.HasIndex("WorkItemId");
 
+                    b.HasIndex("WorkflowRunId");
+
+                    b.HasIndex("WorkflowStepId");
+
                     b.ToTable("AgentRuns", (string)null);
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Agents.AgentTeam", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Goal")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("AgentTeams", (string)null);
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Agents.AgentTeamMember", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AgentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Role")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentId");
+
+                    b.HasIndex("TeamId", "AgentId")
+                        .IsUnique();
+
+                    b.ToTable("AgentTeamMembers", (string)null);
                 });
 
             modelBuilder.Entity("CrewPilot.Core.Agents.RunLog", b =>
@@ -703,6 +767,201 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.ToTable("WorkLogs", (string)null);
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.Workflows.Blocker", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("AgentRunId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ContextSnapshot")
+                        .HasMaxLength(16000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Resolution")
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ResolutionNote")
+                        .HasMaxLength(4000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset?>("ResolvedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("WorkItemId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("WorkflowRunId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentRunId");
+
+                    b.HasIndex("WorkItemId");
+
+                    b.HasIndex("WorkflowRunId");
+
+                    b.HasIndex("ProjectId", "Status");
+
+                    b.ToTable("Blockers", (string)null);
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Workflows.Workflow", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsTemplate")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Workflows", (string)null);
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Workflows.WorkflowRun", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("CurrentStepId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CurrentStepOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset?>("FinishedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("WorkItemId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("WorkflowId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkItemId");
+
+                    b.HasIndex("WorkflowId");
+
+                    b.ToTable("WorkflowRuns", (string)null);
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Workflows.WorkflowStep", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("AgentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ApprovalPolicy")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InputContract")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Instruction")
+                        .HasMaxLength(8000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MaxRetries")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("OutputContract")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RequiredJob")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("WorkflowId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentId");
+
+                    b.HasIndex("WorkflowId", "Order");
+
+                    b.ToTable("WorkflowSteps", (string)null);
+                });
+
             modelBuilder.Entity("CrewPilot.Core.WorkItems.Defect", b =>
                 {
                     b.HasBaseType("CrewPilot.Core.WorkItems.WorkItem");
@@ -782,9 +1041,53 @@ namespace CrewPilot.Infrastructure.Migrations
                         .HasForeignKey("WorkItemId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("CrewPilot.Core.Workflows.WorkflowRun", "WorkflowRun")
+                        .WithMany()
+                        .HasForeignKey("WorkflowRunId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("CrewPilot.Core.Workflows.WorkflowStep", "WorkflowStep")
+                        .WithMany()
+                        .HasForeignKey("WorkflowStepId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Agent");
 
                     b.Navigation("WorkItem");
+
+                    b.Navigation("WorkflowRun");
+
+                    b.Navigation("WorkflowStep");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Agents.AgentTeam", b =>
+                {
+                    b.HasOne("CrewPilot.Core.Projects.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Agents.AgentTeamMember", b =>
+                {
+                    b.HasOne("CrewPilot.Core.Agents.Agent", "Agent")
+                        .WithMany()
+                        .HasForeignKey("AgentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CrewPilot.Core.Agents.AgentTeam", "Team")
+                        .WithMany("Members")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Agent");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.Agents.RunLog", b =>
@@ -964,6 +1267,78 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Navigation("WorkItem");
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.Workflows.Blocker", b =>
+                {
+                    b.HasOne("CrewPilot.Core.Agents.AgentRun", "AgentRun")
+                        .WithMany()
+                        .HasForeignKey("AgentRunId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("CrewPilot.Core.WorkItems.WorkItem", "WorkItem")
+                        .WithMany()
+                        .HasForeignKey("WorkItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CrewPilot.Core.Workflows.WorkflowRun", "WorkflowRun")
+                        .WithMany()
+                        .HasForeignKey("WorkflowRunId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AgentRun");
+
+                    b.Navigation("WorkItem");
+
+                    b.Navigation("WorkflowRun");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Workflows.Workflow", b =>
+                {
+                    b.HasOne("CrewPilot.Core.Projects.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Workflows.WorkflowRun", b =>
+                {
+                    b.HasOne("CrewPilot.Core.WorkItems.WorkItem", "WorkItem")
+                        .WithMany()
+                        .HasForeignKey("WorkItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CrewPilot.Core.Workflows.Workflow", "Workflow")
+                        .WithMany()
+                        .HasForeignKey("WorkflowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkItem");
+
+                    b.Navigation("Workflow");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Workflows.WorkflowStep", b =>
+                {
+                    b.HasOne("CrewPilot.Core.Agents.Agent", "Agent")
+                        .WithMany()
+                        .HasForeignKey("AgentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("CrewPilot.Core.Workflows.Workflow", "Workflow")
+                        .WithMany("Steps")
+                        .HasForeignKey("WorkflowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Agent");
+
+                    b.Navigation("Workflow");
+                });
+
             modelBuilder.Entity("CrewPilot.Core.Agents.Agent", b =>
                 {
                     b.Navigation("Runs");
@@ -972,6 +1347,11 @@ namespace CrewPilot.Infrastructure.Migrations
             modelBuilder.Entity("CrewPilot.Core.Agents.AgentRun", b =>
                 {
                     b.Navigation("Logs");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Agents.AgentTeam", b =>
+                {
+                    b.Navigation("Members");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.Iterations.Iteration", b =>
@@ -1011,6 +1391,11 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("WorkLogs");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Workflows.Workflow", b =>
+                {
+                    b.Navigation("Steps");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.WorkItems.Requirement", b =>

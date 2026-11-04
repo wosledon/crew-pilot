@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using CrewPilot.Agents.Abstractions;
+using CrewPilot.Agents.Workflows;
 using CrewPilot.Core.Abstractions;
 using CrewPilot.Core.Agents;
 using CrewPilot.Core.Collaboration;
@@ -25,17 +26,20 @@ public sealed class AgentRunExecutor
     private readonly IAgentEngine _engine;
     private readonly ISecretProtector _secrets;
     private readonly AgentRunCancellationRegistry _cancellation;
+    private readonly WorkflowRunner _workflowRunner;
 
     public AgentRunExecutor(
         CrewPilotDbContext db,
         IAgentEngine engine,
         ISecretProtector secrets,
-        AgentRunCancellationRegistry cancellation)
+        AgentRunCancellationRegistry cancellation,
+        WorkflowRunner workflowRunner)
     {
         _db = db;
         _engine = engine;
         _secrets = secrets;
         _cancellation = cancellation;
+        _workflowRunner = workflowRunner;
     }
 
     /// <summary>创建工作项被 Agent 认领的执行记录并入队。</summary>
@@ -80,7 +84,12 @@ public sealed class AgentRunExecutor
             .FirstOrDefaultAsync(r => r.Id == runId, ct);
         if (run is null || run.Status != AgentRunStatus.Queued)
         {
-            // 已取消/已结束的运行不重复执行（排队取消依赖此守卫）
+            // 已取消/已结束的运行不重复执行；工作流运行取消时通知运行器收尾
+            if (run is { Status: AgentRunStatus.Canceled, WorkflowRunId: not null })
+            {
+                await NotifyWorkflowAsync(run, ct);
+            }
+
             return;
         }
 
@@ -139,6 +148,7 @@ public sealed class AgentRunExecutor
             if (runCts.IsCancellationRequested || await IsCanceledInDbAsync(run.Id, ct))
             {
                 await FinishCanceledAsync(run, ct);
+                await NotifyWorkflowAsync(run, ct);
                 return;
             }
 
@@ -166,11 +176,13 @@ public sealed class AgentRunExecutor
                 result.CompletionTokens,
                 result.Duration,
                 ct);
+            await NotifyWorkflowAsync(run, ct);
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
             // 用户取消（接管）：保留状态、日志与已耗工时
             await FinishCanceledAsync(run, ct);
+            await NotifyWorkflowAsync(run, ct);
         }
         finally
         {
@@ -216,6 +228,31 @@ public sealed class AgentRunExecutor
 
         await _db.SaveChangesAsync(ct);
         return true;
+    }
+
+    /// <summary>AgentRun 结束后推进工作流（仅工作流触发的运行）。</summary>
+    private async Task NotifyWorkflowAsync(AgentRun run, CancellationToken ct)
+    {
+        if (run.WorkflowRunId is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await _workflowRunner.OnAgentRunFinishedAsync(run.Id, ct);
+        }
+        catch (Exception ex)
+        {
+            _db.RunLogs.Add(new RunLog
+            {
+                AgentRunId = run.Id,
+                Sequence = 9_997,
+                Kind = "error",
+                Content = $"工作流推进失败：{ex.Message}",
+            });
+            await _db.SaveChangesAsync(CancellationToken.None);
+        }
     }
 
     private async Task FinishAsync(

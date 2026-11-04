@@ -6,6 +6,7 @@ using CrewPilot.Core.Prototypes;
 using CrewPilot.Core.Providers;
 using CrewPilot.Core.WorkItems;
 using CrewPilot.Core.WorkLogs;
+using CrewPilot.Core.Workflows;
 using Microsoft.EntityFrameworkCore;
 
 namespace CrewPilot.Infrastructure.Persistence;
@@ -48,6 +49,18 @@ public class CrewPilotDbContext(DbContextOptions<CrewPilotDbContext> options) : 
     public DbSet<AgentRun> AgentRuns => Set<AgentRun>();
 
     public DbSet<RunLog> RunLogs => Set<RunLog>();
+
+    public DbSet<AgentTeam> AgentTeams => Set<AgentTeam>();
+
+    public DbSet<AgentTeamMember> AgentTeamMembers => Set<AgentTeamMember>();
+
+    public DbSet<Workflow> Workflows => Set<Workflow>();
+
+    public DbSet<WorkflowStep> WorkflowSteps => Set<WorkflowStep>();
+
+    public DbSet<WorkflowRun> WorkflowRuns => Set<WorkflowRun>();
+
+    public DbSet<Blocker> Blockers => Set<Blocker>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

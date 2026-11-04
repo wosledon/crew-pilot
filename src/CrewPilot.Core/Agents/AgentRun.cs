@@ -18,7 +18,17 @@ public class AgentRun : Entity
 
     public WorkItem? WorkItem { get; set; }
 
-    /// <summary>触发原因，如 manual / assigned / workflow。</summary>
+    /// <summary>由工作流触发时的实例 Id。</summary>
+    public Guid? WorkflowRunId { get; set; }
+
+    public Workflows.WorkflowRun? WorkflowRun { get; set; }
+
+    /// <summary>执行的工作流步骤 Id。</summary>
+    public Guid? WorkflowStepId { get; set; }
+
+    public Workflows.WorkflowStep? WorkflowStep { get; set; }
+
+    /// <summary>触发原因，如 manual / assigned / workflow / mention。</summary>
     public string Trigger { get; set; } = "manual";
 
     /// <summary>执行时的工作目录（项目目录隔离 / worktree）。</summary>

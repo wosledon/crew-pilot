@@ -46,15 +46,15 @@ internal static class ApiTestHelpers
     }
 
     public static async Task<AgentDetailDto> CreateAgentAsync(
-        HttpClient client, Guid providerId, string name = "开发 Agent")
+        HttpClient client, Guid providerId, string name = "开发 Agent", string job = "developer")
     {
         var response = await client.PostAsJsonAsync("/api/agents", new
         {
             name = name + "-" + Guid.NewGuid().ToString("N")[..6],
-            job = "developer",
+            job,
             providerId,
             model = "test-model",
-            systemPrompt = "你是开发 Agent",
+            systemPrompt = $"你是{name}",
         });
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<AgentDetailDto>())!;
