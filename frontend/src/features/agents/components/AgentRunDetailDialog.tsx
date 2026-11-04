@@ -31,13 +31,19 @@ export function AgentRunDetailDialog({ runId, open, onOpenChange }: AgentRunDeta
   const [liveLogs, setLiveLogs] = useState<
     Array<{ sequence: number; kind: string; content: string }>
   >([]);
+  const [liveOutput, setLiveOutput] = useState("");
 
   useEffect(() => {
     if (!open || runId === null) {
       return;
     }
     setLiveLogs([]);
+    setLiveOutput("");
     const source = new EventSource(`/api/agent-runs/${runId}/stream`);
+    const onToken = (event: MessageEvent<string>) => {
+      const payload = JSON.parse(event.data) as { delta: string };
+      setLiveOutput((previous) => previous + payload.delta);
+    };
     const onLog = (event: MessageEvent<string>) => {
       const log = JSON.parse(event.data) as {
         sequence: number;
@@ -52,6 +58,7 @@ export function AgentRunDetailDialog({ runId, open, onOpenChange }: AgentRunDeta
       source.close();
       void run.refetch();
     };
+    source.addEventListener("token", onToken as EventListener);
     source.addEventListener("log", onLog as EventListener);
     source.addEventListener("done", onDone);
     source.onerror = () => source.close();
@@ -86,6 +93,15 @@ export function AgentRunDetailDialog({ runId, open, onOpenChange }: AgentRunDeta
               </span>
             ) : null}
           </div>
+
+          {liveOutput !== "" ? (
+            <div className="space-y-1">
+              <p className="text-xs font-medium">{t("agentruns:liveOutput")}</p>
+              <pre className="max-h-40 overflow-auto whitespace-pre-wrap rounded-md bg-muted/50 p-2 font-mono text-xs">
+                {liveOutput}
+              </pre>
+            </div>
+          ) : null}
 
           {liveLogs.length > 0 ? (
             <div className="space-y-1">

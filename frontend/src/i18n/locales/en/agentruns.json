@@ -41,5 +41,6 @@
   "prompt": "Prompt",
   "retry": "Retry",
   "retried": "Retried and queued",
-  "liveLogs": "Live logs (SSE)"
+  "liveLogs": "Live logs (SSE)",
+  "liveOutput": "Live output (streaming)"
 }
