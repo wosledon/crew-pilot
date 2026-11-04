@@ -35,10 +35,11 @@ npm run dev
 
 ```bash
 dotnet build CrewPilot.slnx      # 构建解决方案
-dotnet test                      # 运行全部测试（122 项）
+dotnet test                      # 运行全部测试（123 项）
 cd frontend && npm run build     # 前端生产构建（tsc + vite）
 cd frontend && npm run lint      # ESLint
 cd frontend && npm run test:run  # 前端 Vitest（13 项）
+cd frontend && npm run test:e2e  # Playwright E2E（自动启动 API + Vite）
 cd frontend && npm run api:types # 由 docs/openapi.json 生成 API 类型
 
 # 导出最新 OpenAPI（先启动 API），覆盖 docs/openapi.json
@@ -82,7 +83,7 @@ docs/PRD.md                 # 产品需求（事实来源）
 - [x] Agent 数字员工：岗位/模型/提示词/工具权限 CRUD + 试运行
 - [x] AgentEngine：Microsoft Agent Framework（MAF 1.27）落地，工具白名单 + worktree 隔离
 - [x] 认领闭环：指派 → 后台执行 → 日志/产物/token 留痕 → 工时 1:1 折算 → PR 回填 → 可取消接管
-- [x] 测试：122 项后端 + 13 项前端（Vitest），全部绿
+- [x] 测试：123 项后端 + 13 项前端（Vitest）+ 2 条 Playwright E2E，全部绿
 - [x] 硬化：可取消的 AgentRun、工具白名单生效、路径沙箱、命令不经 shell、`LocalPath` 可配置
 - [x] 协作：评论（@Agent 触发执行并回写）、附件上传下载、活动流时间线
 - [x] 里程碑：CRUD + 迭代归属 + 甘特图标记
@@ -96,4 +97,5 @@ docs/PRD.md                 # 产品需求（事实来源）
 - [x] 工作项视图：卡片/列表切换、多选批量流转/指派/删除、看板标签筛选
 - [x] M3：工作流可视化编辑器、Agent 团队管理、项目默认团队（按岗位解析 Agent）
 - [x] 报表：工时/成本按迭代与日期过滤（甘特页过滤器）
-- [ ] 剩余：手写类型逐步迁移到生成契约、Playwright E2E、旧版 MCP SSE 双通道、可视化运行监控增强
+- [x] E2E：Playwright 主链路（项目/工作项/看板）+ CI job；试运行支持注入工作项上下文
+- [ ] 剩余：手写类型逐步迁移到生成契约、旧版 MCP SSE 双通道、可视化运行监控增强

@@ -107,7 +107,8 @@ nginx 参考配置见 `frontend/nginx.conf`。
 GitHub Actions：`.github/workflows/ci.yml`
 
 - backend：`dotnet restore/build/test`（Release）
-- frontend：`npm ci` + `lint` + `format:check` + `test:run` + `build`
+- frontend：`npm ci` + `lint` + `format:check` + `test:run` + OpenAPI 类型校验 + `build`
+- e2e：安装 Chromium 后运行 `npm run test:e2e`（自动启动 API + Vite），失败上传 trace
 
 ## 6. 常见问题
 

@@ -8,8 +8,8 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 122 项测试全绿 |
-| 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest 全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 123 项测试全绿 |
+| 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
 | M2 | 完成并硬化（取消/沙箱/工具权限/LocalPath 已修） |
@@ -85,7 +85,7 @@
 - [x] PostgreSQL 支持（Npgsql + provider 切换 + 独立迁移程序集 + compose 覆盖；Round 10）
 - [x] CI（GitHub Actions：build/test/lint）+ Dockerfile + compose + 部署文档（Round 7）
 - [~] OpenAPI 生成前端客户端：已导出 `docs/openapi.json` + 生成 `api-schema.d.ts` + 契约别名（Round 15），手写类型逐步迁移中
-- [x] 前端测试（Vitest + Testing Library 起步，Round 8；Playwright E2E 待补）
+- [x] 前端测试：Vitest（13 项）+ Playwright E2E 起步（Round 16，2 条主链路）
 - [ ] 测试补齐：真实 MAF 适配层、取消、沙箱、worktree、安全用例
 - [ ] 文档更新：README 进度、AGENTS 现状、README.en
 
@@ -194,7 +194,7 @@
 - [x] 工具权限真正生效（Round 1）
 - [x] 提示词模板变量替换（{{title}}/{{requirement}}/{{acceptanceCriteria}}/{{type}}/{{status}}/{{priority}}，Round 9）
 - [ ] 沙箱策略字段
-- [ ] 试运行可选需求并注入上下文
+- [x] 试运行可选需求并注入上下文（Round 16）
 
 ### 5.3 Agent 团队（P1）
 
@@ -292,6 +292,14 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 审计 ✅ Round 6；认证 P5 |
 
 ## 4. 每轮工作日志
+
+### Round 16（2026-11-04）
+
+- 试运行上下文（PRD 5.2）：`POST /api/agents/{id}/runs` 支持 `workItemId`，注入标题/类型/状态/描述/验收标准；前端试运行弹窗增加项目/工作项选择；集成测试断言提示词内容
+- Playwright E2E 起步（P5）：`frontend/e2e/smoke.spec.ts` 覆盖「创建项目 → 工作项 → 看板查看」「Agent 页加载」；配置自动启动 API（http profile）与 Vite dev server；CI 新增独立 e2e job（安装 Chromium、失败上传 trace）
+- 工程：`.gitignore` 忽略 Playwright 产物；format 检查扩展到 e2e 与配置文件
+- 测试：后端 122 → 123（试运行上下文），E2E 2/2 通过；前端 13 项仍绿
+- 验证：`dotnet test`、`npm run lint` / `format:check` / `test:run` / `test:e2e` / `build` 全绿
 
 ### Round 15（2026-11-04）
 
