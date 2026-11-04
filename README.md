@@ -35,7 +35,7 @@ npm run dev
 
 ```bash
 dotnet build CrewPilot.slnx      # 构建解决方案
-dotnet test                      # 运行全部测试（133 项）
+dotnet test                      # 运行全部测试（139 项）
 cd frontend && npm run build     # 前端生产构建（tsc + vite）
 cd frontend && npm run lint      # ESLint
 cd frontend && npm run test:run  # 前端 Vitest（13 项）
@@ -83,14 +83,14 @@ docs/PRD.md                 # 产品需求（事实来源）
 - [x] Agent 数字员工：岗位/模型/提示词/工具权限 CRUD + 试运行
 - [x] AgentEngine：Microsoft Agent Framework（MAF 1.27）落地，工具白名单 + worktree 隔离
 - [x] 认领闭环：指派 → 后台执行 → 日志/产物/token 留痕 → 工时 1:1 折算 → PR 回填 → 可取消接管
-- [x] 测试：133 项后端 + 13 项前端（Vitest）+ 2 条 Playwright E2E，全部绿
+- [x] 测试：139 项后端 + 13 项前端（Vitest）+ 2 条 Playwright E2E，全部绿
 - [x] 硬化：可取消的 AgentRun、工具白名单生效、路径沙箱、命令不经 shell、`LocalPath` 可配置
 - [x] 协作：评论（@Agent 触发执行并回写）、附件上传下载、活动流时间线
 - [x] 里程碑：CRUD + 迭代归属 + 甘特图标记
 - [x] 工作项/项目：标签与编辑删除、Task 父子与流转、指派人变更、项目归档与成员管理、工时归属/剩余工时
 - [x] M3 核心：工作流编排、审批策略、卡点队列、失败重试、三条内置模板、Agent 团队实体
 - [x] M4 主体：项目 CI/CD 集成（Token 加密）、gh/glab PR/MR/CI/Release、合并自动流转、发布面板
-- [x] M5 主体：Skills 装配与运行时注入、MCP 配置/授权/HTTP+旧版 SSE+stdio 运行时工具、Token 成本报表、审计日志
+- [x] M5 主体：Skills 装配与运行时注入、MCP 配置/授权/HTTP+旧版 SSE+stdio 运行时工具/工具级审计、Token 成本报表
 - [x] OpenAPI：导出 spec、生成前端契约类型、CI 校验生成结果
 - [x] P5 部分：SignalR 实时推送、GitHub Actions CI、Docker/compose（SQLite/PostgreSQL 双 provider）、结构化 JSON 日志 + 关联 ID、前后端测试
 - [x] 原型工坊：HTML 编辑 + 严格 CSP 沙箱预览、URL/图片/MCP 引用、图片上传、版本历史与恢复、需求关联
@@ -101,4 +101,4 @@ docs/PRD.md                 # 产品需求（事实来源）
 - [x] 安全：可选单用户密码认证（Cookie）、审计日志、DPAPI/AES-GCM 机密保护、原型 CSP
 - [x] 看板 Agent 实时状态（最近 Run/进行中徽标）、缺陷↔需求关联
 - [x] 报表：工时/成本按迭代与日期过滤、人力成本（工时×时薪）、估算偏差与超支项
-- [ ] 剩余：手写类型逐步迁移到生成契约、MCP 工具级审计、可视化运行监控增强
+- [ ] 剩余：手写类型逐步迁移到生成契约、可视化运行监控增强

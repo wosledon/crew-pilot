@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 133 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 139 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -71,7 +71,7 @@
 - [x] MCP：Server 配置、认证加密、启停、连通性测试、按 Agent 授权
 - [x] MCP 运行时：Streamable HTTP 客户端（initialize / tools/list / tools/call，Round 9）
 - [x] MCP 运行时：stdio 传输（Round 15）、旧版 HTTP+SSE 双通道（Round 20）
-- [ ] MCP 收尾：工具级审计
+- [x] MCP 收尾：工具级审计（Round 21）
 - [x] 成本统计：token × 模型单价 → 项目级费用，按供应商/模型汇总
 - [x] 审计日志：敏感操作留痕 + 查询 API/页面
 - [x] 结构化日志（生产 JSON console，Round 14）+ 请求关联 ID
@@ -292,6 +292,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 21（2026-11-04）
+
+- MCP 工具级审计（PRD 5.7）：新增 `McpRouteInvoker` 包装每次 `tools/call`，记录服务器/工具/耗时/成功失败/错误（不含参数原文）；`McpToolSession` 暴露运行内调用审计队列
+- `AgentRunExecutor` 在运行结束（含失败/取消）统一落库 `AuditLog`：action `mcp.tool.called`、projectId、targetId `server:tool`、detail JSON（runId/workItemId/agent/elapsedMs）
+- 测试：133 → 139（成功/失败审计、未知工具、工具名清洗），`dotnet test` 全绿；前端 lint / format / test / build 仍绿
+- 验证：`dotnet test`、`npm run lint` / `format:check` / `test:run` / `build` 全绿
 
 ### Round 20（2026-11-04）
 
