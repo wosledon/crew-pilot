@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 128 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 131 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -119,7 +119,7 @@
 - [x] 创建/查询、严重级别、复现步骤、环境、状态机
 - [x] 编辑缺陷字段（Round 3）
 - [ ] 测试 Agent 验证后自动流转
-- [ ] 关联需求 UI
+- [x] 关联需求 UI（Round 18：缺陷编辑绑定需求 + 详情展示）
 
 ### 4.4 原型工坊（P0）
 
@@ -247,7 +247,7 @@
 ### 5.9 Agent 认领闭环（P0）
 
 - [x] 指派 → 入队 → 执行 → 日志/产物/token → 工时 → PR 回填
-- [ ] 看板卡片显示 Agent 头像/实时状态
+- [x] 看板卡片显示 Agent 头像/实时状态（Round 18：最近 Run 徽标 + 5s 刷新/SignalR）
 - [x] 工作流完成时自动流转工作项状态（InProgress→InReview / Fixing→PendingVerification）
 - [ ] Agent 作为项目成员/指派人
 - [ ] PR 创建与合并（当前仅从输出正则抓链接）
@@ -292,6 +292,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 18（2026-11-04）
+
+- 缺陷↔需求关联（PRD 4.3）：创建/编辑缺陷可绑定同项目需求（`RelatedRequirementId` 校验）、详情返回需求标题；前端编辑弹窗下拉 + 详情展示
+- 看板 Agent 实时状态（PRD 5.9）：`GET /api/projects/{id}/agent-activity` 返回每个工作项最近一次 Run（进行中优先）；看板卡片显示 🤖 Agent + 状态徽标，5s 轮询（SignalR 事件同时刷新）
+- 测试：128 → 131（缺陷关联/跨项目校验、Agent 活动），`dotnet test` 全绿；前端 13 项 + E2E 2 条仍通过
+- 验证：`dotnet test`、`npm run lint` / `format:check` / `test:run` / `test:e2e` / `build` 全绿
 
 ### Round 17（2026-11-04）
 
