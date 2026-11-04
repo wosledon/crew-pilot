@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 131 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 132 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -139,9 +139,9 @@
 - [x] 登记人归属（Round 3：Owner / Agent 成员）
 - [x] 剩余工时自动扣减（Round 3）
 - [x] token 成本视图（Round 6，支持迭代/日期过滤，Round 14）
-- [ ] 人力成本视图（工时 × 单价）
+- [x] 人力成本视图（工时 × 成员时薪，Round 19）
 - [x] 报表按迭代/日期过滤（Round 14）
-- [ ] 估算偏差分析（预估 vs 实际趋势）
+- [x] 估算偏差分析（按类型预估/已耗/偏差%/超支项，Round 19）
 - [ ] 甘特图按成员泳道汇总
 
 ### 4.6 任务与迭代看板（P0/P1）
@@ -292,6 +292,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 19（2026-11-04）
+
+- 人力成本（PRD 4.5/4.8）：`ProjectMember.HourlyRate` + 迁移（SQLite/PG）；成员卡可直接编辑时薪；`GET /api/projects/{id}/human-cost-report`（工时 × 时薪，按成员汇总）；甘特页新增人力成本卡
+- 估算偏差（PRD 4.8）：`GET /api/projects/{id}/estimate-deviation`（按类型：预估/已耗/偏差小时/偏差%/超支项数）；甘特页新增估算偏差卡（超支高风险标记）
+- 测试：131 → 132（人力成本 + 偏差计算），`dotnet test` 全绿；前端 13 项 + E2E 2 条仍通过
+- 验证：`dotnet test`、`npm run lint` / `format:check` / `test:run` / `test:e2e` / `build` 全绿
 
 ### Round 18（2026-11-04）
 
