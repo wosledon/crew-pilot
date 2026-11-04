@@ -9,7 +9,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 158 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 160 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -165,7 +165,7 @@
 - [x] 依赖关系 FS/SS（Round 1：实体/API/甘特 UI，环路与跨项目校验）
 - [x] 关键路径（Round 1：按预估工时加权最长链，甘特高亮）
 - [x] 工时泳道（Round 2：甘特页按指派人工时占比条）
-- [~] PM Agent 自动更新进度/周报（P2）
+- [x] PM Agent 自动更新进度/周报（Round 34：数据周报 + 交给 PM Agent 生成文字版）
 
 ### 4.8 评论、附件与活动流（P0/P1）
 
@@ -295,6 +295,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 34（2026-11-05，P2 演进 Round 3）
+
+- PM 周报（PRD 4.7 P2）：`GET /api/projects/{id}/weekly-report?days=7` 汇总完成/进行中工作项、登记工时、Agent 执行次数、未解决卡点、无更新风险，输出 Markdown
+- `POST /api/projects/{id}/weekly-report/agent` 查找岗位 manager 的启用 Agent，创建 `weekly-report` AgentRun（提示词含周报数据），入队执行；无 PM Agent 返回 404
+- 前端甘特页新增「PM 周报」卡片：生成预览 + 交给 PM Agent（toast 显示运行号）
+- 测试：158 → 160（周报汇总内容、PM Agent 调度/无 PM 404），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 33（2026-11-05，P2 演进 Round 2）
 

@@ -9,7 +9,7 @@
 | 项 | 命令 | 结果 |
 | --- | --- | --- |
 | 后端构建 | `dotnet build CrewPilot.slnx` | 0 警告 / 0 错误 |
-| 后端测试 | `dotnet test CrewPilot.slnx` | **158 项通过**（50 单测 + 108 集成） |
+| 后端测试 | `dotnet test CrewPilot.slnx` | **160 项通过**（50 单测 + 110 集成） |
 | 前端静态检查 | `npm run lint` / `npm run format:check` | 0 error，格式通过 |
 | 前端单测 | `npm run test:run` | **13 项通过** |
 | 前端构建 | `npm run build` | 通过（tsc + vite） |
@@ -70,7 +70,7 @@ CI：`.github/workflows/ci.yml` 含 backend / frontend / e2e 三个 job。
 ### 4.7 甘特图（P1）
 
 - [x] 迭代时间线、工作项截止日、逾期标红、里程碑标记
-- [x] 依赖关系 FS/SS（实体/API/甘特 UI，环路与跨项目校验）+ 关键路径高亮（Round 1）
+- [x] 依赖关系 FS/SS（实体/API/甘特 UI，环路与跨项目校验）+ 关键路径高亮（Round 1）`n- [x] PM 周报：数据汇总预览 + 交给 PM Agent 生成（Round 34）
 - [x] 工时泳道/成员泳道（Round 2：按指派人汇总已耗/预估与工作项数）
 
 ### 4.8 评论、附件与活动流（P0/P1）
@@ -177,7 +177,7 @@ PRD 第 4 节：P2 = 后续演进，不阻塞 v1 验收。
 | 项 | 说明 |
 | --- | --- |
 
-| PM Agent 自动更新进度/周报 | P2 |
+
 | 多文件原型 | P2 |
 | 富文本描述 | P2 |
 | 500+ 卡片性能压力验证 | P2 |
