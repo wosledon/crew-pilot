@@ -38,7 +38,9 @@ public sealed record WorkItemDetailDto(
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,
     string? Tags,
-    Guid? ParentWorkItemId);
+    Guid? ParentWorkItemId,
+    Guid? RelatedRequirementId,
+    string? RelatedRequirementTitle);
 
 public sealed record CreateWorkItemRequest(
     string Type,
@@ -56,7 +58,8 @@ public sealed record CreateWorkItemRequest(
     string? ReproSteps,
     string? Environment,
     string? Tags = null,
-    Guid? ParentWorkItemId = null);
+    Guid? ParentWorkItemId = null,
+    Guid? RelatedRequirementId = null);
 
 public sealed record UpdateWorkItemRequest(
     string Title,
@@ -75,7 +78,8 @@ public sealed record UpdateWorkItemRequest(
     string? Tags = null,
     Guid? ParentWorkItemId = null,
     string? BranchUrl = null,
-    string? PrUrl = null);
+    string? PrUrl = null,
+    Guid? RelatedRequirementId = null);
 
 public sealed record TransitionRequest(string ToStatus);
 

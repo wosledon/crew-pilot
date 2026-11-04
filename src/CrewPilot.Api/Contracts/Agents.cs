@@ -83,3 +83,11 @@ public sealed record AgentRunDetailDto(
 public sealed record AssignAgentRequest(Guid AgentId);
 
 public sealed record PreviewAgentRequest(string Prompt, Guid? WorkItemId = null);
+
+/// <summary>工作项最近一次 Agent 活动（看板实时状态）。</summary>
+public sealed record WorkItemAgentActivityDto(
+    Guid WorkItemId,
+    Guid AgentRunId,
+    string AgentName,
+    string Status,
+    DateTimeOffset UpdatedAt);

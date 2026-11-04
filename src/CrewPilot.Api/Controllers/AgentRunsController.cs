@@ -10,8 +10,7 @@ namespace CrewPilot.Api.Controllers;
 public sealed class AgentRunsController(CrewPilotDbContext db) : ControllerBase
 {
     [HttpGet("api/agent-runs")]
-    public async Task<ActionResult<IReadOnlyList<AgentRunListItemDto>>> List(
-        [FromQuery] Guid? projectId, [FromQuery] Guid? workItemId, [FromQuery] Guid? agentId, CancellationToken ct = default)
+    public async Task<ActionResult<IReadOnlyList<AgentRunListItemDto>>> List(        [FromQuery] Guid? projectId, [FromQuery] Guid? workItemId, [FromQuery] Guid? agentId, CancellationToken ct = default)
     {
         var query = db.AgentRuns.AsNoTracking().AsQueryable();
         if (projectId.HasValue)
@@ -57,6 +56,46 @@ public sealed class AgentRunsController(CrewPilotDbContext db) : ControllerBase
             .ToList();
         return Ok(items);
     }
+
+    /// <summary>项目内每个工作项最近一次 Agent 活动（优先进行中），供看板展示实时状态。</summary>
+    [HttpGet("api/projects/{projectId:guid}/agent-activity")]
+    public async Task<ActionResult<IReadOnlyList<WorkItemAgentActivityDto>>> Activity(
+        Guid projectId, CancellationToken ct)
+    {
+        var rows = await db.AgentRuns
+            .AsNoTracking()
+            .Where(r => r.WorkItem != null && r.WorkItem.ProjectId == projectId &&
+                        r.WorkItemId != null)
+            .Select(r => new
+            {
+                r.Id,
+                r.WorkItemId,
+                AgentName = r.Agent.Name,
+                r.Status,
+                r.CreatedAt,
+                r.FinishedAt,
+            })
+            .ToListAsync(ct);
+
+        var activities = rows
+            .GroupBy(r => r.WorkItemId!.Value)
+            .Select(group => group
+                .OrderByDescending(r => IsActive(r.Status))
+                .ThenByDescending(r => r.CreatedAt)
+                .First())
+            .Select(r => new WorkItemAgentActivityDto(
+                r.WorkItemId!.Value,
+                r.Id,
+                r.AgentName,
+                r.Status.ToString().ToLowerInvariant(),
+                (r.FinishedAt ?? r.CreatedAt)))
+            .ToList();
+        return Ok(activities);
+    }
+
+    /// <summary>进行中/等待人工的运行优先于历史运行。</summary>
+    private static bool IsActive(AgentRunStatus status) =>
+        status is AgentRunStatus.Queued or AgentRunStatus.Running or AgentRunStatus.WaitingForHuman;
 
     [HttpGet("api/agent-runs/{id:guid}")]
     public async Task<ActionResult<AgentRunDetailDto>> Get(Guid id, CancellationToken ct)

@@ -125,6 +125,18 @@ public sealed class WorkItemsController(
             task.ParentWorkItemId = parentId ?? Guid.Empty;
         }
 
+        if (workItem is Defect defect)
+        {
+            var (relatedId, relatedError) = await ResolveRelatedRequirementAsync(
+                projectId, request.RelatedRequirementId, ct);
+            if (relatedError is not null)
+            {
+                return Problem(detail: relatedError, statusCode: 400);
+            }
+
+            defect.RelatedRequirementId = relatedId;
+        }
+
         db.WorkItems.Add(workItem);
         await AddActivityAsync(projectId, workItem.Id, "workitem.created", new { type, workItem.Title }, ct);
         await db.SaveChangesAsync(ct);
@@ -169,6 +181,14 @@ public sealed class WorkItemsController(
                 defect.Severity = ParseSeverity(request.Severity);
                 defect.ReproSteps = request.ReproSteps;
                 defect.Environment = request.Environment;
+                var (relatedId, relatedError) = await ResolveRelatedRequirementAsync(
+                    workItem.ProjectId, request.RelatedRequirementId, ct);
+                if (relatedError is not null)
+                {
+                    return Problem(detail: relatedError, statusCode: 400);
+                }
+
+                defect.RelatedRequirementId = relatedId;
                 break;
             case TaskItem task:
                 var parentId = await ResolveParentAsync(workItem.ProjectId, request.ParentWorkItemId, ct);
@@ -396,6 +416,27 @@ public sealed class WorkItemsController(
         }
 
         var loggedHours = await GetLoggedHoursAsync([row.Id], ct);
+        Guid? relatedRequirementId = null;
+        string? relatedRequirementTitle = null;
+        if (row.Type == "defect")
+        {
+            relatedRequirementId = await db.WorkItems
+                .OfType<Defect>()
+                .AsNoTracking()
+                .Where(d => d.Id == id)
+                .Select(d => d.RelatedRequirementId)
+                .FirstOrDefaultAsync(ct);
+            if (relatedRequirementId is Guid requirementId)
+            {
+                relatedRequirementTitle = await db.WorkItems
+                    .OfType<Requirement>()
+                    .AsNoTracking()
+                    .Where(r => r.Id == requirementId)
+                    .Select(r => r.Title)
+                    .FirstOrDefaultAsync(ct);
+            }
+        }
+
         return new WorkItemDetailDto(
             row.Id, row.Type, row.Title, row.Status,
             row.Priority.ToString().ToLowerInvariant(), row.Description, row.AcceptanceCriteria,
@@ -403,7 +444,8 @@ public sealed class WorkItemsController(
             row.StoryPoints, row.EstimatedHours,
             loggedHours.TryGetValue(row.Id, out var hours) ? hours : 0m,
             row.RemainingHours, row.AssigneeName, row.IterationId, row.DueDate, row.BranchUrl, row.PrUrl,
-            row.CreatedAt, row.UpdatedAt, row.Tags, row.ParentWorkItemId);
+            row.CreatedAt, row.UpdatedAt, row.Tags, row.ParentWorkItemId,
+            relatedRequirementId, relatedRequirementTitle);
     }
 
     /// <summary>工作项查询行（跨 TPH 三类统一视图）。</summary>
@@ -677,6 +719,23 @@ public sealed class WorkItemsController(
         var exists = await db.WorkItems.AnyAsync(
             w => w.Id == parentWorkItemId && w.ProjectId == projectId, ct);
         return exists ? parentWorkItemId : null;
+    }
+
+    /// <summary>校验并解析缺陷关联需求：必须存在且属于同一项目。</summary>
+    private async Task<(Guid? Id, string? Error)> ResolveRelatedRequirementAsync(
+        Guid projectId, Guid? relatedRequirementId, CancellationToken ct)
+    {
+        if (relatedRequirementId is null || relatedRequirementId == Guid.Empty)
+        {
+            return (null, null);
+        }
+
+        var exists = await db.WorkItems
+            .OfType<Requirement>()
+            .AnyAsync(r => r.Id == relatedRequirementId && r.ProjectId == projectId, ct);
+        return exists
+            ? (relatedRequirementId, null)
+            : (null, "关联需求不存在或不属于该项目");
     }
 
     /// <summary>单用户产品：工时登记人默认为 Owner 本人。</summary>
