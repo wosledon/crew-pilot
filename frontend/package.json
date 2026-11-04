@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "test": "vitest",
     "test:run": "vitest run",
-    "api:types": "openapi-typescript ../docs/openapi.json -o src/lib/api-schema.d.ts",
+    "api:types": "openapi-typescript ../docs/openapi.json -o src/lib/api-schema.d.ts && node scripts/normalize-openapi-types.mjs",
     "test:e2e": "playwright test",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\" \"e2e/**/*.ts\" \"playwright.config.ts\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css,json}\" \"e2e/**/*.ts\" \"playwright.config.ts\"",

@@ -1,375 +1,118 @@
-/** 与后端 DTO 对齐的前端类型（后续切换为 OpenAPI 生成客户端） */
+/**
+ * 前端类型：API 响应/请求优先取自 OpenAPI 生成契约（`api-schema.d.ts`），
+ * 仅保留领域联合类型（状态、类型枚举）与前端专用结构。
+ * 新增后端 DTO 后运行 `npm run api:types` 同步生成。
+ */
+import type { components } from "./api-schema";
+
+type Api = components["schemas"];
 
 export type ProjectStatus = "active" | "archived";
 
 /** 单用户认证状态 */
-export interface AuthStatus {
-  enabled: boolean;
-  authenticated: boolean;
-}
+export type AuthStatus = Api["AuthStatusDto"];
 
-export interface ProjectSummary {
-  id: string;
-  key: string;
-  name: string;
-  repoUrl: string | null;
+export type ProjectSummary = Omit<Api["ProjectSummaryDto"], "status"> & {
   status: ProjectStatus;
-  workItemCount: number;
-  createdAt: string;
-}
+};
 
-export interface ProjectDetail {
-  id: string;
-  key: string;
-  name: string;
-  description: string | null;
-  repoUrl: string | null;
-  localPath: string | null;
+export type ProjectDetail = Omit<Api["ProjectDetailDto"], "status"> & {
   status: ProjectStatus;
-  workItemCount: number;
-  createdAt: string;
-  updatedAt: string;
-  defaultTeamId: string | null;
-}
+};
 
 export type WorkItemType = "requirement" | "defect" | "task";
 
-export interface WorkItemListItem {
-  id: string;
+export type WorkItemListItem = Omit<Api["WorkItemListItemDto"], "type"> & {
   type: WorkItemType;
-  title: string;
-  status: string;
-  priority: string;
-  assigneeName: string | null;
-  estimatedHours: number | null;
-  loggedHours: number;
-  remainingHours: number | null;
-  dueDate: string | null;
-  prUrl: string | null;
-  updatedAt: string;
-  tags: string | null;
-}
+};
 
-export interface WorkItemDetail {
-  id: string;
+export type WorkItemDetail = Omit<Api["WorkItemDetailDto"], "type"> & {
   type: WorkItemType;
-  title: string;
-  status: string;
-  priority: string;
-  description: string | null;
-  acceptanceCriteria: string | null;
-  severity: string | null;
-  reproSteps: string | null;
-  environment: string | null;
-  storyPoints: number | null;
-  estimatedHours: number | null;
-  loggedHours: number;
-  remainingHours: number | null;
-  assigneeName: string | null;
-  iterationId: string | null;
-  dueDate: string | null;
-  branchUrl: string | null;
-  prUrl: string | null;
-  createdAt: string;
-  updatedAt: string;
-  tags: string | null;
-  parentWorkItemId: string | null;
-  relatedRequirementId: string | null;
-  relatedRequirementTitle: string | null;
-}
+};
 
 /** 批量操作结果 */
-export interface BatchItemResult {
-  id: string;
-  ok: boolean;
-  error: string | null;
-}
+export type BatchItemResult = Api["BatchItemResultDto"];
 
-export interface BatchWorkItemsResult {
-  succeeded: number;
-  failed: number;
-  results: BatchItemResult[];
-}
+export type BatchWorkItemsResult = Api["BatchWorkItemsResultDto"];
 
-export interface WorkLog {
-  id: string;
-  hours: number;
-  date: string;
-  note: string | null;
-  memberName: string | null;
-  createdAt: string;
-}
+export type WorkLog = Api["WorkLogDto"];
 
 export type PrototypeType = "html" | "url" | "image" | "mcp";
-export interface Prototype {
-  id: string;
-  projectId: string;
-  requirementId: string | null;
-  name: string;
+
+export type Prototype = Omit<Api["PrototypeDto"], "type"> & {
   type: PrototypeType;
-  content: string;
-  version: number;
-  createdByName: string | null;
-  updatedAt: string;
-}
+};
 
-export interface PrototypeVersion {
-  id: string;
-  prototypeId: string;
-  version: number;
-  name: string;
-  content: string;
-  createdByName: string | null;
-  createdAt: string;
-}
+export type PrototypeVersion = Api["PrototypeVersionDto"];
 
-export interface PrototypeImage {
-  path: string;
-  url: string;
-  size: number;
-}
+export type PrototypeImage = Api["PrototypeImageDto"];
 
 export type IterationStatus = "planned" | "active" | "completed";
 
-export interface IterationListItem {
-  id: string;
-  name: string;
-  goal: string | null;
-  startDate: string;
-  endDate: string;
+export type IterationListItem = Omit<Api["IterationListItemDto"], "status"> & {
   status: IterationStatus;
-  workItemCount: number;
-  estimatedHours: number;
-  loggedHours: number;
-  milestoneId: string | null;
-}
+};
 
-export interface IterationDetail {
-  id: string;
-  projectId: string;
-  name: string;
-  goal: string | null;
-  startDate: string;
-  endDate: string;
+export type IterationDetail = Omit<Api["IterationDetailDto"], "status"> & {
   status: IterationStatus;
-  workItemCount: number;
-  milestoneId: string | null;
-}
+};
 
-export interface Milestone {
-  id: string;
-  projectId: string;
-  name: string;
-  description: string | null;
-  date: string;
-  iterationCount: number;
-}
+export type Milestone = Api["MilestoneDto"];
 
 export type CommentAuthorKind = "user" | "agent";
 
-export interface Comment {
-  id: string;
-  workItemId: string;
-  content: string;
-  authorName: string;
+export type Comment = Omit<Api["CommentDto"], "authorKind"> & {
   authorKind: CommentAuthorKind;
-  createdAt: string;
-}
+};
 
-export interface Attachment {
-  id: string;
-  workItemId: string;
-  fileName: string;
-  contentType: string;
-  size: number;
-  createdAt: string;
-}
+export type Attachment = Api["AttachmentDto"];
 
-export interface BurndownPoint {
-  date: string;
-  remainingHours: number;
-  idealHours: number;
-}
+export type BurndownPoint = Api["BurndownPointDto"];
 
-export interface Burndown {
-  iterationId: string;
-  totalEstimatedHours: number;
-  points: BurndownPoint[];
-}
+export type Burndown = Api["BurndownDto"];
 
-export interface HoursByGroup {
-  key: string;
-  label: string;
-  estimatedHours: number;
-  loggedHours: number;
-}
+export type HoursByGroup = Api["HoursByGroupDto"];
 
-export interface HoursReport {
-  totalEstimatedHours: number;
-  totalLoggedHours: number;
-  byType: HoursByGroup[];
-  byAssignee: HoursByGroup[];
-  byMember: HoursByGroup[];
-}
+export type HoursReport = Api["HoursReportDto"];
 
 /** 人力成本报表 */
-export interface HumanCostByMember {
-  key: string;
-  label: string;
-  hours: number;
-  hourlyRate: number | null;
-  cost: number;
-}
+export type HumanCostByMember = Api["HumanCostByMemberDto"];
 
-export interface HumanCostReport {
-  totalHours: number;
-  totalCost: number;
-  byMember: HumanCostByMember[];
-}
+export type HumanCostReport = Api["HumanCostReportDto"];
 
 /** 估算偏差报表 */
-export interface EstimateDeviationRow {
-  key: string;
-  label: string;
-  estimatedHours: number;
-  loggedHours: number;
-  deviationHours: number;
-  deviationPercent: number | null;
-  itemCount: number;
-  overrunCount: number;
-}
+export type EstimateDeviationRow = Api["EstimateDeviationRowDto"];
 
-export interface EstimateDeviationReport {
-  estimatedHours: number;
-  loggedHours: number;
-  deviationHours: number;
-  deviationPercent: number | null;
-  itemCount: number;
-  overrunCount: number;
-  byType: EstimateDeviationRow[];
-}
+export type EstimateDeviationReport = Api["EstimateDeviationReportDto"];
 
-export interface ProjectMember {
-  id: string;
-  projectId: string;
+export type ProjectMember = Omit<Api["ProjectMemberDto"], "kind"> & {
   kind: "user" | "agent";
-  role: string;
-  displayName: string;
-  createdAt: string;
-  hourlyRate: number | null;
-}
+};
 
-export interface Activity {
-  id: string;
-  eventType: string;
-  payload: string;
-  actorName: string | null;
-  actorKind: string | null;
-  workItemId: string | null;
-  createdAt: string;
-}
+export type Activity = Api["ActivityDto"];
 
-export interface ProviderListItem {
-  id: string;
-  name: string;
-  baseUrl: string;
-  source: string;
-  enabled: boolean;
-  isDefault: boolean;
-  modelCount: number;
-}
+export type ProviderListItem = Api["ProviderListItemDto"];
 
-export interface ModelDto {
-  id: string;
-  modelId: string;
-  displayName: string;
-  contextLength: number | null;
-  capabilities: string | null;
-  inputPricePerMillion: number | null;
-  outputPricePerMillion: number | null;
-  enabled: boolean;
-}
+export type ModelDto = Api["ModelDto"];
 
-export interface ProviderDetail {
-  id: string;
-  name: string;
-  baseUrl: string;
-  source: string;
-  enabled: boolean;
-  isDefault: boolean;
-  models: ModelDto[];
-}
+export type ProviderDetail = Api["ProviderDetailDto"];
 
-export interface AgentListItem {
-  id: string;
-  name: string;
-  job: string;
-  providerName: string;
-  model: string;
-  enabled: boolean;
-  runCount: number;
-}
+export type AgentListItem = Api["AgentListItemDto"];
 
-export interface AgentDetail {
-  id: string;
-  name: string;
-  job: string;
-  providerId: string;
-  providerName: string;
-  model: string;
-  systemPrompt: string;
-  tools: string | null;
-  commandWhitelist: string | null;
-  enabled: boolean;
-  skillIds: string[];
-  mcpServerIds: string[];
-}
+export type AgentDetail = Api["AgentDetailDto"];
 
 export type AgentRunStatus =
   "queued" | "running" | "succeeded" | "failed" | "canceled" | "waitingforhuman";
 
-export interface AgentRunListItem {
-  id: string;
-  agentName: string;
-  workItemId: string | null;
-  workItemTitle: string | null;
-  trigger: string;
+export type AgentRunListItem = Omit<Api["AgentRunListItemDto"], "status"> & {
   status: AgentRunStatus;
-  error: string | null;
-  createdAt: string;
-  finishedAt: string | null;
-  duration: string | null;
-  promptTokens: number | null;
-  completionTokens: number | null;
-}
+};
 
-export interface AgentRunLog {
-  sequence: number;
-  kind: string;
-  content: string;
-  createdAt: string;
-}
+export type AgentRunLog = Api["RunLogDto"];
 
-export interface AgentRunDetail {
-  id: string;
-  agentName: string;
-  model: string | null;
-  workItemId: string | null;
-  workItemTitle: string | null;
-  trigger: string;
+export type AgentRunDetail = Omit<Api["AgentRunDetailDto"], "status"> & {
   status: AgentRunStatus;
-  workingDirectory: string | null;
-  prompt: string;
-  output: string | null;
-  error: string | null;
-  promptTokens: number | null;
-  completionTokens: number | null;
-  createdAt: string;
-  startedAt: string | null;
-  finishedAt: string | null;
-  duration: string | null;
-  logs: AgentRunLog[];
-}
+};
 
 /** 工作流（M3） */
 export type ApprovalPolicy = "auto" | "blockersonly" | "always";
@@ -378,76 +121,31 @@ export type BlockerKind = "agentblocked" | "approval" | "failure";
 export type BlockerStatus = "open" | "resolved";
 export type BlockerResolution = "continue" | "redirect" | "cancel";
 
-export interface WorkflowStep {
-  id: string;
-  order: number;
-  name: string;
-  agentId: string | null;
-  agentName: string | null;
-  requiredJob: string | null;
-  instruction: string | null;
+export type WorkflowStep = Omit<Api["WorkflowStepDto"], "approvalPolicy"> & {
   approvalPolicy: ApprovalPolicy;
-  maxRetries: number;
-  inputContract: string | null;
-  outputContract: string | null;
-}
+};
 
-export interface Workflow {
-  id: string;
-  projectId: string | null;
-  name: string;
-  description: string | null;
-  isTemplate: boolean;
-  enabled: boolean;
+export type Workflow = Omit<Api["WorkflowDto"], "steps"> & {
   steps: WorkflowStep[];
-  createdAt: string;
-  updatedAt: string;
-}
+};
 
-export interface WorkflowTemplateStep {
-  name: string;
-  job: string;
-  instruction: string | null;
+export type WorkflowTemplateStep = Omit<Api["WorkflowTemplateStepDto"], "approvalPolicy"> & {
   approvalPolicy: ApprovalPolicy;
-  maxRetries: number;
-}
+};
 
-export interface WorkflowTemplate {
-  key: string;
-  name: string;
-  description: string;
+export type WorkflowTemplate = Omit<Api["WorkflowTemplateDto"], "steps"> & {
   steps: WorkflowTemplateStep[];
-}
+};
 
-export interface WorkflowRun {
-  id: string;
-  workflowId: string;
-  workflowName: string;
-  workItemId: string;
-  workItemTitle: string;
+export type WorkflowRun = Omit<Api["WorkflowRunDto"], "status"> & {
   status: WorkflowRunStatus;
-  currentStepOrder: number;
-  currentStepId: string | null;
-  createdAt: string;
-  finishedAt: string | null;
-}
+};
 
-export interface Blocker {
-  id: string;
-  projectId: string;
-  workItemId: string;
-  workItemTitle: string;
-  workflowRunId: string | null;
-  agentRunId: string | null;
+export type Blocker = Omit<Api["BlockerDto"], "kind" | "status" | "resolution"> & {
   kind: BlockerKind;
-  reason: string;
-  contextSnapshot: string | null;
   status: BlockerStatus;
   resolution: BlockerResolution | null;
-  resolutionNote: string | null;
-  createdAt: string;
-  resolvedAt: string | null;
-}
+};
 
 export interface WorkflowRunDetail {
   run: WorkflowRun;
@@ -455,113 +153,42 @@ export interface WorkflowRunDetail {
   blockers: Blocker[];
 }
 
-export interface AgentTeamMember {
-  agentId: string;
-  agentName: string;
-  role: string | null;
-}
+export type AgentTeamMember = Api["AgentTeamMemberDto"];
 
-export interface AgentTeam {
-  id: string;
-  projectId: string;
-  name: string;
-  goal: string | null;
-  members: AgentTeamMember[];
-}
+export type AgentTeam = Api["AgentTeamDto"];
 
 /** CI/CD（M4） */
-export interface ProjectIntegration {
-  id: string;
-  projectId: string;
+export type ProjectIntegration = Omit<Api["ProjectIntegrationDto"], "platform"> & {
   platform: "github" | "gitlab";
-  hasToken: boolean;
-  repository: string | null;
-  updatedAt: string;
-}
+};
 
-export interface CiCheck {
-  name: string;
-  status: string;
-  conclusion: string | null;
-  url: string | null;
-}
+export type CiCheck = Api["CiCheckDto"];
 
 export type PullRequestState = "open" | "merged" | "closed" | "unknown";
 export type CiStatus = "success" | "failure" | "pending" | "none";
 
-export interface PullRequestStatus {
+export type PullRequestStatus = Omit<Api["PullRequestStatusDto"], "state" | "ciStatus"> & {
   state: PullRequestState;
   ciStatus: CiStatus;
-  mergeable: boolean | null;
-  url: string | null;
-  checks: CiCheck[];
-}
+};
 
-export interface ReleaseResult {
-  tag: string;
-  url: string | null;
-  message: string;
-}
+export type ReleaseResult = Api["ReleaseDto"];
 
 /** 工作项最近一次 Agent 活动（看板实时状态） */
-export interface WorkItemAgentActivity {
-  workItemId: string;
-  agentRunId: string;
-  agentName: string;
+export type WorkItemAgentActivity = Omit<Api["WorkItemAgentActivityDto"], "status"> & {
   status: AgentRunStatus;
-  updatedAt: string;
-}
+};
 
 /** M5：Skills / MCP / 审计 / 成本 */
-export interface Skill {
-  id: string;
-  name: string;
-  description: string | null;
-  promptContent: string;
-  tools: string | null;
-  scriptPath: string | null;
-  enabled: boolean;
-  agentCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
+export type Skill = Api["SkillDto"];
 
-export interface McpServer {
-  id: string;
-  name: string;
-  endpoint: string;
-  transport: string;
-  hasToken: boolean;
-  enabled: boolean;
-  agentCount: number;
-  updatedAt: string;
-}
+export type McpServer = Api["McpServerDto"];
 
-export interface AuditLogEntry {
-  id: string;
-  projectId: string | null;
-  action: string;
-  targetType: string;
-  targetId: string | null;
-  actor: string;
-  detail: string | null;
-  createdAt: string;
-}
+export type AuditLogEntry = Api["AuditLogDto"];
 
-export interface CostByModel {
-  provider: string;
-  model: string;
-  promptTokens: number;
-  completionTokens: number;
-  cost: number;
-}
+export type CostByModel = Api["CostByModelDto"];
 
-export interface CostReport {
-  totalPromptTokens: number;
-  totalCompletionTokens: number;
-  totalCost: number;
-  byModel: CostByModel[];
-}
+export type CostReport = Api["CostReportDto"];
 
 /** API 错误（携带 ProblemDetails 状态码） */
 export class ApiError extends Error {
