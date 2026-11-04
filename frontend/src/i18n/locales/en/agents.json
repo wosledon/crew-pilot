@@ -20,6 +20,7 @@
   "modelPlaceholder": "Sync the provider catalog first",
   "systemPrompt": "System prompt",
   "systemPromptPlaceholder": "You are a senior developer…",
+  "systemPromptHint": "Template variables: {{title}} / {{requirement}} / {{acceptanceCriteria}} / {{type}} / {{status}} / {{priority}}",
   "tools": "Tools",
   "toolsHint": "read_file / write_file / list_files / run_command (JSON array)",
   "commandWhitelist": "Command whitelist",

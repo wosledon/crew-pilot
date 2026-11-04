@@ -20,6 +20,7 @@
   "modelPlaceholder": "先从供应商同步模型目录",
   "systemPrompt": "系统提示词",
   "systemPromptPlaceholder": "你是一名资深开发者……",
+  "systemPromptHint": "支持模板变量：{{title}} / {{requirement}} / {{acceptanceCriteria}} / {{type}} / {{status}} / {{priority}}",
   "tools": "工具权限",
   "toolsHint": "read_file / write_file / list_files / run_command（JSON 数组）",
   "commandWhitelist": "命令白名单",

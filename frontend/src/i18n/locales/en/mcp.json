@@ -1,6 +1,6 @@
 {
   "title": "MCP",
-  "description": "Model Context Protocol servers: encrypted auth, per-Agent authorization",
+  "description": "Model Context Protocol servers: encrypted auth, per-Agent authorization; Streamable HTTP at runtime",
   "create": "New MCP server",
   "createTitle": "New MCP server",
   "editTitle": "Edit MCP server",

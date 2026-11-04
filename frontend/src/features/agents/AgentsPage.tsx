@@ -254,6 +254,7 @@ export function AgentsPage() {
               placeholder={t("agents:systemPromptPlaceholder")}
               className="min-h-24"
             />
+            <span className="text-xs text-muted-foreground">{t("agents:systemPromptHint")}</span>
           </label>
 
           <label className="block space-y-1.5 text-sm">
