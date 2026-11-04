@@ -14,7 +14,8 @@
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
 | M2 | 完成并硬化（取消/沙箱/工具权限/LocalPath 已修） |
 | M3 | 核心闭环完成（工作流/审批/卡点队列/模板/团队实体） |
-| M4–M5 | 未开工 |
+| M4 | 主体完成（Token 加密、gh/glab、PR/CI 同步、发布） |
+| M5 | 未开工 |
 | 工程化 | 无 CI、无 Docker、无 PostgreSQL、API 类型手写、无前端测试 |
 
 ## 1. 分阶段实施计划
@@ -54,13 +55,14 @@
 - [x] 步骤失败自动重试；通过卡点处理实现单步重跑/改向
 - [~] 前端：工作流面板（模板创建/启动/运行记录/运行时间线）+ 卡点队列页已完成；可视化步骤编辑器待补
 
-### P3 M4 CI/CD
+### P3 M4 CI/CD（Round 5 完成主体）
 
-- [ ] GitHub Token / GitLab Token 加密存储（Project 级或全局）
-- [ ] `gh` / `glab` 进程封装：PR/MR 创建、查询、合并、CI 状态、Release
-- [ ] 工作项 ↔ PR/MR ↔ Issue 关联与 CI 状态回写
-- [ ] 发布流模板（changelog → 审批 → tag → release）
-- [ ] 前端：PR/CI 状态展示、发布操作面板
+- [x] GitHub / GitLab Token 加密存储（Project 级，DPAPI）
+- [x] `gh` / `glab` 进程封装：PR/MR 创建、状态查询、合并、CI 状态、Release
+- [x] 工作项 ↔ PR/MR 关联与 CI 状态回写（合并后自动流转 Done/Closed）
+- [x] 发布流模板（Round 4）+ 直接发布 API（tag → Release）
+- [x] 前端：集成配置卡、PR/CI 状态展示与同步、发布面板
+- [ ] CI 状态实时推送（当前手动同步 / 轮询；SignalR 阶段补齐）
 
 ### P4 M5 打磨
 
@@ -235,12 +237,13 @@
 - [ ] PR 创建与合并（当前仅从输出正则抓链接）
 - [ ] 失败重试
 
-### 6. CI/CD（P1）
+### 6. CI/CD（P1 · Round 5）
 
-- [ ] GitHub `gh` 封装
-- [ ] GitLab `glab` 封装
-- [ ] 发布流
-- [ ] CI 状态回写
+- [x] GitHub `gh` 封装（PR 创建/状态/合并/Release）
+- [x] GitLab `glab` 封装（MR 创建/状态/合并/Release）
+- [x] 发布流（模板 + 直接 Release API）
+- [x] CI 状态回写（手动同步，合并自动流转）
+- [ ] CI 状态实时推送（SignalR 阶段）
 
 ### 8. 架构与安全
 
@@ -273,6 +276,17 @@
 | 15 | 无认证 / 无审计日志 | 全局 | P4/P5 |
 
 ## 4. 每轮工作日志
+
+### Round 5（2026-11-04）
+
+- M4 CI/CD：
+  - `ProjectIntegration` 实体（DPAPI 加密 Token）+ 迁移；WorkItem 增加 `PrState` / `CiStatus`
+  - `IGitCliService` / `GitCliService`：gh/glab PR/MR 创建、状态查询（含 CI checks）、合并、Release；Token 仅通过环境变量注入，不落日志
+  - API：项目集成配置/测试/删除、发布；工作项 PR 创建/查询/同步（合并自动流转 Done/Closed）
+  - 前端：CI/CD 集成配置卡、工作项 PR/CI 状态与同步、项目发布面板；中英文案齐备
+- 工程：`ProcessRunner` 迁至 Infrastructure 并支持环境变量注入
+- 测试：86 → 90（集成配置脱敏/测试、PR 创建/同步/合并流转、发布、未配置场景），`dotnet test` 全绿
+- 验证：`npm run lint` 0 error、`format:check` 通过、`npm run build` 通过
 
 ### Round 4（2026-11-04）
 

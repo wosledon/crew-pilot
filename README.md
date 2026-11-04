@@ -35,7 +35,7 @@ npm run dev
 
 ```bash
 dotnet build CrewPilot.slnx      # 构建解决方案
-dotnet test                      # 运行全部测试（86 项）
+dotnet test                      # 运行全部测试（90 项）
 cd frontend && npm run build     # 前端生产构建（tsc + vite）
 cd frontend && npm run lint      # ESLint（配置随脚手架完善）
 
@@ -72,13 +72,14 @@ docs/PRD.md                 # 产品需求（事实来源）
 - [x] Agent 数字员工：岗位/模型/提示词/工具权限 CRUD + 试运行
 - [x] AgentEngine：Microsoft Agent Framework（MAF 1.27）落地，工具白名单 + worktree 隔离
 - [x] 认领闭环：指派 → 后台执行 → 日志/产物/token 留痕 → 工时 1:1 折算 → PR 回填 → 可取消接管
-- [x] 测试：86 项全绿（单测 + WebApplicationFactory 集成测试，Fake 引擎）
+- [x] 测试：90 项全绿（单测 + WebApplicationFactory 集成测试，Fake 引擎 / Fake CLI）
 - [x] 硬化：可取消的 AgentRun、工具白名单生效、路径沙箱、命令不经 shell、`LocalPath` 可配置
 - [x] 协作：评论（@Agent 触发执行并回写）、附件上传下载、活动流时间线
 - [x] 里程碑：CRUD + 迭代归属 + 甘特图标记
 - [x] 工作项/项目：标签与编辑删除、Task 父子与流转、指派人变更、项目归档与成员管理、工时归属/剩余工时
 - [x] M3 核心：工作流编排、审批策略、卡点队列、失败重试、三条内置模板、Agent 团队实体
-- [ ] M3 收尾：可视化编排编辑器、全局审批默认配置、团队指派 UI
-- [ ] M4：gh/glab CI/CD 集成
+- [x] M4 主体：项目 CI/CD 集成（Token 加密）、gh/glab PR/MR/CI/Release、合并自动流转、发布面板
+- [ ] M4 收尾：CI 实时推送
+- [ ] M5：Skills、MCP、成本统计、部署与加固
 - [ ] M4：gh/glab CI/CD 集成
 - [ ] M5：Skills、设计 MCP、成本统计
