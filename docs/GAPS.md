@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（仅 SQLite）/ 105 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 109 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 10 项 Vitest 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -16,7 +16,7 @@
 | M3 | 核心闭环完成（工作流/审批/卡点队列/模板/团队实体） |
 | M4 | 主体完成（Token 加密、gh/glab、PR/CI 同步、发布） |
 | M5 | 主体完成（Skills/MCP 配置/成本/审计），剩余 MCP 运行时与部署 |
-| 工程化 | CI/Docker/compose/SignalR/前端测试已落地；无 PostgreSQL、API 类型手写 |
+| 工程化 | CI/Docker/compose/SignalR/PG/前端测试已落地；API 类型手写 |
 
 ## 1. 分阶段实施计划
 
@@ -80,7 +80,7 @@
 ### P5 基建与质量
 
 - [x] SignalR 实时推送（工作项状态 / AgentRun 进度 / 卡点，Round 7）
-- [ ] PostgreSQL 支持（Npgsql + provider 切换 + 迁移验证）
+- [x] PostgreSQL 支持（Npgsql + provider 切换 + 独立迁移程序集 + compose 覆盖；Round 10）
 - [x] CI（GitHub Actions：build/test/lint）+ Dockerfile + compose + 部署文档（Round 7）
 - [ ] OpenAPI 生成前端客户端，删除手写类型
 - [x] 前端测试（Vitest + Testing Library 起步，Round 8；Playwright E2E 待补）
@@ -287,6 +287,17 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 审计 ✅ Round 6；认证 P5 |
 
 ## 4. 每轮工作日志
+
+### Round 10（2026-11-04）
+
+- PostgreSQL（P5）：
+  - `Database:Provider` 切换 Sqlite / PostgreSql；独立迁移程序集 `CrewPilot.Infrastructure.PostgreSql`（设计时工厂 + InitialCreate 迁移），SQLite 迁移保持不变
+  - `docker-compose.postgres.yml` 覆盖：postgres:17 + healthcheck + 自动迁移；`docs/DEPLOY.md` 增加 PG 环境变量/迁移/备份说明
+  - 冒烟验证：`Database__Provider=PostgreSql` + `AutoMigrate=false` 启动 API，`/health` 返回 `{"status":"ok","database":"PostgreSql"}`
+- 跨平台机密保护：非 Windows 使用 `AesGcmSecretProtector`（密钥文件 `App_Data/secrets.key`，0600 权限），Docker/Linux 可正常加密 API Key / Token；Windows 继续 DPAPI
+- 运维：新增 `GET /health` 存活探针（返回 database provider）
+- 测试：105 → 109（AES-GCM 往返/密钥复用/篡改、health），`dotnet test` 全绿；前端 10 项仍绿
+- 说明：本机无 PostgreSQL/Docker，未做真实 PG 连接与镜像构建
 
 ### Round 9（2026-11-04）
 
