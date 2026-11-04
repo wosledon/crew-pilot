@@ -82,4 +82,4 @@ public sealed record AgentRunDetailDto(
 
 public sealed record AssignAgentRequest(Guid AgentId);
 
-public sealed record PreviewAgentRequest(string Prompt);
+public sealed record PreviewAgentRequest(string Prompt, Guid? WorkItemId = null);

@@ -257,6 +257,32 @@ public sealed class PlatformExtrasApiTests(CrewPilotApiFactory factory)
     }
 
     [Fact]
+    public async Task AgentPreview_WithWorkItem_InjectsContext()
+    {
+        var client = factory.CreateClient();
+        var project = await ApiTestHelpers.CreateProjectAsync(client);
+        var provider = await ApiTestHelpers.CreateProviderAsync(client);
+        var agent = await ApiTestHelpers.CreateAgentAsync(client, provider.Id);
+        var item = await ApiTestHelpers.CreateRequirementAsync(client, project.Id);
+
+        var response = await client.PostAsJsonAsync($"/api/agents/{agent.Id}/runs", new
+        {
+            prompt = "请分析下一步",
+            workItemId = item.Id,
+        });
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        await ApiTestHelpers.WaitForAsync(
+            () => client.GetFromJsonAsync<List<AgentRunListItemDto>>(
+                $"/api/agent-runs?workItemId={item.Id}"),
+            runs => runs is not null && runs.Any(r => r.Status == "succeeded"));
+
+        factory.Engine.LastRequest!.Prompt.Should().Contain("## 工作项上下文");
+        factory.Engine.LastRequest.Prompt.Should().Contain(item.Title);
+        factory.Engine.LastRequest.Prompt.Should().Contain("类型：requirement");
+    }
+
+    [Fact]
     public async Task Audit_RecordsSensitiveDeletes()
     {
         var client = factory.CreateClient();

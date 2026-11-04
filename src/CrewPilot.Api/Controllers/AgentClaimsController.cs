@@ -1,6 +1,8 @@
 using CrewPilot.Api.Contracts;
 using CrewPilot.Agents.Execution;
 using CrewPilot.Core.Agents;
+using CrewPilot.Core.Services;
+using CrewPilot.Core.WorkItems;
 using CrewPilot.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +43,7 @@ public sealed class AgentClaimsController(
         }
     }
 
-    /// <summary>Agent 试运行（不关联工作项）。</summary>
+    /// <summary>Agent 试运行（可选关联工作项，注入需求上下文）。</summary>
     [HttpPost("api/agents/{id:guid}/runs")]
     public async Task<ActionResult<AgentRunListItemDto>> Preview(
         Guid id, [FromBody] PreviewAgentRequest request, CancellationToken ct)
@@ -57,11 +59,20 @@ public sealed class AgentClaimsController(
             return Problem(detail: "提示词必填", statusCode: 400);
         }
 
+        var workItem = request.WorkItemId is Guid workItemId
+            ? await db.WorkItems.FirstOrDefaultAsync(w => w.Id == workItemId, ct)
+            : null;
+        if (request.WorkItemId is not null && workItem is null)
+        {
+            return Problem(detail: "关联工作项不存在", statusCode: 404);
+        }
+
         var run = new AgentRun
         {
             AgentId = agent.Id,
+            WorkItemId = workItem?.Id,
             Trigger = "preview",
-            Prompt = request.Prompt.Trim(),
+            Prompt = BuildPreviewPrompt(request.Prompt.Trim(), workItem),
             Status = AgentRunStatus.Queued,
         };
         db.AgentRuns.Add(run);
@@ -70,9 +81,52 @@ public sealed class AgentClaimsController(
 
         return Created($"/api/agent-runs/{run.Id}",
             new AgentRunListItemDto(
-                run.Id, agent.Name, null, null, run.Trigger, "queued", null,
+                run.Id, agent.Name, run.WorkItemId, workItem?.Title, run.Trigger, "queued", null,
                 run.CreatedAt, null, null, null, null));
     }
+
+    private static string BuildPreviewPrompt(string prompt, WorkItem? workItem)
+    {
+        if (workItem is null)
+        {
+            return prompt;
+        }
+
+        var builder = new System.Text.StringBuilder(prompt);
+        builder.AppendLine();
+        builder.AppendLine();
+        builder.AppendLine("## 工作项上下文");
+        builder.AppendLine($"标题：{workItem.Title}");
+        builder.AppendLine($"类型：{ExecutorPromptType(workItem)}");
+        builder.AppendLine($"状态：{ExecutorPromptStatus(workItem)}");
+        if (!string.IsNullOrWhiteSpace(workItem.Description))
+        {
+            builder.AppendLine($"描述：{workItem.Description}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(workItem.AcceptanceCriteria))
+        {
+            builder.AppendLine($"验收标准：{workItem.AcceptanceCriteria}");
+        }
+
+        return builder.ToString();
+    }
+
+    private static string ExecutorPromptType(WorkItem workItem) => workItem switch
+    {
+        Requirement => "requirement",
+        Defect => "defect",
+        TaskItem => "task",
+        _ => "workitem",
+    };
+
+    private static string ExecutorPromptStatus(WorkItem workItem) => workItem switch
+    {
+        Requirement requirement => requirement.Status.ToString(),
+        Defect defect => defect.Status.ToString(),
+        TaskItem task => WorkItemStateMachine.ToStatus(task),
+        _ => string.Empty,
+    };
 
     /// <summary>取消（接管）进行中的 AgentRun。</summary>
     [HttpPost("api/agent-runs/{id:guid}/cancel")]
