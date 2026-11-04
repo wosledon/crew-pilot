@@ -3355,6 +3355,88 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/projects/{projectId}/weekly-report": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          days?: number;
+        };
+        header?: never;
+        path: {
+          projectId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["WeeklyReportDto"];
+            "application/json": components["schemas"]["WeeklyReportDto"];
+            "text/json": components["schemas"]["WeeklyReportDto"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/projects/{projectId}/weekly-report/agent": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: {
+          days?: number;
+        };
+        header?: never;
+        path: {
+          projectId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["AgentRunListItemDto"];
+            "application/json": components["schemas"]["AgentRunListItemDto"];
+            "text/json": components["schemas"]["AgentRunListItemDto"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/projects/{projectId}/cost-report": {
     parameters: {
       query?: never;
@@ -5450,6 +5532,19 @@ export interface components {
       platform: string;
       token: null | string;
       repository: null | string;
+    };
+    WeeklyReportDto: {
+      /** Format: date */
+      from: string;
+      /** Format: date */
+      to: string;
+      markdown: string;
+      /** Format: int32 */
+      completedCount: number;
+      /** Format: int32 */
+      activeCount: number;
+      /** Format: int32 */
+      openBlockers: number;
     };
     WorkflowDto: {
       /** Format: uuid */

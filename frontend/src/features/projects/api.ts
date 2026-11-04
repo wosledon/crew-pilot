@@ -19,6 +19,7 @@ import type {
   WorkItemDependency,
   WorkItemDetail,
   WorkItemListItem,
+  WeeklyReport,
   WorkLog,
 } from "@/lib/types";
 
@@ -412,6 +413,22 @@ export function useDeleteDependency(projectId: string) {
         queryKey: projectKeys.criticalPath(projectId),
       });
     },
+  });
+}
+
+export function useGenerateWeeklyReport() {
+  return useMutation({
+    mutationFn: (variables: { projectId: string; days?: number }) =>
+      api.get<WeeklyReport>(
+        `/projects/${variables.projectId}/weekly-report?days=${variables.days ?? 7}`,
+      ),
+  });
+}
+
+export function useDispatchWeeklyReportAgent() {
+  return useMutation({
+    mutationFn: (projectId: string) =>
+      api.post<{ id: string }>(`/projects/${projectId}/weekly-report/agent?days=7`),
   });
 }
 

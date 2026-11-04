@@ -42,5 +42,12 @@
   },
   "workloadLanes": "Workload lanes (by assignee)",
   "workloadLanesHint": "Logged vs estimated hours and item count, sorted by estimate",
-  "unassigned": "Unassigned"
+  "unassigned": "Unassigned",
+  "pmReport": "PM weekly report",
+  "pmReportHint": "Last 7 days progress, hours and risks; can be sent to the PM Agent",
+  "pmReportEmpty": "Click “Generate report” to preview data",
+  "generateReport": "Generate report",
+  "dispatchToPm": "Send to PM Agent",
+  "reportGenerated": "Report generated",
+  "reportDispatched": "Sent to PM Agent (run {{id}})"
 }

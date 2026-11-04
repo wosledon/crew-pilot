@@ -42,5 +42,12 @@
   },
   "workloadLanes": "工时泳道（按指派人）",
   "workloadLanesHint": "已耗 / 预估工时与工作项数，按预估工时排序",
-  "unassigned": "未指派"
+  "unassigned": "未指派",
+  "pmReport": "PM 周报",
+  "pmReportHint": "汇总近 7 天进度、工时与风险，可交给 PM Agent 生成文字版",
+  "pmReportEmpty": "点击「生成周报」查看数据汇总",
+  "generateReport": "生成周报",
+  "dispatchToPm": "交给 PM Agent",
+  "reportGenerated": "周报已生成",
+  "reportDispatched": "已交给 PM Agent（运行 {{id}}）"
 }

@@ -18,13 +18,21 @@ import {
   useDeleteDependency,
   useDeleteMilestone,
   useDependencies,
+  useDispatchWeeklyReportAgent,
+  useGenerateWeeklyReport,
   useHoursReport,
   useIterations,
   useMilestones,
   useWorkItems,
 } from "./api";
 import { priorityTone, statusTone } from "./statusFlow";
-import type { DependencyType, Milestone, WorkItemDependency, WorkItemListItem } from "@/lib/types";
+import type {
+  DependencyType,
+  Milestone,
+  WeeklyReport,
+  WorkItemDependency,
+  WorkItemListItem,
+} from "@/lib/types";
 import { CostCard } from "@/features/platform/CostCard";
 import { HumanCostCard } from "./components/HumanCostCard";
 import { EstimateDeviationCard } from "./components/EstimateDeviationCard";
@@ -50,6 +58,9 @@ export function GanttPage() {
   const criticalPath = useCriticalPath(projectId);
   const createDependency = useCreateDependency(projectId);
   const deleteDependency = useDeleteDependency(projectId);
+  const generateWeeklyReport = useGenerateWeeklyReport();
+  const dispatchWeeklyReport = useDispatchWeeklyReportAgent();
+  const [weeklyReport, setWeeklyReport] = useState<WeeklyReport | null>(null);
   const createMilestone = useCreateMilestone(projectId);
   const deleteMilestone = useDeleteMilestone(projectId);
   const confirm = useConfirm();
@@ -64,6 +75,25 @@ export function GanttPage() {
 
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
+
+  const handleGenerateWeeklyReport = async () => {
+    try {
+      const generated = await generateWeeklyReport.mutateAsync({ projectId, days: 7 });
+      setWeeklyReport(generated);
+      toast.success(t("gantt:reportGenerated"));
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
+  const handleDispatchWeeklyReport = async () => {
+    try {
+      const run = await dispatchWeeklyReport.mutateAsync(projectId);
+      toast.success(t("gantt:reportDispatched", { id: run.id.slice(0, 8) }));
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
 
   const handleCreateMilestone = async () => {
     try {
@@ -445,6 +475,41 @@ export function GanttPage() {
           >
             {t("gantt:clearFilters")}
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>{t("gantt:pmReport")}</CardTitle>
+            <p className="text-xs text-muted-foreground">{t("gantt:pmReportHint")}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={generateWeeklyReport.isPending}
+              onClick={() => void handleGenerateWeeklyReport()}
+            >
+              {t("gantt:generateReport")}
+            </Button>
+            <Button
+              size="sm"
+              disabled={dispatchWeeklyReport.isPending}
+              onClick={() => void handleDispatchWeeklyReport()}
+            >
+              {t("gantt:dispatchToPm")}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {weeklyReport === null ? (
+            <p className="text-sm text-muted-foreground">{t("gantt:pmReportEmpty")}</p>
+          ) : (
+            <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-md bg-muted/50 p-3 text-xs">
+              {weeklyReport.markdown}
+            </pre>
+          )}
         </CardContent>
       </Card>
 

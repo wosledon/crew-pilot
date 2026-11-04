@@ -46,6 +46,9 @@ export type WorkItemDependency = Omit<Api["WorkItemDependencyDto"], "type"> & {
 
 export type CriticalPath = Api["CriticalPathDto"];
 
+/** 项目周报（PM Agent / 数据汇总） */
+export type WeeklyReport = Api["WeeklyReportDto"];
+
 export type PrototypeType = "html" | "url" | "image" | "mcp";
 
 export type Prototype = Omit<Api["PrototypeDto"], "type"> & {
