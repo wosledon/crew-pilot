@@ -20,7 +20,9 @@ public sealed record AgentRunRequest(
     string? ApiKey = null,
     string? WorkingDirectory = null,
     IReadOnlyList<string>? Tools = null,
-    IReadOnlyList<string>? CommandWhitelist = null);
+    IReadOnlyList<string>? CommandWhitelist = null,
+    IReadOnlyList<McpToolDescriptor>? McpTools = null,
+    IMcpToolInvoker? McpInvoker = null);
 
 /// <summary>执行过程中的一个步骤（工具调用 / 助手输出 / 错误）。</summary>
 public sealed record AgentRunStep(int Sequence, string Kind, string Content);

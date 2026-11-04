@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
+using CrewPilot.Agents.Abstractions;
 using Microsoft.Extensions.AI;
 
 namespace CrewPilot.Agents.Engine;
@@ -119,6 +120,43 @@ public static class AgentTools
         }
 
         return tools;
+    }
+
+    /// <summary>
+    /// 把 MCP 工具包装为 MAF 可调用的函数。MCP 的 inputSchema 作为描述附注，
+    /// 模型通过单个 JSON 字符串参数传参。
+    /// </summary>
+    public static IList<AITool> CreateMcpTools(
+        IReadOnlyList<McpToolDescriptor>? descriptors,
+        IMcpToolInvoker? invoker)
+    {
+        if (descriptors is null || invoker is null || descriptors.Count == 0)
+        {
+            return [];
+        }
+
+        var tools = new List<AITool>();
+        foreach (var descriptor in descriptors)
+        {
+            var description = BuildMcpDescription(descriptor);
+            Func<string, CancellationToken, Task<string>> call = (
+                [Description("该 MCP 工具的参数 JSON 对象字符串（需符合 inputSchema）")] string arguments,
+                CancellationToken cancellationToken) =>
+                invoker.CallToolAsync(descriptor.Name, arguments, cancellationToken);
+            tools.Add(AIFunctionFactory.Create(call, descriptor.Name, description));
+        }
+
+        return tools;
+    }
+
+    private static string BuildMcpDescription(McpToolDescriptor descriptor)
+    {
+        var description = string.IsNullOrWhiteSpace(descriptor.Description)
+            ? $"MCP 工具 {descriptor.Name}"
+            : descriptor.Description;
+        return string.IsNullOrWhiteSpace(descriptor.InputSchemaJson)
+            ? description
+            : $"{description}\n参数 inputSchema：{descriptor.InputSchemaJson}";
     }
 
     /// <summary>把相对路径解析到工作目录内；越界返回 null（含同前缀兄弟目录逃逸）。</summary>

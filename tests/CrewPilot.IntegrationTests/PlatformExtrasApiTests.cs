@@ -216,6 +216,47 @@ public sealed class PlatformExtrasApiTests(CrewPilotApiFactory factory)
     }
 
     [Fact]
+    public async Task SystemPromptTemplate_IsRenderedPerWorkItem()
+    {
+        var client = factory.CreateClient();
+        var project = await ApiTestHelpers.CreateProjectAsync(client);
+        var provider = await ApiTestHelpers.CreateProviderAsync(client);
+        var agent = await ApiTestHelpers.CreateAgentAsync(client, provider.Id);
+        var item = await ApiTestHelpers.CreateRequirementAsync(client, project.Id);
+
+        var skill = await (await client.PostAsJsonAsync("/api/skills", new
+        {
+            name = "模板技能",
+            promptContent = "技能要求：{{title}}",
+        })).Content.ReadFromJsonAsync<SkillDto>();
+
+        var update = await client.PutAsJsonAsync($"/api/agents/{agent.Id}", new
+        {
+            name = agent.Name,
+            job = agent.Job,
+            systemPrompt = "需求标题：{{title}}；类型：{{type}}；状态：{{status}}",
+            enabled = true,
+            skillIds = new[] { skill!.Id },
+        });
+        update.EnsureSuccessStatusCode();
+
+        await client.PostAsJsonAsync($"/api/workitems/{item.Id}/assign-agent", new
+        {
+            agentId = agent.Id,
+        });
+        await ApiTestHelpers.WaitForAsync(
+            () => client.GetFromJsonAsync<List<AgentRunListItemDto>>(
+                $"/api/agent-runs?workItemId={item.Id}"),
+            runs => runs is not null && runs.Any(r => r.Status == "succeeded"));
+
+        var systemPrompt = factory.Engine.LastRequest!.SystemPrompt;
+        systemPrompt.Should().Contain($"需求标题：{item.Title}");
+        systemPrompt.Should().Contain("类型：requirement");
+        systemPrompt.Should().Contain("状态：Backlog");
+        systemPrompt.Should().Contain($"技能要求：{item.Title}");
+    }
+
+    [Fact]
     public async Task Audit_RecordsSensitiveDeletes()
     {
         var client = factory.CreateClient();

@@ -88,6 +88,9 @@ public sealed class AgentRunExecutor
             .Include(r => r.Agent)
             .ThenInclude(a => a.Skills)
             .ThenInclude(s => s.Skill)
+            .Include(r => r.Agent)
+            .ThenInclude(a => a.McpServers)
+            .ThenInclude(m => m.McpServer)
             .Include(r => r.WorkItem)
             .FirstOrDefaultAsync(r => r.Id == runId, ct);
         if (run is null || run.Status != AgentRunStatus.Queued)
@@ -109,6 +112,10 @@ public sealed class AgentRunExecutor
         using var runCts = _cancellation.Register(run.Id, ct);
         try
         {
+            // MCP 工具会话：绑定 Server 可用才注入，单个 Server 失败自动跳过
+            await using var mcpSession = await McpToolSession.ConnectAsync(
+                run.Agent.McpServers, _secrets, ct);
+
             // 取消可能发生在状态落库与注册之间，注册后再确认一次
             if (await IsCanceledInDbAsync(run.Id, ct))
             {
@@ -143,13 +150,15 @@ public sealed class AgentRunExecutor
             var request = new AgentRunRequest(
                 AgentName: run.Agent.Name,
                 Prompt: run.Prompt,
-                SystemPrompt: ComposeSystemPrompt(run.Agent),
+                SystemPrompt: ComposeSystemPrompt(run.Agent, run.WorkItem),
                 Model: run.Agent.Model,
                 BaseUrl: run.Agent.Provider.BaseUrl,
                 ApiKey: apiKey,
                 WorkingDirectory: workingDirectory,
                 Tools: ParseTools(run.Agent.Tools),
-                CommandWhitelist: ParseTools(run.Agent.CommandWhitelist));
+                CommandWhitelist: ParseTools(run.Agent.CommandWhitelist),
+                McpTools: mcpSession.Tools,
+                McpInvoker: mcpSession.Invoker);
 
             var result = await _engine.RunAsync(request, runCts.Token);
 
@@ -239,9 +248,12 @@ public sealed class AgentRunExecutor
         return true;
     }
 
-    /// <summary>系统提示词 = Agent 基础提示词 + 已装配且启用的 Skills 内容。</summary>
-    private static string ComposeSystemPrompt(Agent agent)
+    /// <summary>系统提示词 = Agent 基础提示词（模板变量替换）+ 已装配且启用的 Skills 内容。</summary>
+    private static string ComposeSystemPrompt(Agent agent, WorkItem? workItem)
     {
+        var basePrompt = workItem is null
+            ? agent.SystemPrompt
+            : PromptTemplate.Render(agent.SystemPrompt, workItem);
         var skills = agent.Skills
             .Select(link => link.Skill)
             .Where(skill => skill.Enabled)
@@ -249,17 +261,19 @@ public sealed class AgentRunExecutor
             .ToList();
         if (skills.Count == 0)
         {
-            return agent.SystemPrompt;
+            return basePrompt;
         }
 
-        var builder = new System.Text.StringBuilder(agent.SystemPrompt);
+        var builder = new System.Text.StringBuilder(basePrompt);
         builder.AppendLine();
         builder.AppendLine();
         builder.AppendLine("## 已装配技能");
         foreach (var skill in skills)
         {
             builder.AppendLine($"### {skill.Name}");
-            builder.AppendLine(skill.PromptContent);
+            builder.AppendLine(workItem is null
+                ? skill.PromptContent
+                : PromptTemplate.Render(skill.PromptContent, workItem));
             builder.AppendLine();
         }
 

@@ -41,7 +41,15 @@ public sealed class MafAgentEngine : IAgentEngine
                 request.Tools,
                 request.CommandWhitelist,
                 cancellationToken);
-            Log("info", $"Agent {request.AgentName} 启动（模型 {request.Model}，工具 {tools.Count} 个）");
+            foreach (var mcpTool in AgentTools.CreateMcpTools(
+                         request.McpTools, request.McpInvoker))
+            {
+                tools.Add(mcpTool);
+            }
+
+            Log("info",
+                $"Agent {request.AgentName} 启动（模型 {request.Model}，工具 {tools.Count} 个，" +
+                $"其中 MCP {request.McpTools?.Count ?? 0} 个）");
 
             var agent = openAiClient
                 .GetChatClient(request.Model)
