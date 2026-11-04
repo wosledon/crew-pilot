@@ -39,5 +39,8 @@
   "dependencyTypes": {
     "finishToStart": "Finish → Start (FS)",
     "startToStart": "Start → Start (SS)"
-  }
+  },
+  "workloadLanes": "Workload lanes (by assignee)",
+  "workloadLanesHint": "Logged vs estimated hours and item count, sorted by estimate",
+  "unassigned": "Unassigned"
 }

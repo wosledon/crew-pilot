@@ -162,6 +162,21 @@ export function GanttPage() {
     .map((id) => items.find((item) => item.id === id)?.title)
     .filter((title): title is string => title !== undefined);
 
+  const workload = Object.entries(
+    items.reduce<Record<string, { estimated: number; logged: number; count: number }>>(
+      (groups, item) => {
+        const key = item.assigneeName ?? t("gantt:unassigned");
+        const group = groups[key] ?? { estimated: 0, logged: 0, count: 0 };
+        group.estimated += item.estimatedHours ?? 0;
+        group.logged += item.loggedHours;
+        group.count += 1;
+        groups[key] = group;
+        return groups;
+      },
+      {},
+    ),
+  ).sort((a, b) => b[1].estimated - a[1].estimated);
+
   // 时间范围：迭代起止 + 工作项截止日 + 里程碑日期
   const dates: string[] = [
     ...iterationList.flatMap((iteration) => [iteration.startDate, iteration.endDate]),
@@ -430,6 +445,37 @@ export function GanttPage() {
           >
             {t("gantt:clearFilters")}
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("gantt:workloadLanes")}</CardTitle>
+          <p className="text-xs text-muted-foreground">{t("gantt:workloadLanesHint")}</p>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {workload.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t("gantt:empty")}</p>
+          ) : (
+            workload.map(([name, group]) => {
+              const ratio =
+                group.estimated > 0 ? Math.min(100, (group.logged / group.estimated) * 100) : 0;
+              return (
+                <div key={name} className="flex items-center gap-3">
+                  <span className="w-32 shrink-0 truncate text-sm">{name}</span>
+                  <div className="relative h-5 flex-1 rounded-md bg-muted/50">
+                    <div
+                      className="absolute inset-y-0.5 rounded bg-primary/70"
+                      style={{ width: `${Math.max(1, ratio)}%` }}
+                    />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">
+                      {group.logged}h / {group.estimated}h · {group.count}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </CardContent>
       </Card>
 

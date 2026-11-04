@@ -39,5 +39,8 @@
   "dependencyTypes": {
     "finishToStart": "完成 → 开始（FS）",
     "startToStart": "开始 → 开始（SS）"
-  }
+  },
+  "workloadLanes": "工时泳道（按指派人）",
+  "workloadLanesHint": "已耗 / 预估工时与工作项数，按预估工时排序",
+  "unassigned": "未指派"
 }
