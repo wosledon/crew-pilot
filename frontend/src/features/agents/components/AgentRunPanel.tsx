@@ -9,6 +9,7 @@ import { Select } from "@/components/ui/Select";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { useAgentRuns, useAgents, useAssignAgent, useCancelAgentRun } from "../api";
+import { AgentRunDetailDialog } from "./AgentRunDetailDialog";
 
 const statusTones: Record<string, BadgeTone> = {
   queued: "neutral",
@@ -100,6 +101,7 @@ export function AgentRunPanel({
   const { t } = useTranslation(["agentruns", "common"]);
   const runs = useAgentRuns({ workItemId, projectId });
   const cancelRun = useCancelAgentRun();
+  const [detailRunId, setDetailRunId] = useState<string | null>(null);
 
   const handleCancel = async (id: string) => {
     try {
@@ -124,39 +126,56 @@ export function AgentRunPanel({
   }
 
   return (
-    <ul className="space-y-2">
-      {items.map((run) => (
-        <li key={run.id}>
-          <Card>
-            <CardHeader className="flex-row items-center justify-between gap-2 py-3">
-              <CardTitle className="flex min-w-0 items-center gap-2 text-sm">
-                <Bot className="h-4 w-4 shrink-0 text-primary" />
-                <span className="truncate">{run.agentName}</span>
-                <Badge tone={statusTones[run.status] ?? "neutral"}>
-                  {t(`agentruns:statuses.${run.status}`)}
-                </Badge>
-                <Badge tone="neutral">{t(`agentruns:triggers.${run.trigger}`)}</Badge>
-              </CardTitle>
-              <div className="flex shrink-0 items-center gap-2">
-                {run.duration !== null ? (
+    <>
+      <ul className="space-y-2">
+        {items.map((run) => (
+          <li key={run.id}>
+            <Card>
+              <CardHeader className="flex-row items-center justify-between gap-2 py-3">
+                <CardTitle className="flex min-w-0 items-center gap-2 text-sm">
+                  <Bot className="h-4 w-4 shrink-0 text-primary" />
+                  <span className="truncate">{run.agentName}</span>
+                  <Badge tone={statusTones[run.status] ?? "neutral"}>
+                    {t(`agentruns:statuses.${run.status}`)}
+                  </Badge>
+                  <Badge tone="neutral">{t(`agentruns:triggers.${run.trigger}`)}</Badge>
+                </CardTitle>
+                <div className="flex shrink-0 items-center gap-2">
                   <span className="text-xs text-muted-foreground">
-                    {formatDuration(run.duration)}
+                    {new Date(run.createdAt).toLocaleString()}
                   </span>
-                ) : null}
-                {run.status === "queued" || run.status === "running" ? (
-                  <Button size="sm" variant="outline" onClick={() => void handleCancel(run.id)}>
-                    {t("agentruns:cancel")}
+                  {run.duration !== null ? (
+                    <span className="text-xs text-muted-foreground">
+                      {formatDuration(run.duration)}
+                    </span>
+                  ) : null}
+                  <Button size="sm" variant="outline" onClick={() => setDetailRunId(run.id)}>
+                    {t("agentruns:viewDetail")}
                   </Button>
-                ) : null}
-              </div>
-            </CardHeader>
-            {run.error !== null ? (
-              <CardContent className="pt-0 text-xs text-destructive">{run.error}</CardContent>
-            ) : null}
-          </Card>
-        </li>
-      ))}
-    </ul>
+                  {run.status === "queued" || run.status === "running" ? (
+                    <Button size="sm" variant="outline" onClick={() => void handleCancel(run.id)}>
+                      {t("agentruns:cancel")}
+                    </Button>
+                  ) : null}
+                </div>
+              </CardHeader>
+              {run.error !== null ? (
+                <CardContent className="pt-0 text-xs text-destructive">{run.error}</CardContent>
+              ) : null}
+            </Card>
+          </li>
+        ))}
+      </ul>
+      <AgentRunDetailDialog
+        runId={detailRunId}
+        open={detailRunId !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDetailRunId(null);
+          }
+        }}
+      />
+    </>
   );
 }
 

@@ -33,5 +33,9 @@
   "createdAt": "Created at",
   "finishedAt": "Finished at",
   "error": "Error",
-  "viewDetail": "View details"
+  "viewDetail": "View details",
+  "detailTitle": "Run detail",
+  "live": "Live updating",
+  "runningNow": "Running…",
+  "prompt": "Prompt"
 }

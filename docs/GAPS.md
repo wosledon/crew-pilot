@@ -224,7 +224,7 @@
 - [x] 内置工具：文件读写/列目录/白名单命令
 - [x] 项目目录隔离 + git worktree（Round 1 打通 LocalPath）
 - [~] worktree 清理/合并/PR：失败/取消已清理，成功保留待 M4 接 PR
-- [ ] 流式输出与工具调用级日志
+- [~] 运行详情：日志/工具调用时间线、实时刷新（Round 22）；流式 token 输出待做
 - [ ] 多 Agent 协作
 - [x] 沙箱加固（路径逃逸/命令注入/超时，Round 1）
 
@@ -292,6 +292,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 22（2026-11-04）
+
+- 运行监控（PRD 5.9）：新增 `AgentRunDetailDialog` —— 状态/触发/耗时/token、提示词、输出、错误、工作目录，执行日志按序号 + kind + 时间线展示；运行中每 2s 自动刷新并显示「实时刷新中」
+- 执行记录列表：显示创建时间、新增「查看详情」入口（工作项详情/项目页均复用 `AgentRunPanel`）
+- 测试：后端 139 项不变；前端 lint / format / test:run（13）/ build / E2E（2）全绿
+- 验证：`npm run lint` / `format:check` / `test:run` / `test:e2e` / `build` 全绿
 
 ### Round 21（2026-11-04）
 

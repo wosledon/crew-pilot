@@ -33,5 +33,9 @@
   "createdAt": "创建于",
   "finishedAt": "完成于",
   "error": "错误",
-  "viewDetail": "查看详情"
+  "viewDetail": "查看详情",
+  "detailTitle": "运行详情",
+  "live": "实时刷新中",
+  "runningNow": "执行中…",
+  "prompt": "提示词"
 }
