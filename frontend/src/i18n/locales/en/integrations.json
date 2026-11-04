@@ -51,5 +51,9 @@
     "failure": "Failed",
     "pending": "Running",
     "none": "No checks"
-  }
+  },
+  "mergePr": "Merge PR",
+  "merged": "PR merged",
+  "mergeConfirmTitle": "Merge PR/MR?",
+  "mergeConfirmDescription": "Merge via gh/glab and sync status automatically. This cannot be undone."
 }

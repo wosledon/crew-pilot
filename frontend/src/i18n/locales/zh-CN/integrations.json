@@ -51,5 +51,9 @@
     "failure": "失败",
     "pending": "进行中",
     "none": "无检查"
-  }
+  },
+  "mergePr": "合并 PR",
+  "merged": "PR 已合并",
+  "mergeConfirmTitle": "合并 PR/MR？",
+  "mergeConfirmDescription": "将通过 gh/glab 合并该 PR，并自动同步状态；此操作不可撤销。"
 }

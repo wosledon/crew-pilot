@@ -68,6 +68,17 @@ export function useSyncPullRequest(workItemId: string) {
   });
 }
 
+export function useMergePullRequest(workItemId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.post<PullRequestStatus>(`/workitems/${workItemId}/pull-request/merge`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["workitems"] });
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
+
 export function useCreateRelease(projectId: string) {
   const queryClient = useQueryClient();
   return useMutation({

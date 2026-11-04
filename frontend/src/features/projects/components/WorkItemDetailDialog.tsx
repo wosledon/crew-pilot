@@ -10,7 +10,11 @@ import { Select } from "@/components/ui/Select";
 import { ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { useAgents } from "@/features/agents/api";
-import { useCreatePullRequest, useSyncPullRequest } from "@/features/integrations/api";
+import {
+  useCreatePullRequest,
+  useMergePullRequest,
+  useSyncPullRequest,
+} from "@/features/integrations/api";
 import { formatDateTime } from "@/lib/format";
 import type { PullRequestStatus, WorkItemDetail } from "@/lib/types";
 import { priorityTone, statusTone } from "../statusFlow";
@@ -53,6 +57,7 @@ export function WorkItemDetailDialog({
   const deleteWorkItem = useDeleteWorkItem();
   const createPullRequest = useCreatePullRequest(workItemId);
   const syncPullRequest = useSyncPullRequest(workItemId);
+  const mergePullRequest = useMergePullRequest(workItemId);
   const confirm = useConfirm();
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -179,6 +184,26 @@ export function WorkItemDetailDialog({
       const status = await syncPullRequest.mutateAsync();
       setPrStatus(status);
       toast.success(t("integrations:synced"));
+      await item.refetch();
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
+  const handleMergePullRequest = async () => {
+    const approved = await confirm({
+      title: t("integrations:mergeConfirmTitle"),
+      description: t("integrations:mergeConfirmDescription"),
+      confirmText: t("integrations:mergePr"),
+      destructive: true,
+    });
+    if (!approved) {
+      return;
+    }
+    try {
+      const status = await mergePullRequest.mutateAsync();
+      setPrStatus(status);
+      toast.success(t("integrations:merged"));
       await item.refetch();
     } catch (error) {
       toast.error(errorMessage(error));
@@ -458,6 +483,16 @@ export function WorkItemDetailDialog({
                   >
                     {t("integrations:sync")}
                   </Button>
+                  {prStatus?.state === "open" ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => void handleMergePullRequest()}
+                      disabled={mergePullRequest.isPending}
+                    >
+                      {t("integrations:mergePr")}
+                    </Button>
+                  ) : null}
                 </div>
                 {prStatus !== null && prStatus.checks.length > 0 ? (
                   <ul className="space-y-1 text-xs text-muted-foreground">
