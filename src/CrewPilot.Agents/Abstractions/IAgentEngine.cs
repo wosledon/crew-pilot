@@ -1,5 +1,7 @@
 namespace CrewPilot.Agents.Abstractions;
 
+using System.Runtime.CompilerServices;
+
 /// <summary>
 /// Agent 执行引擎抽象。
 /// 约定：所有对 Microsoft Agent Framework（MAF）的调用必须收敛于此接口的实现之后，
@@ -8,7 +10,29 @@ namespace CrewPilot.Agents.Abstractions;
 public interface IAgentEngine
 {
     Task<AgentRunResult> RunAsync(AgentRunRequest request, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 流式执行：增量输出（Delta）与最终结果（Result）。
+    /// 默认实现回退到一次性执行并按块产出，具体引擎可覆盖为真实 token 流。
+    /// </summary>
+    async IAsyncEnumerable<AgentStreamEvent> StreamAsync(
+        AgentRunRequest request,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var result = await RunAsync(request, cancellationToken);
+        const int chunkSize = 32;
+        for (var offset = 0; offset < result.Output.Length; offset += chunkSize)
+        {
+            yield return new AgentStreamEvent(
+                result.Output.Substring(offset, Math.Min(chunkSize, result.Output.Length - offset)));
+        }
+
+        yield return new AgentStreamEvent(Result: result);
+    }
 }
+
+/// <summary>流式执行事件：Delta 为增量文本，Result 为最终执行结果（二者互斥）。</summary>
+public sealed record AgentStreamEvent(string? Delta = null, AgentRunResult? Result = null);
 
 /// <summary>一次 Agent 执行请求。</summary>
 public sealed record AgentRunRequest(

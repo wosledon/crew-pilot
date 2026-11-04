@@ -29,6 +29,7 @@ public sealed class AgentRunExecutor
     private readonly ISecretProtector _secrets;
     private readonly AgentRunCancellationRegistry _cancellation;
     private readonly WorkflowRunner _workflowRunner;
+    private readonly AgentRunStreamHub _streamHub;
     private readonly IRealtimeNotifier? _realtime;
 
     public AgentRunExecutor(
@@ -37,6 +38,7 @@ public sealed class AgentRunExecutor
         ISecretProtector secrets,
         AgentRunCancellationRegistry cancellation,
         WorkflowRunner workflowRunner,
+        AgentRunStreamHub streamHub,
         IRealtimeNotifier? realtime = null)
     {
         _db = db;
@@ -44,6 +46,7 @@ public sealed class AgentRunExecutor
         _secrets = secrets;
         _cancellation = cancellation;
         _workflowRunner = workflowRunner;
+        _streamHub = streamHub;
         _realtime = realtime;
     }
 
@@ -163,7 +166,23 @@ public sealed class AgentRunExecutor
                 McpInvoker: mcpSession.Invoker,
                 SandboxPolicy: run.Agent.SandboxPolicy);
 
-            var result = await _engine.RunAsync(request, runCts.Token);
+            AgentRunResult? streamedResult = null;
+            await foreach (var streamEvent in _engine.StreamAsync(request, runCts.Token))
+            {
+                if (streamEvent.Delta is { Length: > 0 } delta)
+                {
+                    _streamHub.Publish(run.Id, delta);
+                }
+
+                if (streamEvent.Result is { } finalResult)
+                {
+                    streamedResult = finalResult;
+                }
+            }
+
+            _streamHub.Complete(run.Id);
+            var result = streamedResult
+                ?? throw new InvalidOperationException("Agent 引擎未返回执行结果");
 
             // 引擎可能忽略取消令牌直接返回，这里再确认一次取消状态
             if (runCts.IsCancellationRequested || await IsCanceledInDbAsync(run.Id, ct))

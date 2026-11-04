@@ -73,6 +73,7 @@ else
 builder.Services.AddSingleton<IAgentEngine, MafAgentEngine>();
 builder.Services.AddSingleton<AgentRunQueue>();
 builder.Services.AddSingleton<AgentRunCancellationRegistry>();
+builder.Services.AddSingleton<AgentRunStreamHub>();
 builder.Services.AddHostedService<AgentRunWorker>();
 builder.Services.AddScoped<AgentRunExecutor>();
 builder.Services.AddScoped<WorkflowRunner>();

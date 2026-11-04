@@ -264,7 +264,8 @@ public sealed class AgentRunCancellationTests
         var workflowRunner = new WorkflowRunner(
             db, new AgentRunQueue(), NullLogger<WorkflowRunner>.Instance);
         var executor = new AgentRunExecutor(
-            db, engine, new PassThroughSecretProtector(), registry, workflowRunner);
+            db, engine, new PassThroughSecretProtector(), registry, workflowRunner,
+            new AgentRunStreamHub());
         return (run, engine, executor, registry);
     }
 

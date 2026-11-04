@@ -10,7 +10,10 @@ using Microsoft.EntityFrameworkCore;
 namespace CrewPilot.Api.Controllers;
 
 [ApiController]
-public sealed class AgentRunsController(CrewPilotDbContext db, AgentRunQueue queue) : ControllerBase
+public sealed class AgentRunsController(
+    CrewPilotDbContext db,
+    AgentRunQueue queue,
+    CrewPilot.Agents.Execution.AgentRunStreamHub streamHub) : ControllerBase
 {
     private static readonly System.Text.Json.JsonSerializerOptions SseJson = new(
         System.Text.Json.JsonSerializerDefaults.Web)
@@ -224,9 +227,17 @@ public sealed class AgentRunsController(CrewPilotDbContext db, AgentRunQueue que
 
         var lastSequence = -1;
         var lastStatus = string.Empty;
-        while (!ct.IsCancellationRequested)
+        var (subscriptionId, tokenReader) = streamHub.Subscribe(id);
+        try
         {
-            var run = await db.AgentRuns
+            while (!ct.IsCancellationRequested)
+            {
+                while (tokenReader.TryRead(out var delta))
+                {
+                    await WriteEventAsync("token", new { delta });
+                }
+
+                var run = await db.AgentRuns
                 .AsNoTracking()
                 .Where(r => r.Id == id)
                 .Select(r => new
@@ -271,6 +282,11 @@ public sealed class AgentRunsController(CrewPilotDbContext db, AgentRunQueue que
             }
 
             await Task.Delay(1000, ct);
+            }
+        }
+        finally
+        {
+            streamHub.Unsubscribe(id, subscriptionId);
         }
     }
 }
