@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 120 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 122 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -70,7 +70,8 @@
 - [ ] Skills 收尾：SKILL.md 目录/脚本/资源、导入导出、脚本执行
 - [x] MCP：Server 配置、认证加密、启停、连通性测试、按 Agent 授权
 - [x] MCP 运行时：Streamable HTTP 客户端（initialize / tools/list / tools/call，Round 9）
-- [ ] MCP 收尾：stdio / 旧版 SSE 双通道传输、工具级审计
+- [x] MCP 运行时：stdio 传输（Round 15）
+- [ ] MCP 收尾：旧版 HTTP+SSE 双通道、工具级审计
 - [x] 成本统计：token × 模型单价 → 项目级费用，按供应商/模型汇总
 - [x] 审计日志：敏感操作留痕 + 查询 API/页面
 - [x] 结构化日志（生产 JSON console，Round 14）+ 请求关联 ID
@@ -83,7 +84,7 @@
 - [x] SignalR 实时推送（工作项状态 / AgentRun 进度 / 卡点，Round 7）
 - [x] PostgreSQL 支持（Npgsql + provider 切换 + 独立迁移程序集 + compose 覆盖；Round 10）
 - [x] CI（GitHub Actions：build/test/lint）+ Dockerfile + compose + 部署文档（Round 7）
-- [ ] OpenAPI 生成前端客户端，删除手写类型
+- [~] OpenAPI 生成前端客户端：已导出 `docs/openapi.json` + 生成 `api-schema.d.ts` + 契约别名（Round 15），手写类型逐步迁移中
 - [x] 前端测试（Vitest + Testing Library 起步，Round 8；Playwright E2E 待补）
 - [ ] 测试补齐：真实 MAF 适配层、取消、沙箱、worktree、安全用例
 - [ ] 文档更新：README 进度、AGENTS 现状、README.en
@@ -232,7 +233,7 @@
 - [x] Server 配置、认证加密、启停、连通性测试
 - [x] 按 Agent 授权（AgentMcpServer）
 - [x] 运行时 MCP 客户端（Streamable HTTP：initialize/tools/list/tools/call，工具注入 AgentEngine；Round 9）
-- [ ] stdio / 旧版 SSE 双通道传输
+- [x] stdio 传输（Round 15；旧版 HTTP+SSE 双通道未支持）
 - [ ] 设计 MCP 链路（原型 ↔ MCP）
 
 ### 5.8 单用户协同（P0）
@@ -286,11 +287,19 @@
 | 10 | 工时登记人缺失 | `WorkItemsController.AddWorkLog` | ✅ Round 3 |
 | 11 | `UpdateWorkItemRequest` 无法改指派人/缺陷字段 | `Contracts/WorkItems.cs` | ✅ Round 3 |
 | 12 | Task 状态流转 400、父子关系无法设置 | `WorkItemsController` | ✅ Round 3 |
-| 13 | 前端手写 API 类型，未用 OpenAPI 生成 | `frontend/src/lib/types.ts` | P5 |
+| 13 | 前端手写 API 类型，未用 OpenAPI 生成 | `frontend/src/lib/types.ts` | OpenAPI 已生成并逐步迁移 |
 | 14 | 无 PostgreSQL provider，连接串切换无效 | `Program.cs` | P5 |
 | 15 | 无认证 / 审计日志缺失 | 全局 | 审计 ✅ Round 6；认证 P5 |
 
 ## 4. 每轮工作日志
+
+### Round 15（2026-11-04）
+
+- MCP stdio 传输（PRD 5.7）：新增 `IMcpSession` 抽象 + `StdioMcpClient`（子进程 + 换行 JSON-RPC，stderr 排空、超时、进程树清理）；`McpToolSession` 按配置 transport 选择 HTTP/stdio
+- 单测：stdio 行协议（initialize/tools/list/tools/call，Pipe 假服务端）+ 命令行拆分
+- OpenAPI（P5）：导出 `docs/openapi.json`；引入 openapi-typescript，生成 `src/lib/api-schema.d.ts` + `src/lib/contracts.ts` 契约别名；`npm run api:types`；CI 增加「生成结果无 diff」校验
+- 测试：120 → 122（stdio 协议/分词），`dotnet test` 全绿；前端 13 项仍绿
+- 验证：`dotnet test`、前端 `lint` / `format:check` / `test:run` / `build` 全绿
 
 ### Round 14（2026-11-04）
 

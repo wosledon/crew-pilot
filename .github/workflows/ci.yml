@@ -42,5 +42,9 @@ jobs:
         run: npm run format:check
       - name: Unit tests
         run: npm run test:run
+      - name: Verify generated OpenAPI types
+        run: |
+          npm run api:types
+          git diff --exit-code -- src/lib/api-schema.d.ts
       - name: Build
         run: npm run build
