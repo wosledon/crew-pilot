@@ -56,6 +56,7 @@ export interface WorkflowStepBody {
   maxRetries?: number;
   inputContract?: string;
   outputContract?: string;
+  parallel?: boolean;
 }
 
 export function useCreateWorkflow(projectId: string) {

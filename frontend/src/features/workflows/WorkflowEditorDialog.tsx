@@ -21,6 +21,7 @@ interface StepForm {
   maxRetries: string;
   inputContract: string;
   outputContract: string;
+  parallel: string;
 }
 
 export interface WorkflowEditorDialogProps {
@@ -42,6 +43,7 @@ const newStep = (): StepForm => ({
   maxRetries: "1",
   inputContract: "",
   outputContract: "",
+  parallel: "false",
 });
 
 /** 工作流可视化编辑器：步骤列表 + Agent/岗位/审批策略/重试，支持增删与排序。 */
@@ -91,6 +93,7 @@ export function WorkflowEditorDialog({
             maxRetries: String(step.maxRetries),
             inputContract: step.inputContract ?? "",
             outputContract: step.outputContract ?? "",
+            parallel: String(step.parallel),
           })),
       );
       setInitialized(true);
@@ -123,17 +126,24 @@ export function WorkflowEditorDialog({
       return;
     }
 
-    const payload = validSteps.map<WorkflowStepBody>((step, index) => ({
-      name: step.name.trim(),
-      order: index,
-      agentId: step.agentId === "" ? undefined : step.agentId,
-      requiredJob: step.requiredJob === "" ? undefined : step.requiredJob,
-      instruction: step.instruction.trim() || undefined,
-      approvalPolicy: step.approvalPolicy,
-      maxRetries: Number(step.maxRetries) || 0,
-      inputContract: step.inputContract.trim() || undefined,
-      outputContract: step.outputContract.trim() || undefined,
-    }));
+    let previousOrder = 0;
+    const payload = validSteps.map<WorkflowStepBody>((step, index) => {
+      const parallel = step.parallel === "true";
+      const order = parallel && index > 0 ? previousOrder : index;
+      previousOrder = order;
+      return {
+        name: step.name.trim(),
+        order,
+        agentId: step.agentId === "" ? undefined : step.agentId,
+        requiredJob: step.requiredJob === "" ? undefined : step.requiredJob,
+        instruction: step.instruction.trim() || undefined,
+        approvalPolicy: step.approvalPolicy,
+        maxRetries: Number(step.maxRetries) || 0,
+        inputContract: step.inputContract.trim() || undefined,
+        outputContract: step.outputContract.trim() || undefined,
+        parallel,
+      };
+    });
 
     try {
       if (workflowId === null) {
@@ -282,6 +292,18 @@ export function WorkflowEditorDialog({
                       max={10}
                       value={step.maxRetries}
                       onChange={(event) => updateStep(step.key, { maxRetries: event.target.value })}
+                    />
+                  </label>
+                  <label className="block space-y-1.5 text-sm">
+                    <span className="font-medium">{t("workflows:parallel")}</span>
+                    <Select
+                      value={step.parallel}
+                      onValueChange={(value) => updateStep(step.key, { parallel: value })}
+                      options={[
+                        { value: "false", label: t("workflows:parallelNo") },
+                        { value: "true", label: t("workflows:parallelYes") },
+                      ]}
+                      ariaLabel={t("workflows:parallel")}
                     />
                   </label>
                 </div>

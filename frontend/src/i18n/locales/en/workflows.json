@@ -89,5 +89,8 @@
   "inputContract": "Input contract (optional)",
   "outputContract": "Output contract (optional)",
   "saveWorkflow": "Save workflow",
-  "invalidSteps": "At least one named step is required"
+  "invalidSteps": "At least one named step is required",
+  "parallel": "Run in parallel",
+  "parallelYes": "Yes (parallel with previous)",
+  "parallelNo": "No"
 }

@@ -89,5 +89,8 @@
   "inputContract": "输入契约（可选）",
   "outputContract": "输出契约（可选）",
   "saveWorkflow": "保存工作流",
-  "invalidSteps": "至少需要一个填写名称的步骤"
+  "invalidSteps": "至少需要一个填写名称的步骤",
+  "parallel": "并行执行",
+  "parallelYes": "是（与上一步并行）",
+  "parallelNo": "否"
 }
