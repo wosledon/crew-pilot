@@ -12,6 +12,12 @@ namespace CrewPilot.Api.Controllers;
 [ApiController]
 public sealed class AgentRunsController(CrewPilotDbContext db, AgentRunQueue queue) : ControllerBase
 {
+    private static readonly System.Text.Json.JsonSerializerOptions SseJson = new(
+        System.Text.Json.JsonSerializerDefaults.Web)
+    {
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    };
+
     [HttpGet("api/agent-runs")]
     public async Task<ActionResult<IReadOnlyList<AgentRunListItemDto>>> List(
         [FromQuery] Guid? projectId,
@@ -190,5 +196,81 @@ public sealed class AgentRunsController(CrewPilotDbContext db, AgentRunQueue que
             run.Status.ToString().ToLowerInvariant(), run.WorkingDirectory,
             run.Prompt, run.Output, run.Error, run.PromptTokens, run.CompletionTokens,
             run.CreatedAt, run.StartedAt, run.FinishedAt, run.Duration, logs);
+    }
+
+    /// <summary>流式运行事件（SSE）：status → log... → done，供前端实时展示。</summary>
+    [HttpGet("api/agent-runs/{id:guid}/stream")]
+    public async Task Stream(Guid id, CancellationToken ct)
+    {
+        var exists = await db.AgentRuns.AnyAsync(r => r.Id == id, ct);
+        if (!exists)
+        {
+            Response.StatusCode = 404;
+            return;
+        }
+
+        Response.Headers.ContentType = "text/event-stream; charset=utf-8";
+        Response.Headers.CacheControl = "no-cache";
+        Response.Headers["X-Accel-Buffering"] = "no";
+
+        async Task WriteEventAsync(string name, object data)
+        {
+            await Response.WriteAsync($"event: {name}\ndata: ", ct);
+            await Response.WriteAsync(
+                System.Text.Json.JsonSerializer.Serialize(data, SseJson), ct);
+            await Response.WriteAsync("\n\n", ct);
+            await Response.Body.FlushAsync(ct);
+        }
+
+        var lastSequence = -1;
+        var lastStatus = string.Empty;
+        while (!ct.IsCancellationRequested)
+        {
+            var run = await db.AgentRuns
+                .AsNoTracking()
+                .Where(r => r.Id == id)
+                .Select(r => new
+                {
+                    r.Status,
+                    r.PromptTokens,
+                    r.CompletionTokens,
+                    r.Error,
+                    r.FinishedAt,
+                })
+                .FirstAsync(ct);
+            var status = run.Status.ToString().ToLowerInvariant();
+            if (!string.Equals(status, lastStatus, StringComparison.Ordinal))
+            {
+                lastStatus = status;
+                await WriteEventAsync("status", new
+                {
+                    status,
+                    promptTokens = run.PromptTokens,
+                    completionTokens = run.CompletionTokens,
+                    error = run.Error,
+                    finishedAt = run.FinishedAt,
+                });
+            }
+
+            var logs = await db.RunLogs
+                .AsNoTracking()
+                .Where(l => l.AgentRunId == id && l.Sequence > lastSequence)
+                .OrderBy(l => l.Sequence)
+                .Select(l => new { l.Sequence, l.Kind, l.Content, l.CreatedAt })
+                .ToListAsync(ct);
+            foreach (var log in logs)
+            {
+                lastSequence = log.Sequence;
+                await WriteEventAsync("log", log);
+            }
+
+            if (status is "succeeded" or "failed" or "canceled")
+            {
+                await WriteEventAsync("done", new { status });
+                break;
+            }
+
+            await Task.Delay(1000, ct);
+        }
     }
 }
