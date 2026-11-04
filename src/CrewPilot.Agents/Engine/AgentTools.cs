@@ -7,7 +7,8 @@ namespace CrewPilot.Agents.Engine;
 
 /// <summary>
 /// Agent 内置工具：read_file / write_file / list_files / run_command。
-/// 全部限制在工作目录内；run_command 仅执行白名单命令，带超时与输出截断（见 AGENTS.md 第 6 节）。
+/// 全部限制在工作目录内；run_command 仅执行白名单命令，不经过 shell，带超时与输出截断
+/// （见 AGENTS.md 第 6 节）。
 /// </summary>
 public static class AgentTools
 {
@@ -15,7 +16,19 @@ public static class AgentTools
 
     public const int MaxOutputChars = 8_000;
 
-    public static IList<AITool> Create(string? workingDirectory, IReadOnlyList<string>? whitelist)
+    /// <summary>引擎支持的全部工具名（与 Agent.Tools 字段的 JSON 数组对齐）。</summary>
+    public static IReadOnlyList<string> AllToolNames { get; } =
+        ["read_file", "write_file", "list_files", "run_command"];
+
+    /// <summary>
+    /// 创建可用的工具集合。
+    /// <paramref name="enabledTools"/> 为空表示全部启用；否则只启用其中列出的工具。
+    /// </summary>
+    public static IList<AITool> Create(
+        string? workingDirectory,
+        IReadOnlyList<string>? enabledTools = null,
+        IReadOnlyList<string>? whitelist = null,
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(workingDirectory) || !Directory.Exists(workingDirectory))
         {
@@ -23,77 +36,83 @@ public static class AgentTools
         }
 
         var root = Path.GetFullPath(workingDirectory);
+        var enabled = enabledTools is { Count: > 0 }
+            ? enabledTools.ToHashSet(StringComparer.OrdinalIgnoreCase)
+            : AllToolNames.ToHashSet(StringComparer.OrdinalIgnoreCase);
         var tools = new List<AITool>();
 
-        string? Resolve(string path)
+        if (enabled.Contains("read_file"))
         {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                return null;
-            }
-
-            var full = Path.GetFullPath(Path.Combine(root, path));
-            return full.StartsWith(root, StringComparison.Ordinal) ? full : null;
+            tools.Add(AIFunctionFactory.Create(
+                ([Description("相对工作目录的文件路径")] string path) =>
+                {
+                    var full = ResolvePath(root, path);
+                    return full is null || !File.Exists(full)
+                        ? $"文件不存在或越权：{path}"
+                        : File.ReadAllText(full);
+                },
+                "read_file",
+                "读取工作目录中的文件内容"));
         }
 
-        tools.Add(AIFunctionFactory.Create(
-            ([Description("相对工作目录的文件路径")] string path) =>
-            {
-                var full = Resolve(path);
-                return full is null || !File.Exists(full)
-                    ? $"文件不存在或越权：{path}"
-                    : File.ReadAllText(full);
-            },
-            "read_file",
-            "读取工作目录中的文件内容"));
-
-        tools.Add(AIFunctionFactory.Create(
-            ([Description("相对工作目录的文件路径")] string path,
-             [Description("要写入的完整内容")] string content) =>
-            {
-                var full = Resolve(path);
-                if (full is null)
+        if (enabled.Contains("write_file"))
+        {
+            tools.Add(AIFunctionFactory.Create(
+                ([Description("相对工作目录的文件路径")] string path,
+                 [Description("要写入的完整内容")] string content) =>
                 {
-                    return $"非法路径：{path}";
-                }
+                    var full = ResolvePath(root, path);
+                    if (full is null || full == root)
+                    {
+                        return $"非法路径：{path}";
+                    }
 
-                Directory.CreateDirectory(Path.GetDirectoryName(full)!);
-                File.WriteAllText(full, content);
-                return $"已写入 {path}（{content.Length} 字符）";
-            },
-            "write_file",
-            "把内容写入工作目录中的文件"));
+                    Directory.CreateDirectory(Path.GetDirectoryName(full)!);
+                    File.WriteAllText(full, content);
+                    return $"已写入 {path}（{content.Length} 字符）";
+                },
+                "write_file",
+                "把内容写入工作目录中的文件"));
+        }
 
-        tools.Add(AIFunctionFactory.Create(
-            ([Description("相对工作目录的目录路径，留空为根目录")] string path) =>
-            {
-                var full = Resolve(string.IsNullOrWhiteSpace(path) ? "." : path);
-                if (full is null || !Directory.Exists(full))
+        if (enabled.Contains("list_files"))
+        {
+            tools.Add(AIFunctionFactory.Create(
+                ([Description("相对工作目录的目录路径，留空为根目录")] string path) =>
                 {
-                    return $"目录不存在或越权：{path}";
-                }
+                    var full = ResolvePath(root, string.IsNullOrWhiteSpace(path) ? "." : path);
+                    if (full is null || !Directory.Exists(full))
+                    {
+                        return $"目录不存在或越权：{path}";
+                    }
 
-                return string.Join('\n', Directory.GetFileSystemEntries(full)
-                    .Select(entry => Path.GetRelativePath(root, entry))
-                    .OrderBy(entry => entry, StringComparer.Ordinal));
-            },
-            "list_files",
-            "列出工作目录中的文件与子目录"));
+                    return string.Join('\n', Directory.GetFileSystemEntries(full)
+                        .Select(entry => Path.GetRelativePath(root, entry))
+                        .OrderBy(entry => entry, StringComparer.Ordinal));
+                },
+                "list_files",
+                "列出工作目录中的文件与子目录"));
+        }
 
-        if (whitelist is { Count: > 0 })
+        if (enabled.Contains("run_command") && whitelist is { Count: > 0 })
         {
             var allowed = whitelist.ToHashSet(StringComparer.OrdinalIgnoreCase);
             tools.Add(AIFunctionFactory.Create(
-                ([Description("要执行的命令，如 git status")] string command) =>
+                ([Description("要执行的命令，如 git status（不经过 shell，不支持管道/重定向）")] string command) =>
                 {
-                    var executable = command.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? string.Empty;
-                    var name = Path.GetFileNameWithoutExtension(executable);
+                    var tokens = TokenizeCommand(command);
+                    if (tokens.Count == 0)
+                    {
+                        return "空命令";
+                    }
+
+                    var name = Path.GetFileNameWithoutExtension(tokens[0]);
                     if (!allowed.Contains(name))
                     {
                         return $"命令不在白名单：{name}";
                     }
 
-                    return RunCommand(root, command);
+                    return RunCommandAsync(root, tokens, cancellationToken).GetAwaiter().GetResult();
                 },
                 "run_command",
                 "在工作目录执行白名单内的终端命令（git/dotnet/npm/gh 等）"));
@@ -102,9 +121,72 @@ public static class AgentTools
         return tools;
     }
 
-    private static string RunCommand(string workingDirectory, string command)
+    /// <summary>把相对路径解析到工作目录内；越界返回 null（含同前缀兄弟目录逃逸）。</summary>
+    public static string? ResolvePath(string workingDirectory, string path)
     {
-        var psi = new ProcessStartInfo("cmd.exe", $"/c {command}")
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return null;
+        }
+
+        var root = Path.GetFullPath(workingDirectory)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        var full = Path.GetFullPath(Path.Combine(root, path));
+        if (string.Equals(full, root, StringComparison.OrdinalIgnoreCase))
+        {
+            return full;
+        }
+
+        var rootWithSeparator = root + Path.DirectorySeparatorChar;
+        return full.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase) ? full : null;
+    }
+
+    /// <summary>把命令行拆成参数（支持双引号/单引号，不经过 shell）。</summary>
+    public static IReadOnlyList<string> TokenizeCommand(string command)
+    {
+        var tokens = new List<string>();
+        var current = new StringBuilder();
+        var inDoubleQuote = false;
+        var inSingleQuote = false;
+
+        foreach (var ch in command)
+        {
+            if (ch == '"' && !inSingleQuote)
+            {
+                inDoubleQuote = !inDoubleQuote;
+            }
+            else if (ch == '\'' && !inDoubleQuote)
+            {
+                inSingleQuote = !inSingleQuote;
+            }
+            else if (char.IsWhiteSpace(ch) && !inDoubleQuote && !inSingleQuote)
+            {
+                if (current.Length > 0)
+                {
+                    tokens.Add(current.ToString());
+                    current.Clear();
+                }
+            }
+            else
+            {
+                current.Append(ch);
+            }
+        }
+
+        if (current.Length > 0)
+        {
+            tokens.Add(current.ToString());
+        }
+
+        return tokens;
+    }
+
+    private static async Task<string> RunCommandAsync(
+        string workingDirectory,
+        IReadOnlyList<string> tokens,
+        CancellationToken cancellationToken)
+    {
+        var psi = new ProcessStartInfo(tokens[0])
         {
             WorkingDirectory = workingDirectory,
             RedirectStandardOutput = true,
@@ -112,32 +194,64 @@ public static class AgentTools
             UseShellExecute = false,
             CreateNoWindow = true,
         };
-
-        using var process = Process.Start(psi);
-        if (process is null)
+        foreach (var argument in tokens.Skip(1))
         {
-            return "命令启动失败";
+            psi.ArgumentList.Add(argument);
         }
 
-        var output = new StringBuilder();
-        output.AppendLine(process.StandardOutput.ReadToEnd());
-        output.AppendLine(process.StandardError.ReadToEnd());
+        using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutCts.CancelAfter(CommandTimeoutMs);
 
-        if (!process.WaitForExit(CommandTimeoutMs))
+        using var process = new Process { StartInfo = psi };
+        Task<string>? stdoutTask = null;
+        Task<string>? stderrTask = null;
+        try
         {
-            try
+            process.Start();
+            stdoutTask = process.StandardOutput.ReadToEndAsync();
+            stderrTask = process.StandardError.ReadToEndAsync();
+
+            await process.WaitForExitAsync(timeoutCts.Token);
+
+            var text = (await stdoutTask) + (await stderrTask);
+            return text.Length > MaxOutputChars
+                ? text[..MaxOutputChars] + "\n…（输出已截断）"
+                : text;
+        }
+        catch (OperationCanceledException)
+        {
+            TryKill(process);
+            await DrainAsync(stdoutTask, stderrTask);
+            return cancellationToken.IsCancellationRequested
+                ? "命令已取消"
+                : $"命令超时（{CommandTimeoutMs}ms）：{tokens[0]}";
+        }
+    }
+
+    private static void TryKill(Process process)
+    {
+        try
+        {
+            if (!process.HasExited)
             {
                 process.Kill(entireProcessTree: true);
             }
-            catch
-            {
-                // 进程可能已退出
-            }
-
-            return $"命令超时（{CommandTimeoutMs}ms）：{command}";
         }
+        catch
+        {
+            // 进程可能已退出
+        }
+    }
 
-        var text = output.ToString();
-        return text.Length > MaxOutputChars ? text[..MaxOutputChars] + "\n…（输出已截断）" : text;
+    private static async Task DrainAsync(params Task<string>?[] tasks)
+    {
+        try
+        {
+            await Task.WhenAll(tasks.OfType<Task<string>>()).WaitAsync(TimeSpan.FromSeconds(2));
+        }
+        catch
+        {
+            // 已 kill，读取任务可能以异常结束，忽略即可
+        }
     }
 }

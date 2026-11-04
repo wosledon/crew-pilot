@@ -23,6 +23,7 @@ builder.Services.AddSingleton<ISecretProtector, DpapiSecretProtector>();
 // Agent 平台：MAF 引擎 + 后台执行队列（认领闭环）
 builder.Services.AddSingleton<IAgentEngine, MafAgentEngine>();
 builder.Services.AddSingleton<AgentRunQueue>();
+builder.Services.AddSingleton<AgentRunCancellationRegistry>();
 builder.Services.AddHostedService<AgentRunWorker>();
 builder.Services.AddScoped<AgentRunExecutor>();
 builder.Services.AddHttpClient("models.dev");

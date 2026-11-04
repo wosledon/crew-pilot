@@ -1,10 +1,10 @@
 using System.Diagnostics;
-using System.Text;
 
 namespace CrewPilot.Agents.Execution;
 
 /// <summary>
 /// 受控进程执行封装：白名单由调用方保证，超时 + 输出截断 + 审计日志（见 AGENTS.md 第 6 节）。
+/// 统一走 <see cref="ProcessStartInfo.ArgumentList"/>，不经过 shell，避免命令拼接注入。
 /// </summary>
 public static class ProcessRunner
 {
@@ -12,11 +12,12 @@ public static class ProcessRunner
 
     public static async Task<(int ExitCode, string Output)> RunAsync(
         string workingDirectory,
-        string command,
+        string fileName,
+        IReadOnlyList<string> arguments,
         TimeSpan timeout,
         CancellationToken ct = default)
     {
-        var psi = new ProcessStartInfo("cmd.exe", $"/c {command}")
+        var psi = new ProcessStartInfo(fileName)
         {
             WorkingDirectory = workingDirectory,
             RedirectStandardOutput = true,
@@ -25,33 +26,67 @@ public static class ProcessRunner
             CreateNoWindow = true,
         };
 
-        using var process = Process.Start(psi);
-        if (process is null)
+        foreach (var argument in arguments)
         {
-            return (-1, "命令启动失败");
+            psi.ArgumentList.Add(argument);
         }
 
-        var output = new StringBuilder();
-        output.AppendLine(process.StandardOutput.ReadToEnd());
-        output.AppendLine(process.StandardError.ReadToEnd());
+        using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        timeoutCts.CancelAfter(timeout);
 
-        if (!process.WaitForExit((int)timeout.TotalMilliseconds))
+        using var process = new Process { StartInfo = psi };
+        Task<string>? stdoutTask = null;
+        Task<string>? stderrTask = null;
+        try
         {
-            try
+            process.Start();
+            stdoutTask = process.StandardOutput.ReadToEndAsync();
+            stderrTask = process.StandardError.ReadToEndAsync();
+
+            await process.WaitForExitAsync(timeoutCts.Token);
+
+            var text = (await stdoutTask) + (await stderrTask);
+            return (process.ExitCode, Truncate(text));
+        }
+        catch (OperationCanceledException)
+        {
+            TryKill(process);
+            await DrainAsync(stdoutTask, stderrTask);
+
+            var reason = ct.IsCancellationRequested
+                ? "命令已取消"
+                : $"命令超时（{(int)timeout.TotalMilliseconds}ms）";
+            return (-1, $"{reason}：{fileName} {string.Join(' ', arguments)}");
+        }
+    }
+
+    private static string Truncate(string text) =>
+        text.Length > MaxOutputChars ? text[..MaxOutputChars] + "\n…（输出已截断）" : text;
+
+    private static void TryKill(Process process)
+    {
+        try
+        {
+            if (!process.HasExited)
             {
                 process.Kill(entireProcessTree: true);
             }
-            catch
-            {
-                // 进程可能已退出
-            }
-
-            return (-1, $"命令超时（{timeout.TotalMilliseconds}ms）：{command}");
         }
+        catch
+        {
+            // 进程可能已退出
+        }
+    }
 
-        var text = output.ToString();
-        return text.Length > MaxOutputChars
-            ? (process.ExitCode, text[..MaxOutputChars] + "\n…（输出已截断）")
-            : (process.ExitCode, text);
+    private static async Task DrainAsync(params Task<string>?[] tasks)
+    {
+        try
+        {
+            await Task.WhenAll(tasks.OfType<Task<string>>()).WaitAsync(TimeSpan.FromSeconds(2));
+        }
+        catch
+        {
+            // 已 kill，读取任务可能以异常结束，忽略即可
+        }
     }
 }

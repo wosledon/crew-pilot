@@ -15,11 +15,21 @@ public sealed record ProjectDetailDto(
     string Name,
     string? Description,
     string? RepoUrl,
+    string? LocalPath,
     string Status,
     int WorkItemCount,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt);
 
-public sealed record CreateProjectRequest(string Key, string Name, string? Description, string? RepoUrl);
+public sealed record CreateProjectRequest(
+    string Key,
+    string Name,
+    string? Description,
+    string? RepoUrl,
+    string? LocalPath = null);
 
-public sealed record UpdateProjectRequest(string Name, string? Description, string? RepoUrl);
+public sealed record UpdateProjectRequest(
+    string Name,
+    string? Description,
+    string? RepoUrl,
+    string? LocalPath = null);

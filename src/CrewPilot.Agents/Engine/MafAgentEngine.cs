@@ -36,7 +36,11 @@ public sealed class MafAgentEngine : IAgentEngine
                 new ApiKeyCredential(request.ApiKey),
                 new OpenAIClientOptions { Endpoint = new Uri(request.BaseUrl) });
 
-            var tools = AgentTools.Create(request.WorkingDirectory, request.CommandWhitelist);
+            var tools = AgentTools.Create(
+                request.WorkingDirectory,
+                request.Tools,
+                request.CommandWhitelist,
+                cancellationToken);
             Log("info", $"Agent {request.AgentName} 启动（模型 {request.Model}，工具 {tools.Count} 个）");
 
             var agent = openAiClient
@@ -62,6 +66,11 @@ public sealed class MafAgentEngine : IAgentEngine
                 promptTokens,
                 completionTokens,
                 steps);
+        }
+        catch (OperationCanceledException)
+        {
+            // 取消（接管）由执行器负责落状态与日志，这里向上传递
+            throw;
         }
         catch (Exception ex)
         {

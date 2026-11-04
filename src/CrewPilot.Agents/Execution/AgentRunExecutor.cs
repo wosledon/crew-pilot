@@ -24,15 +24,18 @@ public sealed class AgentRunExecutor
     private readonly CrewPilotDbContext _db;
     private readonly IAgentEngine _engine;
     private readonly ISecretProtector _secrets;
+    private readonly AgentRunCancellationRegistry _cancellation;
 
     public AgentRunExecutor(
         CrewPilotDbContext db,
         IAgentEngine engine,
-        ISecretProtector secrets)
+        ISecretProtector secrets,
+        AgentRunCancellationRegistry cancellation)
     {
         _db = db;
         _engine = engine;
         _secrets = secrets;
+        _cancellation = cancellation;
     }
 
     /// <summary>创建工作项被 Agent 认领的执行记录并入队。</summary>
@@ -67,7 +70,7 @@ public sealed class AgentRunExecutor
         return run;
     }
 
-    /// <summary>执行一次 AgentRun（由后台 Worker 调用）。</summary>
+    /// <summary>执行一次 AgentRun（由后台 Worker 调用）。仅处理排队中的运行。</summary>
     public async Task ExecuteAsync(Guid runId, CancellationToken ct = default)
     {
         var run = await _db.AgentRuns
@@ -75,8 +78,9 @@ public sealed class AgentRunExecutor
             .ThenInclude(a => a.Provider)
             .Include(r => r.WorkItem)
             .FirstOrDefaultAsync(r => r.Id == runId, ct);
-        if (run is null || run.Status is AgentRunStatus.Running or AgentRunStatus.Succeeded)
+        if (run is null || run.Status != AgentRunStatus.Queued)
         {
+            // 已取消/已结束的运行不重复执行（排队取消依赖此守卫）
             return;
         }
 
@@ -84,62 +88,98 @@ public sealed class AgentRunExecutor
         run.StartedAt = DateTimeOffset.UtcNow;
         await _db.SaveChangesAsync(ct);
 
-        // 项目目录隔离 + git worktree：开发 Agent 按工作项独立作业
-        var workingDirectory = await PrepareWorkingDirectoryAsync(run, ct);
-        run.WorkingDirectory = workingDirectory;
-        await _db.SaveChangesAsync(ct);
-
-        var apiKey = string.Empty;
+        using var runCts = _cancellation.Register(run.Id, ct);
         try
         {
-            apiKey = _secrets.Unprotect(run.Agent.Provider.ApiKeyProtected);
-        }
-        catch (Exception ex)
-        {
-            await FinishAsync(run, false, string.Empty, $"API key 解密失败：{ex.Message}", null, null, null, ct);
-            return;
-        }
-
-        var request = new AgentRunRequest(
-            AgentName: run.Agent.Name,
-            Prompt: run.Prompt,
-            SystemPrompt: run.Agent.SystemPrompt,
-            Model: run.Agent.Model,
-            BaseUrl: run.Agent.Provider.BaseUrl,
-            ApiKey: apiKey,
-            WorkingDirectory: workingDirectory,
-            Tools: ParseTools(run.Agent.Tools),
-            CommandWhitelist: ParseTools(run.Agent.CommandWhitelist));
-
-        var result = await _engine.RunAsync(request, ct);
-
-        var sequence = 0;
-        if (result.Steps is not null)
-        {
-            foreach (var step in result.Steps)
+            // 取消可能发生在状态落库与注册之间，注册后再确认一次
+            if (await IsCanceledInDbAsync(run.Id, ct))
             {
-                _db.RunLogs.Add(new RunLog
-                {
-                    AgentRunId = run.Id,
-                    Sequence = ++sequence,
-                    Kind = step.Kind,
-                    Content = step.Content,
-                });
+                await FinishCanceledAsync(run, ct);
+                return;
             }
-        }
 
-        await FinishAsync(
-            run,
-            result.Succeeded,
-            result.Output,
-            result.Error,
-            result.PromptTokens,
-            result.CompletionTokens,
-            result.Duration,
-            ct);
+            // 项目目录隔离 + git worktree：开发 Agent 按工作项独立作业
+            var workingDirectory = await PrepareWorkingDirectoryAsync(run, runCts.Token);
+            run.WorkingDirectory = workingDirectory;
+            await _db.SaveChangesAsync(ct);
+
+            var apiKey = string.Empty;
+            try
+            {
+                apiKey = _secrets.Unprotect(run.Agent.Provider.ApiKeyProtected);
+            }
+            catch (Exception ex)
+            {
+                await FinishAsync(
+                    run,
+                    false,
+                    string.Empty,
+                    $"API key 解密失败：{ex.Message}",
+                    null,
+                    null,
+                    null,
+                    ct);
+                return;
+            }
+
+            var request = new AgentRunRequest(
+                AgentName: run.Agent.Name,
+                Prompt: run.Prompt,
+                SystemPrompt: run.Agent.SystemPrompt,
+                Model: run.Agent.Model,
+                BaseUrl: run.Agent.Provider.BaseUrl,
+                ApiKey: apiKey,
+                WorkingDirectory: workingDirectory,
+                Tools: ParseTools(run.Agent.Tools),
+                CommandWhitelist: ParseTools(run.Agent.CommandWhitelist));
+
+            var result = await _engine.RunAsync(request, runCts.Token);
+
+            // 引擎可能忽略取消令牌直接返回，这里再确认一次取消状态
+            if (runCts.IsCancellationRequested || await IsCanceledInDbAsync(run.Id, ct))
+            {
+                await FinishCanceledAsync(run, ct);
+                return;
+            }
+
+            var sequence = 0;
+            if (result.Steps is not null)
+            {
+                foreach (var step in result.Steps)
+                {
+                    _db.RunLogs.Add(new RunLog
+                    {
+                        AgentRunId = run.Id,
+                        Sequence = ++sequence,
+                        Kind = step.Kind,
+                        Content = step.Content,
+                    });
+                }
+            }
+
+            await FinishAsync(
+                run,
+                result.Succeeded,
+                result.Output,
+                result.Error,
+                result.PromptTokens,
+                result.CompletionTokens,
+                result.Duration,
+                ct);
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            // 用户取消（接管）：保留状态、日志与已耗工时
+            await FinishCanceledAsync(run, ct);
+        }
+        finally
+        {
+            _cancellation.Unregister(run.Id, runCts);
+            await CleanupWorktreeAsync(run);
+        }
     }
 
-    /// <summary>取消（被接管）：仅对未结束的运行有效。</summary>
+    /// <summary>取消（被接管）：运行中则中止引擎调用，排队中则直接置为已取消。</summary>
     public async Task<bool> CancelAsync(Guid runId, CancellationToken ct = default)
     {
         var run = await _db.AgentRuns.FirstOrDefaultAsync(r => r.Id == runId, ct);
@@ -148,14 +188,25 @@ public sealed class AgentRunExecutor
             return false;
         }
 
+        // 正在执行：向引擎发取消信号，由执行器负责收尾（落状态/日志/工时）
+        if (_cancellation.Cancel(runId))
+        {
+            return true;
+        }
+
+        // 排队中（尚未开始）：直接落已取消，Worker 出队时会被守卫跳过
         run.Status = AgentRunStatus.Canceled;
         run.FinishedAt = DateTimeOffset.UtcNow;
         run.Error = "已被用户取消（接管）";
+
         if (run.WorkItemId is Guid workItemId)
         {
             _db.Activities.Add(new Activity
             {
-                ProjectId = (await _db.WorkItems.Where(w => w.Id == workItemId).Select(w => w.ProjectId).FirstOrDefaultAsync(ct)),
+                ProjectId = await _db.WorkItems
+                    .Where(w => w.Id == workItemId)
+                    .Select(w => w.ProjectId)
+                    .FirstOrDefaultAsync(ct),
                 WorkItemId = workItemId,
                 EventType = "agentrun.canceled",
                 Payload = "{}",
@@ -177,6 +228,13 @@ public sealed class AgentRunExecutor
         TimeSpan? engineDuration,
         CancellationToken ct)
     {
+        // 并发取消保护：DB 中已被置为取消时不再覆盖为成功/失败
+        if (await IsCanceledInDbAsync(run.Id, ct))
+        {
+            await FinishCanceledAsync(run, ct);
+            return;
+        }
+
         run.Status = succeeded ? AgentRunStatus.Succeeded : AgentRunStatus.Failed;
         run.FinishedAt = DateTimeOffset.UtcNow;
         // 优先采用引擎测量的耗时（工时 1:1 折算的依据）
@@ -188,55 +246,103 @@ public sealed class AgentRunExecutor
         run.PromptTokens = promptTokens;
         run.CompletionTokens = completionTokens;
 
-        // 工时 1:1 折算（不加权）
-        if (run.Duration is { } duration && duration > TimeSpan.Zero)
-        {
-            var hours = AgentRunHours.FromDuration(duration);
-            if (run.WorkItemId is Guid workItemId && hours > 0)
-            {
-                _db.WorkLogs.Add(new WorkLog
-                {
-                    WorkItemId = workItemId,
-                    Hours = hours,
-                    Date = DateOnly.FromDateTime(DateTime.UtcNow),
-                    Note = $"AgentRun 自动折算（{run.Trigger}）",
-                    AgentRunId = run.Id,
-                });
-            }
-        }
-
-        if (run.WorkItemId is Guid id)
-        {
-            var workItem = await _db.WorkItems.FirstOrDefaultAsync(w => w.Id == id, ct);
-            if (workItem is not null)
-            {
-                // PR 链接回填
-                if (workItem.PrUrl is null)
-                {
-                    var match = PrUrlPattern.Match(output ?? string.Empty);
-                    if (match.Success)
-                    {
-                        workItem.PrUrl = match.Value;
-                    }
-                }
-
-                _db.Activities.Add(new Activity
-                {
-                    ProjectId = workItem.ProjectId,
-                    WorkItemId = workItem.Id,
-                    EventType = succeeded ? "agentrun.succeeded" : "agentrun.failed",
-                    Payload = System.Text.Json.JsonSerializer.Serialize(new
-                    {
-                        duration = run.Duration?.ToString(),
-                        promptTokens,
-                        completionTokens,
-                    }),
-                    ActorKind = MemberKind.Agent,
-                });
-            }
-        }
+        AddAutoWorkLog(run, "AgentRun 自动折算");
+        AddPrUrlIfFound(run, output);
+        AddRunActivity(run, succeeded ? "agentrun.succeeded" : "agentrun.failed", promptTokens, completionTokens);
 
         await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task FinishCanceledAsync(AgentRun run, CancellationToken ct)
+    {
+        run.Status = AgentRunStatus.Canceled;
+        run.FinishedAt = DateTimeOffset.UtcNow;
+        run.Duration = run.StartedAt is { } started ? run.FinishedAt - started : null;
+        run.Error = "已被用户取消（接管）";
+
+        _db.RunLogs.Add(new RunLog
+        {
+            AgentRunId = run.Id,
+            Sequence = 9_999,
+            Kind = "info",
+            Content = "运行已被用户取消（接管），保留现场与已耗工时。",
+        });
+
+        AddAutoWorkLog(run, "AgentRun 取消折算（被接管）");
+        AddRunActivity(run, "agentrun.canceled", null, null);
+
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private void AddAutoWorkLog(AgentRun run, string note)
+    {
+        if (run.WorkItemId is not Guid workItemId ||
+            run.Duration is not { } duration ||
+            duration <= TimeSpan.Zero)
+        {
+            return;
+        }
+
+        var hours = AgentRunHours.FromDuration(duration);
+        if (hours <= 0)
+        {
+            return;
+        }
+
+        _db.WorkLogs.Add(new WorkLog
+        {
+            WorkItemId = workItemId,
+            Hours = hours,
+            Date = DateOnly.FromDateTime(DateTime.UtcNow),
+            Note = $"{note}（{run.Trigger}）",
+            AgentRunId = run.Id,
+        });
+    }
+
+    private void AddPrUrlIfFound(AgentRun run, string? output)
+    {
+        if (run.WorkItem is null || run.WorkItem.PrUrl is not null)
+        {
+            return;
+        }
+
+        var match = PrUrlPattern.Match(output ?? string.Empty);
+        if (match.Success)
+        {
+            run.WorkItem.PrUrl = match.Value;
+        }
+    }
+
+    private void AddRunActivity(AgentRun run, string eventType, int? promptTokens, int? completionTokens)
+    {
+        if (run.WorkItem is null)
+        {
+            return;
+        }
+
+        _db.Activities.Add(new Activity
+        {
+            ProjectId = run.WorkItem.ProjectId,
+            WorkItemId = run.WorkItem.Id,
+            EventType = eventType,
+            Payload = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                duration = run.Duration?.ToString(),
+                promptTokens,
+                completionTokens,
+            }),
+            ActorKind = MemberKind.Agent,
+        });
+    }
+
+    private async Task<bool> IsCanceledInDbAsync(Guid runId, CancellationToken ct)
+    {
+        var status = await _db.AgentRuns
+            .AsNoTracking()
+            .Where(r => r.Id == runId)
+            .Select(r => r.Status)
+            .FirstOrDefaultAsync(ct);
+        return status == AgentRunStatus.Canceled;
     }
 
     private async Task<string?> PrepareWorkingDirectoryAsync(AgentRun run, CancellationToken ct)
@@ -264,9 +370,10 @@ public sealed class AgentRunExecutor
         try
         {
             Directory.CreateDirectory(worktreesRoot);
-            var (exitCode, _) = await ProcessRunner.RunAsync(
+            var (exitCode, output) = await ProcessRunner.RunAsync(
                 localPath,
-                $"git worktree add \"{worktreePath}\" -b {branch}",
+                "git",
+                ["worktree", "add", worktreePath, "-b", branch],
                 TimeSpan.FromSeconds(60),
                 ct);
             if (exitCode == 0 && Directory.Exists(worktreePath))
@@ -281,8 +388,17 @@ public sealed class AgentRunExecutor
                 await _db.SaveChangesAsync(ct);
                 return worktreePath;
             }
+
+            _db.RunLogs.Add(new RunLog
+            {
+                AgentRunId = run.Id,
+                Sequence = 0,
+                Kind = "error",
+                Content = $"worktree 创建失败（退出码 {exitCode}）：{output}",
+            });
+            await _db.SaveChangesAsync(ct);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _db.RunLogs.Add(new RunLog
             {
@@ -296,6 +412,66 @@ public sealed class AgentRunExecutor
 
         // 非 git 仓库或 worktree 失败时退回项目目录（仍受沙箱约束）
         return localPath;
+    }
+
+    /// <summary>失败/取消时清理 worktree；成功时保留，等待 PR/合并流程（M4）后清理。</summary>
+    private async Task CleanupWorktreeAsync(AgentRun run)
+    {
+        if (run.Status is not (AgentRunStatus.Canceled or AgentRunStatus.Failed) ||
+            string.IsNullOrWhiteSpace(run.WorkingDirectory) ||
+            run.WorkItemId is not Guid workItemId)
+        {
+            return;
+        }
+
+        var localPath = await _db.WorkItems
+            .AsNoTracking()
+            .Where(w => w.Id == workItemId)
+            .Select(w => w.Project.LocalPath)
+            .FirstOrDefaultAsync();
+        if (string.IsNullOrWhiteSpace(localPath))
+        {
+            return;
+        }
+
+        var worktreesRoot = Path.Combine(localPath, ".crewpilot", "worktrees");
+        if (!run.WorkingDirectory.StartsWith(worktreesRoot, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        try
+        {
+            var (exitCode, output) = await ProcessRunner.RunAsync(
+                localPath,
+                "git",
+                ["worktree", "remove", "--force", run.WorkingDirectory],
+                TimeSpan.FromSeconds(30));
+            if (Directory.Exists(run.WorkingDirectory))
+            {
+                Directory.Delete(run.WorkingDirectory, recursive: true);
+            }
+
+            _db.RunLogs.Add(new RunLog
+            {
+                AgentRunId = run.Id,
+                Sequence = 9_998,
+                Kind = exitCode == 0 ? "info" : "error",
+                Content = $"worktree 清理：{run.WorkingDirectory}（退出码 {exitCode}）{output}".Trim(),
+            });
+            await _db.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            _db.RunLogs.Add(new RunLog
+            {
+                AgentRunId = run.Id,
+                Sequence = 9_998,
+                Kind = "error",
+                Content = $"worktree 清理失败：{ex.Message}",
+            });
+            await _db.SaveChangesAsync();
+        }
     }
 
     private static string BuildPrompt(Agent agent, WorkItem workItem)

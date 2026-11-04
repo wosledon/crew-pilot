@@ -67,5 +67,77 @@ public sealed class ProjectsApiTests(CrewPilotApiFactory factory) : IClassFixtur
         get.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
+    [Fact]
+    public async Task CreateProject_WithExistingLocalPath_ReturnsNormalizedPath()
+    {
+        var client = factory.CreateClient();
+        var directory = Directory.CreateTempSubdirectory("crewpilot_project_");
+
+        try
+        {
+            var response = await client.PostAsJsonAsync("/api/projects", new
+            {
+                key = NewKey(),
+                name = "带本地目录的项目",
+                localPath = directory.FullName,
+            });
+
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
+            var created = await response.Content.ReadFromJsonAsync<ProjectDetailDto>();
+            created!.LocalPath.Should().Be(Path.GetFullPath(directory.FullName));
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task CreateProject_WithMissingLocalPath_Returns400()
+    {
+        var client = factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync("/api/projects", new
+        {
+            key = NewKey(),
+            name = "本地目录不存在",
+            localPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N")),
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task UpdateProject_WithEmptyLocalPath_ClearsIt()
+    {
+        var client = factory.CreateClient();
+        var directory = Directory.CreateTempSubdirectory("crewpilot_project_");
+
+        try
+        {
+            var createdResponse = await client.PostAsJsonAsync("/api/projects", new
+            {
+                key = NewKey(),
+                name = "待清空目录",
+                localPath = directory.FullName,
+            });
+            var created = await createdResponse.Content.ReadFromJsonAsync<ProjectDetailDto>();
+
+            var updatedResponse = await client.PutAsJsonAsync($"/api/projects/{created!.Id}", new
+            {
+                name = "待清空目录",
+                localPath = string.Empty,
+            });
+
+            updatedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            var updated = await updatedResponse.Content.ReadFromJsonAsync<ProjectDetailDto>();
+            updated!.LocalPath.Should().BeNull();
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
+    }
+
     private static string NewKey() => "T" + Guid.NewGuid().ToString("N")[..6].ToUpperInvariant();
 }
