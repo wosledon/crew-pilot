@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Bot, Clock, FileText, Timer } from "lucide-react";
 import { Badge, type BadgeTone } from "@/components/ui/Badge";
@@ -27,6 +28,35 @@ export function AgentRunDetailDialog({ runId, open, onOpenChange }: AgentRunDeta
   const run = useAgentRun(runId ?? undefined);
   const detail = run.data;
   const isLive = detail?.status === "queued" || detail?.status === "running";
+  const [liveLogs, setLiveLogs] = useState<
+    Array<{ sequence: number; kind: string; content: string }>
+  >([]);
+
+  useEffect(() => {
+    if (!open || runId === null) {
+      return;
+    }
+    setLiveLogs([]);
+    const source = new EventSource(`/api/agent-runs/${runId}/stream`);
+    const onLog = (event: MessageEvent<string>) => {
+      const log = JSON.parse(event.data) as {
+        sequence: number;
+        kind: string;
+        content: string;
+      };
+      setLiveLogs((previous) =>
+        previous.some((entry) => entry.sequence === log.sequence) ? previous : [...previous, log],
+      );
+    };
+    const onDone = () => {
+      source.close();
+      void run.refetch();
+    };
+    source.addEventListener("log", onLog as EventListener);
+    source.addEventListener("done", onDone);
+    source.onerror = () => source.close();
+    return () => source.close();
+  }, [open, runId, run]);
 
   return (
     <Dialog
@@ -56,6 +86,19 @@ export function AgentRunDetailDialog({ runId, open, onOpenChange }: AgentRunDeta
               </span>
             ) : null}
           </div>
+
+          {liveLogs.length > 0 ? (
+            <div className="space-y-1">
+              <p className="text-xs font-medium">{t("agentruns:liveLogs")}</p>
+              <div className="max-h-40 space-y-0.5 overflow-auto rounded-md bg-muted/50 p-2 font-mono text-xs">
+                {liveLogs.map((log) => (
+                  <p key={log.sequence} className="whitespace-pre-wrap">
+                    [{log.kind}] {log.content}
+                  </p>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
             <span className="flex items-center gap-1">

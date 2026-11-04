@@ -40,5 +40,6 @@
   "runningNow": "执行中…",
   "prompt": "提示词",
   "retry": "重试",
-  "retried": "已重试，执行中"
+  "retried": "已重试，执行中",
+  "liveLogs": "实时日志（SSE）"
 }
