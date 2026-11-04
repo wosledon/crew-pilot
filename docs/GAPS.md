@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 151 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 153 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -68,7 +68,7 @@
 
 - [x] Skills：实体 + CRUD + Agent 装配 + 运行时注入系统提示词
 - [x] SKILL.md 导入/导出（Round 26：front matter + 正文、工具归一、同名冲突 409）
-- [ ] Skills 脚本/资源目录执行与文件同步
+- [x] Skills 脚本/资源目录导入导出（Round 30：zip 包 + scripts/resources 存储与安全校验）`n- [ ] Skill 脚本执行（按 Skill 触发运行脚本）
 - [x] MCP：Server 配置、认证加密、启停、连通性测试、按 Agent 授权
 - [x] MCP 运行时：Streamable HTTP 客户端（initialize / tools/list / tools/call，Round 9）
 - [x] MCP 运行时：stdio 传输（Round 15）、旧版 HTTP+SSE 双通道（Round 20）
@@ -218,7 +218,7 @@
 - [x] 实体与 CRUD（名称/描述/提示词/工具白名单/脚本目录）
 - [x] Agent 装配（AgentSkill）与运行时注入系统提示词
 - [x] 前端管理页与 Agent 能力装配 UI
-- [x] SKILL.md 目录结构、脚本/资源字段、导入导出（Round 26）
+- [x] SKILL.md 目录结构、脚本/资源字段、zip 资源包导入导出（Round 26/30）
 
 ### 5.6 运行引擎（P0）
 
@@ -294,6 +294,14 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 30（2026-11-04）
+
+- Skills 资源包（PRD 5.5）：新增 `SkillStorage`（`Skills:RootPath`，默认 `App_Data/skills`）与 zip 导入/导出
+  - `POST /api/skills/import-bundle`：解析 SKILL.md + 解压 `scripts/`、`resources/`；限制 10MB/5MB 单文件/100 文件/20MB 总量；拒绝 zip-slip 与非法路径
+  - `GET /api/skills/{id}/bundle` 下载 zip；`GET /api/skills/{id}/files` 列出资源；删除 Skill 时清理目录
+- 前端 Skills 页：导入支持 `.zip` 资源包，新增「导出资源包」按钮；说明文案更新
+- 测试：151 → 153（资源包导入/列出/导出、zip-slip 拒绝），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 29（2026-11-04）
 
