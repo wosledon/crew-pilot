@@ -8,15 +8,15 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（仅 SQLite）/ 97 项测试全绿 |
-| 前端 | React 18 + TS + Vite；`npm run lint` / `format:check` / `build` 全绿 |
+| 后端 | .NET 10 + EF Core（仅 SQLite）/ 98 项测试全绿 |
+| 前端 | React 18 + TS + Vite；lint / format / build / 10 项 Vitest 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
 | M2 | 完成并硬化（取消/沙箱/工具权限/LocalPath 已修） |
 | M3 | 核心闭环完成（工作流/审批/卡点队列/模板/团队实体） |
 | M4 | 主体完成（Token 加密、gh/glab、PR/CI 同步、发布） |
 | M5 | 主体完成（Skills/MCP 配置/成本/审计），剩余 MCP 运行时与部署 |
-| 工程化 | CI/Docker/compose/SignalR 已落地；无 PostgreSQL、API 类型手写、无前端测试 |
+| 工程化 | CI/Docker/compose/SignalR/前端测试已落地；无 PostgreSQL、API 类型手写 |
 
 ## 1. 分阶段实施计划
 
@@ -82,7 +82,7 @@
 - [ ] PostgreSQL 支持（Npgsql + provider 切换 + 迁移验证）
 - [x] CI（GitHub Actions：build/test/lint）+ Dockerfile + compose + 部署文档（Round 7）
 - [ ] OpenAPI 生成前端客户端，删除手写类型
-- [ ] 前端测试（Vitest + Testing Library）+ Playwright E2E
+- [x] 前端测试（Vitest + Testing Library 起步，Round 8；Playwright E2E 待补）
 - [ ] 测试补齐：真实 MAF 适配层、取消、沙箱、worktree、安全用例
 - [ ] 文档更新：README 进度、AGENTS 现状、README.en
 
@@ -177,10 +177,9 @@
 ### 5.1 模型供应商（P0）
 
 - [x] 自定义 OpenAI 兼容端点 + DPAPI 加密 + 连通性测试
-- [x] models.dev 目录同步（手动）
-- [ ] 定时刷新/失败降级缓存
-- [x] 默认供应商切换（API 已支持；UI 待补）
-- [x] 模型手动增删改/启停（Round 6）
+- [x] models.dev 目录同步（手动 + 定时刷新，失败保留缓存；Round 8）
+- [x] 默认供应商切换（API + UI，Round 8）
+- [x] 模型手动增删改/启停（API + UI，Round 8）
 - [x] token 用量与费用汇总（Round 6：项目成本报表）
 - [ ] 成本按迭代/日期维度过滤
 
@@ -286,6 +285,16 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 审计 ✅ Round 6；认证 P5 |
 
 ## 4. 每轮工作日志
+
+### Round 8（2026-11-04）
+
+- 供应商收尾（PRD 5.1）：
+  - `PUT /api/providers/{id}/default`：全局唯一默认供应商（停用不可设默认）+ 集成测试
+  - 前端：设为默认按钮、模型目录手动增删改/启停弹窗（价格/上下文/能力标签）
+  - `ProviderCatalogRefreshService`：models.dev 每 24h 定时刷新（可配置/可关闭，失败保留缓存，测试禁用以避免网络）
+- 前端测试基建：Vitest + Testing Library + jsdom + jest-dom；新增 10 项测试（状态流转/格式化/Badge）；CI 增加 `test:run`
+- 测试：后端 97 → 98，前端 0 → 10，全部绿
+- 验证：`dotnet test`、`npm run test:run`、`lint`、`format:check`、`build` 全绿
 
 ### Round 7（2026-11-04）
 
