@@ -12,7 +12,8 @@ public sealed record WorkItemListItemDto(
     decimal? RemainingHours,
     DateOnly? DueDate,
     string? PrUrl,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    string? Tags);
 
 public sealed record WorkItemDetailDto(
     Guid Id,
@@ -35,7 +36,9 @@ public sealed record WorkItemDetailDto(
     string? BranchUrl,
     string? PrUrl,
     DateTimeOffset CreatedAt,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    string? Tags,
+    Guid? ParentWorkItemId);
 
 public sealed record CreateWorkItemRequest(
     string Type,
@@ -51,7 +54,9 @@ public sealed record CreateWorkItemRequest(
     string? AssigneeName,
     string? Severity,
     string? ReproSteps,
-    string? Environment);
+    string? Environment,
+    string? Tags = null,
+    Guid? ParentWorkItemId = null);
 
 public sealed record UpdateWorkItemRequest(
     string Title,
@@ -62,7 +67,15 @@ public sealed record UpdateWorkItemRequest(
     decimal? EstimatedHours,
     decimal? RemainingHours,
     DateOnly? DueDate,
-    Guid? IterationId);
+    Guid? IterationId,
+    string? AssigneeName = null,
+    string? Severity = null,
+    string? ReproSteps = null,
+    string? Environment = null,
+    string? Tags = null,
+    Guid? ParentWorkItemId = null,
+    string? BranchUrl = null,
+    string? PrUrl = null);
 
 public sealed record TransitionRequest(string ToStatus);
 

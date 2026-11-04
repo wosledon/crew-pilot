@@ -633,6 +633,10 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Property<int?>("StoryPoints")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Tags")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(500)

@@ -51,4 +51,10 @@ public static class WorkItemStateMachine
 
         defect.Status = to;
     }
+
+    /// <summary>任务以 done 布尔表达状态；重复设置同一状态视为幂等。</summary>
+    public static void Transition(TaskItem task, bool done) => task.IsDone = done;
+
+    /// <summary>任务状态字符串（todo / done）。</summary>
+    public static string ToStatus(TaskItem task) => task.IsDone ? "done" : "todo";
 }

@@ -37,6 +37,7 @@ public sealed class ReportsApiTests(CrewPilotApiFactory factory) : IClassFixture
         report.ByType.Should().HaveCount(2);
         report.ByType.Should().Contain(g => g.Key == "requirement" && g.EstimatedHours == 6m);
         report.ByAssignee.Should().Contain(g => g.Key == "开发 Agent" && g.LoggedHours == 1.5m);
+        report.ByMember.Should().Contain(g => g.Key == "我" && g.LoggedHours == 1.5m);
     }
 
     [Fact]

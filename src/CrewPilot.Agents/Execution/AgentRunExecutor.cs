@@ -246,7 +246,7 @@ public sealed class AgentRunExecutor
         run.PromptTokens = promptTokens;
         run.CompletionTokens = completionTokens;
 
-        AddAutoWorkLog(run, "AgentRun 自动折算");
+        await AddAutoWorkLogAsync(run, "AgentRun 自动折算");
         AddPrUrlIfFound(run, output);
         AddRunActivity(run, succeeded ? "agentrun.succeeded" : "agentrun.failed", promptTokens, completionTokens);
         await AddMentionReplyAsync(run);
@@ -269,13 +269,13 @@ public sealed class AgentRunExecutor
             Content = "运行已被用户取消（接管），保留现场与已耗工时。",
         });
 
-        AddAutoWorkLog(run, "AgentRun 取消折算（被接管）");
+        await AddAutoWorkLogAsync(run, "AgentRun 取消折算（被接管）");
         AddRunActivity(run, "agentrun.canceled", null, null);
 
         await _db.SaveChangesAsync(ct);
     }
 
-    private void AddAutoWorkLog(AgentRun run, string note)
+    private async Task AddAutoWorkLogAsync(AgentRun run, string note)
     {
         if (run.WorkItemId is not Guid workItemId ||
             run.Duration is not { } duration ||
@@ -290,14 +290,49 @@ public sealed class AgentRunExecutor
             return;
         }
 
+        var member = await EnsureAgentMemberAsync(run);
         _db.WorkLogs.Add(new WorkLog
         {
             WorkItemId = workItemId,
+            MemberId = member?.Id,
             Hours = hours,
             Date = DateOnly.FromDateTime(DateTime.UtcNow),
             Note = $"{note}（{run.Trigger}）",
             AgentRunId = run.Id,
         });
+
+        // 剩余工时随登记自动扣减（不为负）
+        if (run.WorkItem?.RemainingHours is decimal remaining)
+        {
+            run.WorkItem.RemainingHours = Math.Max(0m, remaining - hours);
+        }
+    }
+
+    /// <summary>取得（或创建）Agent 对应的项目成员，用于评论/工时归属。</summary>
+    private async Task<ProjectMember?> EnsureAgentMemberAsync(AgentRun run)
+    {
+        var projectId = run.WorkItem?.ProjectId;
+        if (projectId is null)
+        {
+            return null;
+        }
+
+        var member = await _db.Members.FirstOrDefaultAsync(
+            m => m.ProjectId == projectId && m.DisplayName == run.Agent.Name);
+        if (member is not null)
+        {
+            return member;
+        }
+
+        member = new ProjectMember
+        {
+            ProjectId = projectId.Value,
+            Kind = MemberKind.Agent,
+            Role = ProjectRole.Developer,
+            DisplayName = run.Agent.Name,
+        };
+        _db.Members.Add(member);
+        return member;
     }
 
     private void AddPrUrlIfFound(AgentRun run, string? output)
@@ -356,20 +391,11 @@ public sealed class AgentRunExecutor
         }
 
         var projectId = run.WorkItem.ProjectId;
-        var member = await _db.Members.FirstOrDefaultAsync(
-            m => m.ProjectId == projectId && m.DisplayName == run.Agent.Name);
+        var member = await EnsureAgentMemberAsync(run);
         if (member is null)
         {
-            member = new ProjectMember
-            {
-                ProjectId = projectId,
-                Kind = MemberKind.Agent,
-                Role = ProjectRole.Developer,
-                DisplayName = run.Agent.Name,
-            };
-            _db.Members.Add(member);
+            return;
         }
-
         _db.Comments.Add(new Comment
         {
             WorkItemId = run.WorkItem.Id,

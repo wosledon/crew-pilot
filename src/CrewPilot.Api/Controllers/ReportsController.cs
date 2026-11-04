@@ -8,7 +8,7 @@ namespace CrewPilot.Api.Controllers;
 [ApiController]
 public sealed class ReportsController(CrewPilotDbContext db) : ControllerBase
 {
-    /// <summary>项目工时报表：总计 + 按类型/按指派人分组（预估 vs 已耗）。</summary>
+    /// <summary>项目工时报表：总计 + 按类型/指派人/登记成员分组（预估 vs 已耗）。</summary>
     [HttpGet("api/projects/{projectId:guid}/hours-report")]
     public async Task<ActionResult<HoursReportDto>> HoursReport(Guid projectId, CancellationToken ct)
     {
@@ -25,16 +25,24 @@ public sealed class ReportsController(CrewPilotDbContext db) : ControllerBase
             .ToListAsync(ct);
 
         var ids = items.Select(i => i.Id).ToList();
-        var loggedRows = ids.Count == 0
+        var logs = ids.Count == 0
             ? []
             : await db.WorkLogs
                 .AsNoTracking()
                 .Where(l => ids.Contains(l.WorkItemId))
-                .GroupBy(l => l.WorkItemId)
-                .Select(g => new { Id = g.Key, Total = g.Sum(l => l.Hours) })
+                .Select(l => new
+                {
+                    l.WorkItemId,
+                    l.Hours,
+                    l.Date,
+                    MemberName = l.Member != null ? l.Member.DisplayName : null,
+                })
                 .ToListAsync(ct);
-        var logged = loggedRows.ToDictionary(x => x.Id, x => x.Total);
 
+        // SQLite 不支持 DateTimeOffset 排序，这里按 DateOnly 排序（DateOnly 可下推）
+        var logged = logs
+            .GroupBy(l => l.WorkItemId)
+            .ToDictionary(g => g.Key, g => g.Sum(l => l.Hours));
         decimal LoggedOf(Guid id) => logged.TryGetValue(id, out var hours) ? hours : 0m;
 
         var byType = items
@@ -57,10 +65,33 @@ public sealed class ReportsController(CrewPilotDbContext db) : ControllerBase
             .OrderByDescending(g => g.LoggedHours)
             .ToList();
 
+        // 按登记成员：预估工时只计入该工作项的首个登记成员，避免多成员重复计预估
+        var firstMemberByItem = logs
+            .GroupBy(l => l.WorkItemId)
+            .ToDictionary(g => g.Key, g => g.OrderBy(l => l.Date).First().MemberName ?? "system");
+        var estimateByItem = items.ToDictionary(i => i.Id, i => i.EstimatedHours ?? 0m);
+        var memberKeys = logs.Select(l => l.MemberName ?? "system").Distinct().ToList();
+        var byMember = memberKeys
+            .Select(member =>
+            {
+                var memberItems = firstMemberByItem
+                    .Where(pair => pair.Value == member)
+                    .Select(pair => pair.Key)
+                    .ToHashSet();
+                return new HoursByGroupDto(
+                    member,
+                    member == "system" ? "系统（未归属）" : member,
+                    memberItems.Sum(id => estimateByItem.GetValueOrDefault(id)),
+                    logs.Where(l => (l.MemberName ?? "system") == member).Sum(l => l.Hours));
+            })
+            .OrderByDescending(g => g.LoggedHours)
+            .ToList();
+
         return new HoursReportDto(
             items.Sum(i => i.EstimatedHours) ?? 0m,
             items.Sum(i => LoggedOf(i.Id)),
             byType,
-            byAssignee);
+            byAssignee,
+            byMember);
     }
 }

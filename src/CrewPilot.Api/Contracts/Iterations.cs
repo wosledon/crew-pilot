@@ -52,4 +52,5 @@ public sealed record HoursReportDto(
     decimal TotalEstimatedHours,
     decimal TotalLoggedHours,
     IReadOnlyList<HoursByGroupDto> ByType,
-    IReadOnlyList<HoursByGroupDto> ByAssignee);
+    IReadOnlyList<HoursByGroupDto> ByAssignee,
+    IReadOnlyList<HoursByGroupDto> ByMember);

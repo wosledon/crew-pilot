@@ -1,4 +1,5 @@
 using CrewPilot.Api.Contracts;
+using CrewPilot.Core.Collaboration;
 using CrewPilot.Core.Projects;
 using CrewPilot.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
@@ -131,6 +132,43 @@ public sealed class ProjectsController(CrewPilotDbContext db) : ControllerBase
         db.Projects.Remove(project);
         await db.SaveChangesAsync(ct);
         return NoContent();
+    }
+
+    /// <summary>归档项目：默认从看板/列表收起，数据保留。</summary>
+    [HttpPost("{id:guid}/archive")]
+    public Task<ActionResult<ProjectDetailDto>> Archive(Guid id, CancellationToken ct) =>
+        SetStatusAsync(id, ProjectStatus.Archived, "project.archived", ct);
+
+    /// <summary>取消归档。</summary>
+    [HttpPost("{id:guid}/unarchive")]
+    public Task<ActionResult<ProjectDetailDto>> Unarchive(Guid id, CancellationToken ct) =>
+        SetStatusAsync(id, ProjectStatus.Active, "project.unarchived", ct);
+
+    private async Task<ActionResult<ProjectDetailDto>> SetStatusAsync(
+        Guid id, ProjectStatus status, string eventType, CancellationToken ct)
+    {
+        var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == id, ct);
+        if (project is null)
+        {
+            return Problem(detail: "项目不存在", statusCode: 404);
+        }
+
+        if (project.Status != status)
+        {
+            project.Status = status;
+            project.UpdatedAt = DateTimeOffset.UtcNow;
+            db.Activities.Add(new Activity
+            {
+                ProjectId = project.Id,
+                EventType = eventType,
+                Payload = "{}",
+                ActorKind = MemberKind.User,
+            });
+            await db.SaveChangesAsync(ct);
+        }
+
+        var dto = await GetAsync(id, ct);
+        return Ok(dto);
     }
 
     /// <summary>校验并规范化项目本地工作目录（Agent 沙箱 / git worktree 的根）。</summary>

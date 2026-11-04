@@ -139,5 +139,91 @@ public sealed class ProjectsApiTests(CrewPilotApiFactory factory) : IClassFixtur
         }
     }
 
+    [Fact]
+    public async Task UpdateProject_ChangesFields_AndArchiveTogglesStatus()
+    {
+        var client = factory.CreateClient();
+        var created = await client.PostAsJsonAsync("/api/projects", new
+        {
+            key = NewKey(),
+            name = "待归档项目",
+        });
+        var project = await created.Content.ReadFromJsonAsync<ProjectDetailDto>();
+
+        var updatedResponse = await client.PutAsJsonAsync($"/api/projects/{project!.Id}", new
+        {
+            name = "已改名项目",
+            description = "新的描述",
+            repoUrl = "https://github.com/example/renamed",
+        });
+        updatedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var updated = await updatedResponse.Content.ReadFromJsonAsync<ProjectDetailDto>();
+        updated!.Name.Should().Be("已改名项目");
+        updated.Description.Should().Be("新的描述");
+        updated.Status.Should().Be("active");
+
+        var archivedResponse = await client.PostAsync($"/api/projects/{project.Id}/archive", null);
+        archivedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await archivedResponse.Content.ReadFromJsonAsync<ProjectDetailDto>())!
+            .Status.Should().Be("archived");
+
+        var unarchivedResponse = await client.PostAsync($"/api/projects/{project.Id}/unarchive", null);
+        unarchivedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await unarchivedResponse.Content.ReadFromJsonAsync<ProjectDetailDto>())!
+            .Status.Should().Be("active");
+    }
+
+    [Fact]
+    public async Task ProjectMembers_CanAddAgentUpdateAndRemove()
+    {
+        var client = factory.CreateClient();
+        var project = await ApiTestHelpers.CreateProjectAsync(client);
+        var provider = await ApiTestHelpers.CreateProviderAsync(client);
+        var agent = await ApiTestHelpers.CreateAgentAsync(client, provider.Id);
+
+        var addResponse = await client.PostAsJsonAsync(
+            $"/api/projects/{project.Id}/members", new { agentId = agent.Id });
+        addResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+        var member = await addResponse.Content.ReadFromJsonAsync<ProjectMemberDto>();
+        member!.Kind.Should().Be("agent");
+        member.Role.Should().Be("developer");
+        member.DisplayName.Should().Be(agent.Name);
+
+        var members = await client.GetFromJsonAsync<List<ProjectMemberDto>>(
+            $"/api/projects/{project.Id}/members");
+        members.Should().Contain(m => m.Id == member.Id);
+        members!.Should().Contain(m => m.Role == "owner");
+
+        var updateResponse = await client.PutAsJsonAsync($"/api/members/{member.Id}", new
+        {
+            displayName = agent.Name,
+            role = "qa",
+        });
+        updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await updateResponse.Content.ReadFromJsonAsync<ProjectMemberDto>())!
+            .Role.Should().Be("qa");
+
+        var deleteResponse = await client.DeleteAsync($"/api/members/{member.Id}");
+        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        members = await client.GetFromJsonAsync<List<ProjectMemberDto>>(
+            $"/api/projects/{project.Id}/members");
+        members.Should().NotContain(m => m.Id == member.Id);
+    }
+
+    [Fact]
+    public async Task CannotRemoveOwnerMember()
+    {
+        var client = factory.CreateClient();
+        var project = await ApiTestHelpers.CreateProjectAsync(client);
+        var members = await client.GetFromJsonAsync<List<ProjectMemberDto>>(
+            $"/api/projects/{project.Id}/members");
+        var owner = members!.Single(m => m.Role == "owner");
+
+        var response = await client.DeleteAsync($"/api/members/{owner.Id}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
     private static string NewKey() => "T" + Guid.NewGuid().ToString("N")[..6].ToUpperInvariant();
 }

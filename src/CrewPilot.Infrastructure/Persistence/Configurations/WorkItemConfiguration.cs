@@ -14,6 +14,7 @@ public class WorkItemConfiguration : IEntityTypeConfiguration<WorkItem>
         builder.Property(w => w.Title).HasMaxLength(500).IsRequired();
         builder.Property(w => w.Description).HasMaxLength(16000);
         builder.Property(w => w.AcceptanceCriteria).HasMaxLength(8000);
+        builder.Property(w => w.Tags).HasMaxLength(500);
         builder.Property(w => w.Priority).HasConversion<string>().HasMaxLength(8);
         builder.Property(w => w.EstimatedHours).HasPrecision(9, 2);
         builder.Property(w => w.RemainingHours).HasPrecision(9, 2);

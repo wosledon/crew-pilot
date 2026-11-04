@@ -161,6 +161,127 @@ public sealed class WorkItemsApiTests(CrewPilotApiFactory factory) : IClassFixtu
         defects[0].Type.Should().Be("defect");
     }
 
+    [Fact]
+    public async Task UpdateRequirement_ChangesAssigneeTagsAndFields()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var item = await CreateRequirementAsync(client, project.Id);
+        var due = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(3));
+
+        var response = await client.PutAsJsonAsync($"/api/workitems/{item.Id}", new
+        {
+            title = "更新后的需求",
+            description = "新描述",
+            priority = "p1",
+            estimatedHours = 6m,
+            remainingHours = 5m,
+            dueDate = due,
+            assigneeName = "我",
+            tags = "前端, 体验,前端",
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var updated = await response.Content.ReadFromJsonAsync<WorkItemDetailDto>();
+        updated!.Title.Should().Be("更新后的需求");
+        updated.Priority.Should().Be("p1");
+        updated.EstimatedHours.Should().Be(6m);
+        updated.RemainingHours.Should().Be(5m);
+        updated.DueDate.Should().Be(due);
+        updated.AssigneeName.Should().Be("我");
+        updated.Tags.Should().Be("前端,体验");
+
+        var byTag = await client.GetFromJsonAsync<List<WorkItemListItemDto>>(
+            $"/api/projects/{project.Id}/workitems?tag=前端");
+        byTag.Should().Contain(i => i.Id == item.Id);
+
+        var empty = await client.GetFromJsonAsync<List<WorkItemListItemDto>>(
+            $"/api/projects/{project.Id}/workitems?tag=后端");
+        empty.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task CreateTask_WithParent_CanTransitionDoneAndBack()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var requirement = await CreateRequirementAsync(client, project.Id);
+
+        var created = await client.PostAsJsonAsync($"/api/projects/{project.Id}/workitems", new
+        {
+            type = "task",
+            title = "拆解任务",
+            parentWorkItemId = requirement.Id,
+        });
+        created.StatusCode.Should().Be(HttpStatusCode.Created);
+        var task = await created.Content.ReadFromJsonAsync<WorkItemDetailDto>();
+        task!.Type.Should().Be("task");
+        task.Status.Should().Be("todo");
+        task.ParentWorkItemId.Should().Be(requirement.Id);
+
+        var done = await TransitionAsync(client, task.Id, "done");
+        done.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await done.Content.ReadFromJsonAsync<WorkItemDetailDto>())!.Status.Should().Be("done");
+
+        var reopened = await TransitionAsync(client, task.Id, "todo");
+        reopened.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await reopened.Content.ReadFromJsonAsync<WorkItemDetailDto>())!.Status.Should().Be("todo");
+    }
+
+    [Fact]
+    public async Task CreateTask_WithForeignParent_Returns400()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+
+        var response = await client.PostAsJsonAsync($"/api/projects/{project.Id}/workitems", new
+        {
+            type = "task",
+            title = "非法父任务",
+            parentWorkItemId = Guid.NewGuid(),
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task AddWorkLog_DeductsRemainingHoursAndAttributesOwner()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var created = await client.PostAsJsonAsync($"/api/projects/{project.Id}/workitems", new
+        {
+            type = "requirement",
+            title = "带剩余工时的需求",
+            estimatedHours = 5m,
+            remainingHours = 5m,
+        });
+        var item = await created.Content.ReadFromJsonAsync<WorkItemDetailDto>();
+
+        await client.PostAsJsonAsync($"/api/workitems/{item!.Id}/worklogs", new { hours = 2m, note = "开发" });
+
+        var detail = await client.GetFromJsonAsync<WorkItemDetailDto>($"/api/workitems/{item.Id}");
+        detail!.RemainingHours.Should().Be(3m);
+
+        var logs = await client.GetFromJsonAsync<List<WorkLogDto>>($"/api/workitems/{item.Id}/worklogs");
+        logs!.Should().ContainSingle();
+        logs![0].MemberName.Should().Be("我");
+    }
+
+    [Fact]
+    public async Task DeleteWorkItem_Returns204()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var item = await CreateRequirementAsync(client, project.Id);
+
+        var response = await client.DeleteAsync($"/api/workitems/{item.Id}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        (await client.GetAsync($"/api/workitems/{item.Id}")).StatusCode
+            .Should().Be(HttpStatusCode.NotFound);
+    }
+
     private static async Task<ProjectDetailDto> CreateProjectAsync(HttpClient client)
     {
         var key = "W" + Guid.NewGuid().ToString("N")[..6].ToUpperInvariant();

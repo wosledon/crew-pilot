@@ -33,3 +33,18 @@ public sealed record UpdateProjectRequest(
     string? Description,
     string? RepoUrl,
     string? LocalPath = null);
+
+public sealed record ProjectMemberDto(
+    Guid Id,
+    Guid ProjectId,
+    string Kind,
+    string Role,
+    string DisplayName,
+    DateTimeOffset CreatedAt);
+
+public sealed record AddProjectMemberRequest(
+    string? DisplayName,
+    string? Role,
+    Guid? AgentId = null);
+
+public sealed record UpdateProjectMemberRequest(string DisplayName, string Role);

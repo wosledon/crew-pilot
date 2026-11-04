@@ -24,6 +24,9 @@ public abstract class WorkItem : Entity
     /// <summary>验收标准（checklist 文本）。</summary>
     public string? AcceptanceCriteria { get; set; }
 
+    /// <summary>标签（逗号分隔，如 "前端,体验"）。</summary>
+    public string? Tags { get; set; }
+
     public Priority Priority { get; set; } = Priority.P2;
 
     public int? StoryPoints { get; set; }

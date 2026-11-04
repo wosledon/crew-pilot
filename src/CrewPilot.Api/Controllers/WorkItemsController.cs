@@ -17,7 +17,11 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
     /// <summary>工作项列表，支持 type（requirement/defect/task）与 status 过滤。</summary>
     [HttpGet("api/projects/{projectId:guid}/workitems")]
     public async Task<ActionResult<IReadOnlyList<WorkItemListItemDto>>> List(
-        Guid projectId, [FromQuery] string? type, [FromQuery] string? status, CancellationToken ct)
+        Guid projectId,
+        [FromQuery] string? type,
+        [FromQuery] string? status,
+        [FromQuery] string? tag,
+        CancellationToken ct)
     {
         var rows = await QueryRowsAsync(projectId, type, ct);
 
@@ -25,6 +29,16 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
         {
             rows = rows
                 .Where(r => string.Equals(r.Status, status.Trim(), StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        if (!string.IsNullOrWhiteSpace(tag))
+        {
+            var wanted = tag.Trim();
+            rows = rows
+                .Where(r => r.Tags is not null && r.Tags
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Any(t => string.Equals(t, wanted, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
         }
 
@@ -36,7 +50,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 r.Priority.ToString().ToLowerInvariant(), r.AssigneeName,
                 r.EstimatedHours,
                 loggedHours.TryGetValue(r.Id, out var hours) ? hours : 0m,
-                r.RemainingHours, r.DueDate, r.PrUrl, r.UpdatedAt))
+                r.RemainingHours, r.DueDate, r.PrUrl, r.UpdatedAt, r.Tags))
             .ToList();
         return Ok(items);
     }
@@ -86,6 +100,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
         workItem.Title = request.Title.Trim();
         workItem.Description = request.Description;
         workItem.AcceptanceCriteria = request.AcceptanceCriteria;
+        workItem.Tags = NormalizeTags(request.Tags);
         workItem.Priority = ParsePriority(request.Priority);
         workItem.StoryPoints = request.StoryPoints;
         workItem.EstimatedHours = request.EstimatedHours;
@@ -93,6 +108,17 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
         workItem.DueDate = request.DueDate;
         workItem.IterationId = await ResolveIterationAsync(projectId, request.IterationId, ct);
         workItem.Assignee = await ResolveAssigneeAsync(projectId, request.AssigneeName, ct);
+
+        if (workItem is TaskItem task)
+        {
+            var parentId = await ResolveParentAsync(projectId, request.ParentWorkItemId, ct);
+            if (request.ParentWorkItemId is Guid requestedParent && parentId is null)
+            {
+                return Problem(detail: "父工作项不存在或不属于该项目", statusCode: 400);
+            }
+
+            task.ParentWorkItemId = parentId ?? Guid.Empty;
+        }
 
         db.WorkItems.Add(workItem);
         await AddActivityAsync(projectId, workItem.Id, "workitem.created", new { type, workItem.Title }, ct);
@@ -120,12 +146,35 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
         workItem.Title = request.Title.Trim();
         workItem.Description = request.Description;
         workItem.AcceptanceCriteria = request.AcceptanceCriteria;
+        workItem.Tags = NormalizeTags(request.Tags);
         workItem.Priority = ParsePriority(request.Priority);
         workItem.StoryPoints = request.StoryPoints;
         workItem.EstimatedHours = request.EstimatedHours;
         workItem.RemainingHours = request.RemainingHours;
         workItem.DueDate = request.DueDate;
         workItem.IterationId = await ResolveIterationAsync(workItem.ProjectId, request.IterationId, ct);
+        workItem.Assignee = await ResolveAssigneeAsync(workItem.ProjectId, request.AssigneeName, ct);
+        workItem.BranchUrl = string.IsNullOrWhiteSpace(request.BranchUrl) ? null : request.BranchUrl.Trim();
+        workItem.PrUrl = string.IsNullOrWhiteSpace(request.PrUrl) ? null : request.PrUrl.Trim();
+
+        switch (workItem)
+        {
+            case Defect defect:
+                defect.Severity = ParseSeverity(request.Severity);
+                defect.ReproSteps = request.ReproSteps;
+                defect.Environment = request.Environment;
+                break;
+            case TaskItem task:
+                var parentId = await ResolveParentAsync(workItem.ProjectId, request.ParentWorkItemId, ct);
+                if (request.ParentWorkItemId is Guid requestedParent && parentId is null)
+                {
+                    return Problem(detail: "父工作项不存在或不属于该项目", statusCode: 400);
+                }
+
+                task.ParentWorkItemId = parentId ?? Guid.Empty;
+                break;
+        }
+
         workItem.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync(ct);
 
@@ -173,8 +222,20 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                     toStatus = defect.Status.ToString();
                     break;
 
+                case TaskItem task:
+                    if (!string.Equals(to, "todo", StringComparison.OrdinalIgnoreCase) &&
+                        !string.Equals(to, "done", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return Problem(detail: $"无效的任务状态 {to}（todo/done）", statusCode: 400);
+                    }
+
+                    from = WorkItemStateMachine.ToStatus(task);
+                    WorkItemStateMachine.Transition(task, string.Equals(to, "done", StringComparison.OrdinalIgnoreCase));
+                    toStatus = WorkItemStateMachine.ToStatus(task);
+                    break;
+
                 default:
-                    return Problem(detail: "任务类型暂不支持状态流转", statusCode: 400);
+                    return Problem(detail: "不支持的工作项类型", statusCode: 400);
             }
         }
         catch (InvalidOperationException ex)
@@ -234,19 +295,28 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
             return Problem(detail: "工作项不存在", statusCode: 404);
         }
 
+        var owner = await EnsureOwnerMemberAsync(workItem.ProjectId, ct);
         var log = new WorkLog
         {
             WorkItemId = id,
+            MemberId = owner.Id,
             Hours = request.Hours,
             Date = request.Date ?? DateOnly.FromDateTime(DateTime.UtcNow),
             Note = request.Note,
         };
+
+        // 剩余工时随登记自动扣减（不为负）
+        if (workItem.RemainingHours is decimal remaining)
+        {
+            workItem.RemainingHours = Math.Max(0m, remaining - request.Hours);
+        }
+
         db.WorkLogs.Add(log);
         await AddActivityAsync(workItem.ProjectId, id, "worklog.added", new { log.Hours }, ct);
         await db.SaveChangesAsync(ct);
 
         return Created($"/api/workitems/{id}/worklogs/{log.Id}",
-            new WorkLogDto(log.Id, log.Hours, log.Date, log.Note, null, log.AgentRunId, log.CreatedAt));
+            new WorkLogDto(log.Id, log.Hours, log.Date, log.Note, owner.DisplayName, log.AgentRunId, log.CreatedAt));
     }
 
     private async Task<WorkItemDetailDto?> GetDetailAsync(Guid id, CancellationToken ct)
@@ -265,7 +335,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
             row.StoryPoints, row.EstimatedHours,
             loggedHours.TryGetValue(row.Id, out var hours) ? hours : 0m,
             row.RemainingHours, row.AssigneeName, row.IterationId, row.DueDate, row.BranchUrl, row.PrUrl,
-            row.CreatedAt, row.UpdatedAt);
+            row.CreatedAt, row.UpdatedAt, row.Tags, row.ParentWorkItemId);
     }
 
     /// <summary>工作项查询行（跨 TPH 三类统一视图）。</summary>
@@ -289,7 +359,10 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
         string? BranchUrl,
         string? PrUrl,
         DateTimeOffset CreatedAt,
-        DateTimeOffset UpdatedAt);
+        DateTimeOffset UpdatedAt,
+        string? Tags,
+        Guid? ParentWorkItemId);
+    private const int MaxTagsLength = 500;
 
     /// <summary>跨 TPH 三类工作项查询（需求/缺陷各自带状态列，任务无状态）。</summary>
     private async Task<List<WorkItemRow>> QueryRowsAsync(Guid projectId, string? typeFilter, CancellationToken ct)
@@ -322,13 +395,15 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                     w.PrUrl,
                     w.CreatedAt,
                     w.UpdatedAt,
+                    w.Tags,
                 })
                 .ToListAsync(ct);
             rows.AddRange(reqs.Select(x => new WorkItemRow(
                 x.Id, "requirement", x.Title, x.Status.ToString().ToLowerInvariant(), x.Priority,
                 x.Description, x.AcceptanceCriteria, null, null, null,
                 x.StoryPoints, x.EstimatedHours, x.RemainingHours, x.AssigneeName,
-                x.IterationId, x.DueDate, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt)));
+                x.IterationId, x.DueDate, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt,
+                x.Tags, null)));
         }
 
         if (wantAll || type == "defect")
@@ -358,6 +433,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                     w.PrUrl,
                     w.CreatedAt,
                     w.UpdatedAt,
+                    w.Tags,
                 })
                 .ToListAsync(ct);
             rows.AddRange(defects.Select(x => new WorkItemRow(
@@ -365,7 +441,8 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 x.Description, x.AcceptanceCriteria, x.Severity.ToString().ToLowerInvariant(),
                 x.ReproSteps, x.Environment,
                 x.StoryPoints, x.EstimatedHours, x.RemainingHours, x.AssigneeName,
-                x.IterationId, x.DueDate, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt)));
+                x.IterationId, x.DueDate, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt,
+                x.Tags, null)));
         }
 
         if (wantAll || type == "task")
@@ -391,13 +468,17 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                     w.PrUrl,
                     w.CreatedAt,
                     w.UpdatedAt,
+                    w.Tags,
+                    w.IsDone,
+                    w.ParentWorkItemId,
                 })
                 .ToListAsync(ct);
             rows.AddRange(tasks.Select(x => new WorkItemRow(
-                x.Id, "task", x.Title, "todo", x.Priority,
+                x.Id, "task", x.Title, x.IsDone ? "done" : "todo", x.Priority,
                 x.Description, x.AcceptanceCriteria, null, null, null,
                 x.StoryPoints, x.EstimatedHours, x.RemainingHours, x.AssigneeName,
-                x.IterationId, x.DueDate, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt)));
+                x.IterationId, x.DueDate, x.BranchUrl, x.PrUrl, x.CreatedAt, x.UpdatedAt,
+                x.Tags, x.ParentWorkItemId == Guid.Empty ? null : x.ParentWorkItemId)));
         }
 
         return rows;
@@ -427,6 +508,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 w.PrUrl,
                 w.CreatedAt,
                 w.UpdatedAt,
+                w.Tags,
             })
             .FirstOrDefaultAsync(ct);
         if (req is not null)
@@ -435,7 +517,8 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 req.Id, "requirement", req.Title, req.Status.ToString().ToLowerInvariant(), req.Priority,
                 req.Description, req.AcceptanceCriteria, null, null, null,
                 req.StoryPoints, req.EstimatedHours, req.RemainingHours, req.AssigneeName,
-                req.IterationId, req.DueDate, req.BranchUrl, req.PrUrl, req.CreatedAt, req.UpdatedAt);
+                req.IterationId, req.DueDate, req.BranchUrl, req.PrUrl, req.CreatedAt, req.UpdatedAt,
+                req.Tags, null);
         }
 
         var defect = await db.WorkItems
@@ -463,6 +546,7 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 w.PrUrl,
                 w.CreatedAt,
                 w.UpdatedAt,
+                w.Tags,
             })
             .FirstOrDefaultAsync(ct);
         if (defect is not null)
@@ -472,7 +556,8 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 defect.Description, defect.AcceptanceCriteria, defect.Severity.ToString().ToLowerInvariant(),
                 defect.ReproSteps, defect.Environment,
                 defect.StoryPoints, defect.EstimatedHours, defect.RemainingHours, defect.AssigneeName,
-                defect.IterationId, defect.DueDate, defect.BranchUrl, defect.PrUrl, defect.CreatedAt, defect.UpdatedAt);
+                defect.IterationId, defect.DueDate, defect.BranchUrl, defect.PrUrl, defect.CreatedAt, defect.UpdatedAt,
+                defect.Tags, null);
         }
 
         var task = await db.WorkItems
@@ -496,16 +581,71 @@ public sealed class WorkItemsController(CrewPilotDbContext db) : ControllerBase
                 w.PrUrl,
                 w.CreatedAt,
                 w.UpdatedAt,
+                w.Tags,
+                w.IsDone,
+                w.ParentWorkItemId,
             })
             .FirstOrDefaultAsync(ct);
 
         return task is null
             ? null
             : new WorkItemRow(
-                task.Id, "task", task.Title, "todo", task.Priority,
+                task.Id, "task", task.Title, task.IsDone ? "done" : "todo", task.Priority,
                 task.Description, task.AcceptanceCriteria, null, null, null,
                 task.StoryPoints, task.EstimatedHours, task.RemainingHours, task.AssigneeName,
-                task.IterationId, task.DueDate, task.BranchUrl, task.PrUrl, task.CreatedAt, task.UpdatedAt);
+                task.IterationId, task.DueDate, task.BranchUrl, task.PrUrl, task.CreatedAt, task.UpdatedAt,
+                task.Tags, task.ParentWorkItemId == Guid.Empty ? null : task.ParentWorkItemId);
+    }
+
+    /// <summary>校验并解析父工作项：必须存在且属于同一项目。</summary>
+    private async Task<Guid?> ResolveParentAsync(
+        Guid projectId, Guid? parentWorkItemId, CancellationToken ct)
+    {
+        if (parentWorkItemId is null || parentWorkItemId == Guid.Empty)
+        {
+            return null;
+        }
+
+        var exists = await db.WorkItems.AnyAsync(
+            w => w.Id == parentWorkItemId && w.ProjectId == projectId, ct);
+        return exists ? parentWorkItemId : null;
+    }
+
+    /// <summary>单用户产品：工时登记人默认为 Owner 本人。</summary>
+    private async Task<ProjectMember> EnsureOwnerMemberAsync(Guid projectId, CancellationToken ct)
+    {
+        var member = await db.Members.FirstOrDefaultAsync(
+            m => m.ProjectId == projectId && m.DisplayName == "我", ct);
+        if (member is not null)
+        {
+            return member;
+        }
+
+        member = new ProjectMember
+        {
+            ProjectId = projectId,
+            Kind = MemberKind.User,
+            Role = ProjectRole.Owner,
+            DisplayName = "我",
+        };
+        db.Members.Add(member);
+        return member;
+    }
+
+    private static string? NormalizeTags(string? tags)
+    {
+        if (string.IsNullOrWhiteSpace(tags))
+        {
+            return null;
+        }
+
+        var parts = tags
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(20)
+            .ToList();
+        var normalized = string.Join(',', parts);
+        return normalized.Length > MaxTagsLength ? normalized[..MaxTagsLength] : normalized;
     }
 
     private async Task<Dictionary<Guid, decimal>> GetLoggedHoursAsync(IEnumerable<Guid> ids, CancellationToken ct)
