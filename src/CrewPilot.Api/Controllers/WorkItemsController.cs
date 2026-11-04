@@ -1,5 +1,6 @@
 using System.Text.Json;
 using CrewPilot.Api.Contracts;
+using CrewPilot.Core.Abstractions;
 using CrewPilot.Core.Collaboration;
 using CrewPilot.Core.Projects;
 using CrewPilot.Core.Services;
@@ -15,7 +16,8 @@ namespace CrewPilot.Api.Controllers;
 [ApiController]
 public sealed class WorkItemsController(
     CrewPilotDbContext db,
-    AuditLogger audit) : ControllerBase
+    AuditLogger audit,
+    IRealtimeNotifier realtime) : ControllerBase
 {
     /// <summary>工作项列表，支持 type（requirement/defect/task）与 status 过滤。</summary>
     [HttpGet("api/projects/{projectId:guid}/workitems")]
@@ -128,6 +130,7 @@ public sealed class WorkItemsController(
         await db.SaveChangesAsync(ct);
 
         var dto = await GetDetailAsync(workItem.Id, ct);
+        await realtime.WorkItemChangedAsync(projectId, workItem.Id, dto!.Status, ct);
         return Created($"/api/workitems/{workItem.Id}", dto);
     }
 
@@ -182,6 +185,7 @@ public sealed class WorkItemsController(
         await db.SaveChangesAsync(ct);
 
         var dto = await GetDetailAsync(id, ct);
+        await realtime.WorkItemChangedAsync(workItem.ProjectId, workItem.Id, dto!.Status, ct);
         return Ok(dto);
     }
 
@@ -251,6 +255,7 @@ public sealed class WorkItemsController(
         await db.SaveChangesAsync(ct);
 
         var dto = await GetDetailAsync(id, ct);
+        await realtime.WorkItemChangedAsync(workItem.ProjectId, workItem.Id, toStatus, ct);
         return Ok(dto);
     }
 
@@ -268,6 +273,8 @@ public sealed class WorkItemsController(
         await audit.LogAsync(
             "workitem.delete", "workitem", id.ToString(), workItem.ProjectId,
             workItem.Title, ct);
+        await realtime.WorkItemChangedAsync(
+            workItem.ProjectId, workItem.Id, "deleted", ct);
         return NoContent();
     }
 

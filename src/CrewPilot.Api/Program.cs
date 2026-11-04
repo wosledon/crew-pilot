@@ -2,6 +2,7 @@ using CrewPilot.Agents.Abstractions;
 using CrewPilot.Agents.Engine;
 using CrewPilot.Agents.Execution;
 using CrewPilot.Agents.Workflows;
+using CrewPilot.Api.Realtime;
 using CrewPilot.Core.Abstractions;
 using CrewPilot.Infrastructure.Audit;
 using CrewPilot.Infrastructure.Cicd;
@@ -47,6 +48,10 @@ builder.Services.AddSingleton<IAttachmentStorage>(new LocalAttachmentStorage(att
 // CI/CD：gh / glab CLI 封装（Token 由项目集成配置加密存储）
 builder.Services.AddSingleton<IGitCliService, GitCliService>();
 
+// 实时推送：SignalR Hub + 领域事件广播
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IRealtimeNotifier, SignalRRealtimeNotifier>();
+
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
@@ -56,12 +61,15 @@ builder.Services.AddCors(options =>
     options.AddPolicy("FrontendDev", policy => policy
         .WithOrigins("http://localhost:5173", "http://localhost:4173")
         .AllowAnyHeader()
-        .AllowAnyMethod()));
+        .AllowAnyMethod()
+        .AllowCredentials()));
 
 var app = builder.Build();
 
-// 开发环境自动应用迁移，保证开箱即用
-if (app.Environment.IsDevelopment())
+// 自动应用迁移：开发环境默认开启；容器/生产可通过 Database:AutoMigrate=true 开启
+var autoMigrate = app.Configuration.GetValue(
+    "Database:AutoMigrate", app.Environment.IsDevelopment());
+if (autoMigrate)
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<CrewPilotDbContext>();
@@ -77,6 +85,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+app.MapHub<RealtimeHub>("/hubs/realtime");
 
 app.Run();
 

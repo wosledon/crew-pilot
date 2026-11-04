@@ -28,19 +28,22 @@ public sealed class AgentRunExecutor
     private readonly ISecretProtector _secrets;
     private readonly AgentRunCancellationRegistry _cancellation;
     private readonly WorkflowRunner _workflowRunner;
+    private readonly IRealtimeNotifier? _realtime;
 
     public AgentRunExecutor(
         CrewPilotDbContext db,
         IAgentEngine engine,
         ISecretProtector secrets,
         AgentRunCancellationRegistry cancellation,
-        WorkflowRunner workflowRunner)
+        WorkflowRunner workflowRunner,
+        IRealtimeNotifier? realtime = null)
     {
         _db = db;
         _engine = engine;
         _secrets = secrets;
         _cancellation = cancellation;
         _workflowRunner = workflowRunner;
+        _realtime = realtime;
     }
 
     /// <summary>创建工作项被 Agent 认领的执行记录并入队。</summary>
@@ -72,6 +75,7 @@ public sealed class AgentRunExecutor
         });
 
         await _db.SaveChangesAsync(ct);
+        await NotifyRunAsync(run, workItem.ProjectId, ct);
         return run;
     }
 
@@ -100,6 +104,7 @@ public sealed class AgentRunExecutor
         run.Status = AgentRunStatus.Running;
         run.StartedAt = DateTimeOffset.UtcNow;
         await _db.SaveChangesAsync(ct);
+        await NotifyRunAsync(run, run.WorkItem?.ProjectId ?? Guid.Empty, ct);
 
         using var runCts = _cancellation.Register(run.Id, ct);
         try
@@ -320,6 +325,7 @@ public sealed class AgentRunExecutor
         await AddMentionReplyAsync(run);
 
         await _db.SaveChangesAsync(ct);
+        await NotifyRunAsync(run, run.WorkItem?.ProjectId ?? Guid.Empty, ct);
     }
 
     private async Task FinishCanceledAsync(AgentRun run, CancellationToken ct)
@@ -341,6 +347,25 @@ public sealed class AgentRunExecutor
         AddRunActivity(run, "agentrun.canceled", null, null);
 
         await _db.SaveChangesAsync(ct);
+        await NotifyRunAsync(run, run.WorkItem?.ProjectId ?? Guid.Empty, ct);
+    }
+
+    private async Task NotifyRunAsync(AgentRun run, Guid projectId, CancellationToken ct)
+    {
+        if (_realtime is null || projectId == Guid.Empty)
+        {
+            return;
+        }
+
+        try
+        {
+            await _realtime.AgentRunChangedAsync(
+                projectId, run.Id, run.Status.ToString().ToLowerInvariant(), ct);
+        }
+        catch (Exception)
+        {
+            // 实时推送失败不影响执行结果（前端仍有轮询兜底）
+        }
     }
 
     private async Task AddAutoWorkLogAsync(AgentRun run, string note)

@@ -1,5 +1,6 @@
 using System.Text;
 using CrewPilot.Agents.Execution;
+using CrewPilot.Core.Abstractions;
 using CrewPilot.Core.Agents;
 using CrewPilot.Core.Collaboration;
 using CrewPilot.Core.Projects;
@@ -22,7 +23,8 @@ namespace CrewPilot.Agents.Workflows;
 public sealed class WorkflowRunner(
     CrewPilotDbContext db,
     AgentRunQueue queue,
-    ILogger<WorkflowRunner> logger)
+    ILogger<WorkflowRunner> logger,
+    IRealtimeNotifier? realtime = null)
 {
     public const string BlockerMarker = "[[BLOCKER]]";
 
@@ -169,6 +171,7 @@ public sealed class WorkflowRunner(
         if (run is null)
         {
             await db.SaveChangesAsync(ct);
+            await NotifyBlockerAsync(blocker.ProjectId, blocker.Id, "resolved", ct);
             return true;
         }
 
@@ -190,6 +193,7 @@ public sealed class WorkflowRunner(
             run.UpdatedAt = DateTimeOffset.UtcNow;
             AddActivity(projectId, run.WorkItemId, "workflow.canceled", new { run = run.Id });
             await db.SaveChangesAsync(ct);
+            await NotifyBlockerAsync(projectId, blocker.Id, "resolved", ct);
             return true;
         }
 
@@ -199,6 +203,7 @@ public sealed class WorkflowRunner(
             run.Status = WorkflowRunStatus.Failed;
             run.FinishedAt = DateTimeOffset.UtcNow;
             await db.SaveChangesAsync(ct);
+            await NotifyBlockerAsync(projectId, blocker.Id, "resolved", ct);
             return true;
         }
 
@@ -214,6 +219,7 @@ public sealed class WorkflowRunner(
             await StartStepAsync(run, step, blocker.AgentRun?.Output, note, ct);
         }
 
+        await NotifyBlockerAsync(projectId, blocker.Id, "resolved", ct);
         return true;
     }
 
@@ -378,6 +384,7 @@ public sealed class WorkflowRunner(
         AddActivity(projectId, run.WorkItemId, "blocker.created",
             new { kind = kind.ToString(), reason, step = step.Name });
         await db.SaveChangesAsync(ct);
+        await NotifyBlockerAsync(projectId, blocker.Id, "open", ct);
         logger.LogInformation(
             "卡点挂起：run={RunId} step={Step} kind={Kind} reason={Reason}",
             run.Id, step.Name, kind, reason);
@@ -404,6 +411,28 @@ public sealed class WorkflowRunner(
         AddActivity(await GetProjectIdAsync(run, ct), run.WorkItemId,
             "workflow.canceled", new { run = run.Id, reason });
         await db.SaveChangesAsync(ct);
+        foreach (var blocker in openBlockers)
+        {
+            await NotifyBlockerAsync(blocker.ProjectId, blocker.Id, "resolved", ct);
+        }
+    }
+
+    private async Task NotifyBlockerAsync(
+        Guid projectId, Guid blockerId, string status, CancellationToken ct)
+    {
+        if (realtime is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await realtime.BlockerChangedAsync(projectId, blockerId, status, ct);
+        }
+        catch (Exception)
+        {
+            // 实时推送失败不影响工作流状态
+        }
     }
 
     private async Task<WorkflowStep?> ResolveBlockerStepAsync(
