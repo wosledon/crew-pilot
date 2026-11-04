@@ -9,7 +9,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 160 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 162 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -127,7 +127,7 @@
 ### 4.4 原型工坊（P0）
 
 - [x] HTML 编辑 + sandbox iframe 实时预览
-- [~] 原型多文件支持（P2）
+- [x] 原型多文件支持（Round 35：多文件 API/相对路径预览/CSP，前端文件管理）
 - [x] 版本历史（Round 11：自动快照 + 恢复）
 - [x] URL / 图片 / MCP 原型渲染（Round 11）
 - [x] 图片上传 / 存储（Round 11：PNG/JPG/WEBP/GIF，10MB，只读图片接口）
@@ -295,6 +295,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 35（2026-11-05，P2 演进 Round 4）
+
+- 原型多文件（PRD 4.4 P2）：`PrototypeFile` 实体 + SQLite/PG 迁移；`GET/POST /api/prototypes/{id}/files`、`DELETE /api/prototype-files/{id}`
+- 多文件预览：`GET /api/prototypes/{id}/preview/{**path}` 按相对路径返回 html/css/js/json/svg/txt/md，注入 CSP/nosniff；无多文件时单文件内容兜底 index.html
+- 路径校验（防穿越、扩展名白名单、单文件 300K 字符、最多 50 个）；前端原型工坊新增文件列表/编辑/删除，存在 index.html 时 iframe 走相对路径预览
+- 测试：160 → 162（多文件 CRUD + 相对路径预览 + 路径穿越拒绝、单文件兜底），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 34（2026-11-05，P2 演进 Round 3）
 

@@ -9,7 +9,7 @@
 | 项 | 命令 | 结果 |
 | --- | --- | --- |
 | 后端构建 | `dotnet build CrewPilot.slnx` | 0 警告 / 0 错误 |
-| 后端测试 | `dotnet test CrewPilot.slnx` | **160 项通过**（50 单测 + 110 集成） |
+| 后端测试 | `dotnet test CrewPilot.slnx` | **162 项通过**（50 单测 + 112 集成） |
 | 前端静态检查 | `npm run lint` / `npm run format:check` | 0 error，格式通过 |
 | 前端单测 | `npm run test:run` | **13 项通过** |
 | 前端构建 | `npm run build` | 通过（tsc + vite） |
@@ -49,7 +49,7 @@ CI：`.github/workflows/ci.yml` 含 backend / frontend / e2e 三个 job。
 - [x] URL / 图片 / MCP 引用渲染，图片上传（类型/大小限制）
 - [x] 版本历史、自动快照、恢复
 - [x] 原型 ↔ 需求关联
-- [~] 多文件原型：P2
+- [x] 多文件原型（Round 35：文本资源 + 相对路径预览）
 
 ### 4.5 工时管理（P0）
 
@@ -178,7 +178,7 @@ PRD 第 4 节：P2 = 后续演进，不阻塞 v1 验收。
 | --- | --- |
 
 
-| 多文件原型 | P2 |
+
 | 富文本描述 | P2 |
 | 500+ 卡片性能压力验证 | P2 |
 | 流式 token 输出（当前为一次性输出 + 中间步骤日志） | 引擎能力增强，P2 |
