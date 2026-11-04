@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 148 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 151 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -195,7 +195,7 @@
 - [x] CRUD、岗位、模型、系统提示词、工具/命令白名单字段
 - [x] 工具权限真正生效（Round 1）
 - [x] 提示词模板变量替换（{{title}}/{{requirement}}/{{acceptanceCriteria}}/{{type}}/{{status}}/{{priority}}，Round 9）
-- [ ] 沙箱策略字段
+- [x] 沙箱策略字段（Round 29：工作区读写 / 只读 / 受信命令，引擎工具权限联动）
 - [x] 试运行可选需求并注入上下文（Round 16）
 
 ### 5.3 Agent 团队（P1）
@@ -294,6 +294,16 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 29（2026-11-04）
+
+- Agent 沙箱策略（PRD 5.2 P0）：新增 `SandboxPolicy`（workspacewrite 默认 / readonly / trusted）+ 迁移
+  - readonly：引擎只注入 `read_file`/`list_files`，禁止写入与命令
+  - trusted：文件仍限制工作目录，`run_command` 免白名单（仍不经 shell、带超时）
+  - workspacewrite：文件限制工作目录 + 命令白名单（原行为）
+- `AgentRunRequest` 携带策略，`MafAgentEngine` → `AgentTools.Create` 联动；执行器传入 Agent 配置
+- 前端 Agent 新建表单新增沙箱策略下拉与说明；DTO 暴露 `sandboxPolicy`
+- 测试：148 → 151（只读/受信工具集、策略持久化并传给引擎），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 28（2026-11-04）
 
