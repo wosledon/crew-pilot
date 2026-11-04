@@ -13,7 +13,7 @@ public sealed record McpToolInfo(string Name, string? Description, string? Input
 /// 支持 JSON 与 SSE 两种响应体；认证通过 Bearer Token；不依赖第三方 MCP SDK。
 /// 说明：stdio / 旧版 HTTP+SSE 双通道不在支持范围（配置可保存，运行时跳过）。
 /// </summary>
-public sealed class McpClient : IAsyncDisposable
+public sealed class McpClient : IMcpSession
 {
     private const string ProtocolVersion = "2024-11-05";
 

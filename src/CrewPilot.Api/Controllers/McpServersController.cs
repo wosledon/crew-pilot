@@ -125,7 +125,7 @@ public sealed class McpServersController(
         if (string.Equals(server.Transport, "stdio", StringComparison.OrdinalIgnoreCase))
         {
             return Ok(new McpTestDto(
-                true, "stdio 配置已记录；运行期由 Agent 进程沙箱启动"));
+                true, "stdio 配置已记录；运行时会启动该命令作为 MCP Server"));
         }
 
         try

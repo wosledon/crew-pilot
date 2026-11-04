@@ -16,8 +16,8 @@ public sealed class McpToolSession : IAsyncDisposable
     private static readonly Regex InvalidToolNameChars = new(
         "[^a-zA-Z0-9_-]", RegexOptions.Compiled);
 
-    private readonly List<McpClient> _clients = [];
-    private readonly Dictionary<string, (McpClient Client, string RemoteName)> _routes =
+    private readonly List<IMcpSession> _clients = [];
+    private readonly Dictionary<string, (IMcpSession Client, string RemoteName)> _routes =
         new(StringComparer.OrdinalIgnoreCase);
 
     private McpToolSession()
@@ -45,20 +45,18 @@ public sealed class McpToolSession : IAsyncDisposable
                 continue;
             }
 
-            // 运行时仅支持 Streamable HTTP；stdio / 旧版 SSE 双通道跳过
-            if (!string.Equals(server.Transport, "http", StringComparison.OrdinalIgnoreCase) &&
-                !string.Equals(server.Transport, "sse", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
             try
             {
                 var token = string.IsNullOrWhiteSpace(server.AuthTokenProtected)
                     ? null
                     : secrets.Unprotect(server.AuthTokenProtected);
-                var client = await McpClient.ConnectAsync(
-                    server.Endpoint, token, TimeSpan.FromSeconds(10), ct);
+                var isStdio = string.Equals(
+                    server.Transport, "stdio", StringComparison.OrdinalIgnoreCase);
+                IMcpSession client = isStdio
+                    ? await StdioMcpClient.ConnectAsync(
+                        server.Endpoint, TimeSpan.FromSeconds(30), ct)
+                    : await McpClient.ConnectAsync(
+                        server.Endpoint, token, TimeSpan.FromSeconds(10), ct);
                 session._clients.Add(client);
 
                 foreach (var tool in client.Tools)
@@ -111,7 +109,7 @@ public sealed class McpToolSession : IAsyncDisposable
     }
 
     private sealed class RouteInvoker(
-        IReadOnlyDictionary<string, (McpClient Client, string RemoteName)> routes)
+        IReadOnlyDictionary<string, (IMcpSession Client, string RemoteName)> routes)
         : IMcpToolInvoker
     {
         public Task<string> CallToolAsync(
