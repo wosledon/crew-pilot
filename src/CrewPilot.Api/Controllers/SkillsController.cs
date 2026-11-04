@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json;
 using CrewPilot.Api.Contracts;
 using CrewPilot.Core.Skills;
 using CrewPilot.Infrastructure.Audit;
@@ -101,6 +103,180 @@ public sealed class SkillsController(
         await db.SaveChangesAsync(ct);
         await audit.LogAsync("skill.delete", "skill", id.ToString(), ct: ct);
         return NoContent();
+    }
+
+    /// <summary>导出为 SKILL.md（YAML front matter + 提示词正文）。</summary>
+    [HttpGet("api/skills/{id:guid}/export")]
+    public async Task<IActionResult> Export(Guid id, CancellationToken ct)
+    {
+        var skill = await db.Skills.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id, ct);
+        if (skill is null)
+        {
+            return Problem(detail: "Skill 不存在", statusCode: 404);
+        }
+
+        var markdown = ToSkillMarkdown(skill);
+        var safeName = string.Concat(skill.Name.Select(
+            ch => Path.GetInvalidFileNameChars().Contains(ch) ? '_' : ch));
+        return File(
+            Encoding.UTF8.GetBytes(markdown),
+            "text/markdown; charset=utf-8",
+            $"{safeName}.SKILL.md");
+    }
+
+    /// <summary>从 SKILL.md 导入 Skill（同名已存在返回 409）。</summary>
+    [HttpPost("api/skills/import")]
+    public async Task<ActionResult<SkillDto>> Import(
+        [FromBody] ImportSkillRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.Content))
+        {
+            return Problem(detail: "SKILL.md 内容必填", statusCode: 400);
+        }
+
+        var parsed = ParseSkillMarkdown(request.Content);
+        if (parsed is null)
+        {
+            return Problem(
+                detail: "SKILL.md 格式无效：需要 --- 包裹的 YAML front matter 与正文提示词",
+                statusCode: 400);
+        }
+
+        var name = parsed.Value.Meta.GetValueOrDefault("name", string.Empty);
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return Problem(detail: "front matter 缺少 name", statusCode: 400);
+        }
+
+        var exists = await db.Skills.AnyAsync(s => s.Name == name, ct);
+        if (exists)
+        {
+            return Problem(detail: $"Skill {name} 已存在", statusCode: 409);
+        }
+
+        var skill = new Skill
+        {
+            Name = name,
+            Description = parsed.Value.Meta.GetValueOrDefault("description"),
+            PromptContent = parsed.Value.Body,
+            Tools = NormalizeTools(parsed.Value.Meta.GetValueOrDefault("tools")),
+            ScriptPath = parsed.Value.Meta.GetValueOrDefault("scriptPath"),
+            Enabled = !string.Equals(
+                parsed.Value.Meta.GetValueOrDefault("enabled"), "false",
+                StringComparison.OrdinalIgnoreCase),
+        };
+        db.Skills.Add(skill);
+        await db.SaveChangesAsync(ct);
+        await audit.LogAsync("skill.import", "skill", skill.Id.ToString(), ct: ct);
+        return Created($"/api/skills/{skill.Id}", ToDto(skill));
+    }
+
+    private static string ToSkillMarkdown(Skill skill)
+    {
+        var builder = new StringBuilder();
+        builder.AppendLine("---");
+        builder.AppendLine($"name: {skill.Name}");
+        if (!string.IsNullOrWhiteSpace(skill.Description))
+        {
+            builder.AppendLine($"description: {SingleLine(skill.Description)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(skill.Tools))
+        {
+            builder.AppendLine($"tools: {skill.Tools}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(skill.ScriptPath))
+        {
+            builder.AppendLine($"scriptPath: {skill.ScriptPath}");
+        }
+
+        builder.AppendLine($"enabled: {(skill.Enabled ? "true" : "false")}");
+        builder.AppendLine("---");
+        builder.AppendLine();
+        builder.AppendLine(skill.PromptContent);
+        return builder.ToString();
+    }
+
+    private static string SingleLine(string value) =>
+        value.ReplaceLineEndings(" ").Trim();
+
+    private static (Dictionary<string, string> Meta, string Body)? ParseSkillMarkdown(
+        string content)
+    {
+        var normalized = content.ReplaceLineEndings("\n");
+        if (!normalized.StartsWith("---\n", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var closing = normalized.IndexOf("\n---", 4, StringComparison.Ordinal);
+        if (closing < 0)
+        {
+            return null;
+        }
+
+        var metaBlock = normalized[4..closing];
+        var bodyStart = closing + "\n---".Length;
+        var body = normalized[bodyStart..].TrimStart('\n').TrimEnd();
+        if (body.Length == 0)
+        {
+            return null;
+        }
+
+        var meta = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var rawLine in metaBlock.Split('\n'))
+        {
+            var line = rawLine.Trim();
+            if (line.Length == 0 || line.StartsWith('#'))
+            {
+                continue;
+            }
+
+            var separator = line.IndexOf(':');
+            if (separator <= 0)
+            {
+                continue;
+            }
+
+            var key = line[..separator].Trim();
+            var value = line[(separator + 1)..].Trim().Trim('"', '\'');
+            if (key.Length > 0)
+            {
+                meta[key] = value;
+            }
+        }
+
+        return (meta, body);
+    }
+
+    private static string? NormalizeTools(string? tools)
+    {
+        if (string.IsNullOrWhiteSpace(tools))
+        {
+            return null;
+        }
+
+        var value = tools.Trim();
+        if (value.StartsWith('['))
+        {
+            try
+            {
+                using var document = JsonDocument.Parse(value);
+                return document.RootElement.ValueKind == JsonValueKind.Array
+                    ? document.RootElement.GetRawText()
+                    : null;
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
+        }
+
+        var list = value
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .ToList();
+        return list.Count == 0 ? null : JsonSerializer.Serialize(list);
     }
 
     private static SkillDto ToDto(Skill skill) => new(

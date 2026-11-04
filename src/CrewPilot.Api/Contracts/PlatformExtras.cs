@@ -27,6 +27,9 @@ public sealed record UpdateSkillRequest(
     string? ScriptPath,
     bool Enabled);
 
+/// <summary>SKILL.md 导入：YAML front matter + 正文提示词。</summary>
+public sealed record ImportSkillRequest(string Content);
+
 public sealed record McpServerDto(
     Guid Id,
     string Name,

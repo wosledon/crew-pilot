@@ -42,6 +42,66 @@ public sealed class PlatformExtrasApiTests(CrewPilotApiFactory factory)
     }
 
     [Fact]
+    public async Task Skill_ExportsToSkillMarkdown()
+    {
+        var client = factory.CreateClient();
+        var created = await client.PostAsJsonAsync("/api/skills", new
+        {
+            name = "导出技能" + Guid.NewGuid().ToString("N")[..6],
+            description = "导出测试",
+            promptContent = "请先阅读上下文，再输出结论。",
+            tools = "[\"read_file\"]",
+            scriptPath = "scripts/run.ps1",
+        });
+        created.StatusCode.Should().Be(HttpStatusCode.Created);
+        var skill = await created.Content.ReadFromJsonAsync<SkillDto>();
+
+        var markdown = await client.GetStringAsync($"/api/skills/{skill!.Id}/export");
+
+        markdown.Should().StartWith("---");
+        markdown.Should().Contain($"name: {skill.Name}");
+        markdown.Should().Contain("tools: [\"read_file\"]");
+        markdown.Should().Contain("scriptPath: scripts/run.ps1");
+        markdown.Should().Contain("请先阅读上下文，再输出结论。");
+    }
+
+    [Fact]
+    public async Task Skill_ImportsFromSkillMarkdown_AndRejectsDuplicates()
+    {
+        var client = factory.CreateClient();
+        var name = "导入技能" + Guid.NewGuid().ToString("N")[..6];
+        var content = $"""
+            ---
+            name: {name}
+            description: 从 SKILL.md 导入
+            tools: read_file,run_tests
+            scriptPath: scripts/check.ps1
+            enabled: true
+            ---
+
+            先运行测试，再总结失败原因。
+            """;
+
+        var imported = await client.PostAsJsonAsync("/api/skills/import", new { content });
+        imported.StatusCode.Should().Be(HttpStatusCode.Created);
+        var skill = await imported.Content.ReadFromJsonAsync<SkillDto>();
+        skill!.Name.Should().Be(name);
+        skill.Description.Should().Be("从 SKILL.md 导入");
+        skill.Tools.Should().Be("[\"read_file\",\"run_tests\"]");
+        skill.ScriptPath.Should().Be("scripts/check.ps1");
+        skill.PromptContent.Should().Contain("先运行测试");
+
+        var duplicate = await client.PostAsJsonAsync("/api/skills/import", new { content });
+        duplicate.StatusCode.Should().Be(HttpStatusCode.Conflict);
+
+        var invalid = await client.PostAsJsonAsync("/api/skills/import", new
+        {
+            content = "没有 front matter 的文本",
+        });
+        invalid.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
     public async Task AgentBinding_InjectsSkillIntoSystemPrompt()
     {
         var client = factory.CreateClient();
