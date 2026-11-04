@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 153 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 155 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -77,7 +77,7 @@
 - [x] 审计日志：敏感操作留痕 + 查询 API/页面
 - [x] 结构化日志（生产 JSON console，Round 14）+ 请求关联 ID
 - [x] 审计日志（Round 6）
-- [ ] 安全加固：密钥轮换界面、发布审批
+- [x] 安全加固：密钥轮换界面（Round 31：Provider 编辑轮换 + 审计）、发布审批（项目开关，直接发布 409）
 - [ ] 部署文档 + `docker compose`
 
 ### P5 基建与质量
@@ -179,7 +179,7 @@
 - [x] 单用户 Owner 密码认证（可选启用，Cookie 登录；Round 17）
 - [x] 敏感操作审计日志（Round 6：删除/集成/发布等留痕 + 查询页）
 - [x] 机密加密存储且不出现在响应（DPAPI）
-- [ ] 密钥查看/轮换界面
+- [x] 密钥轮换界面（Round 31；密钥查看按安全设计不提供）
 
 ### 5.1 模型供应商（P0）
 
@@ -294,6 +294,12 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 31（2026-11-04）
+
+- 密钥轮换（PRD 4.9）：Provider 编辑支持更新 API Key（留空保留），更新后审计 `provider.keyRotated`；前端新增「编辑」入口（名称/BaseUrl/启用状态/密钥轮换）
+- 发布审批（PRD 4.9/6.3）：Project 新增 `ReleaseRequiresApproval` + 迁移；`PUT /api/projects/{id}/release-approval`；开启后直接发布 API 返回 409（走发布工作流审批）；前端发布面板可切换并提示
+- 测试：153 → 155（密钥轮换替换密文 + 审计、发布审批拒绝直接发布），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 30（2026-11-04）
 
