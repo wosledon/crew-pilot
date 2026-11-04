@@ -45,5 +45,14 @@
   "restore": "Restore",
   "restored": "Restored to v{{version}} (saved as a new version)",
   "previewTitle": "Preview",
-  "saveVersionHint": "Every save is snapshotted automatically"
+  "saveVersionHint": "Every save is snapshotted automatically",
+  "files": "Files",
+  "filesHint": "Add CSS/JS files to an HTML prototype; preview uses relative paths when index.html exists",
+  "filePath": "File path",
+  "saveFile": "Save file",
+  "fileSaved": "File saved",
+  "fileDeleted": "File deleted",
+  "noFiles": "No files yet",
+  "deleteFileConfirm": "The file will be removed from the preview",
+  "fileEditorPlaceholder": "File content (html/css/js/json/svg/txt/md)"
 }

@@ -13,11 +13,14 @@ import {
   prototypeImageUrl,
   useCreatePrototype,
   useDeletePrototype,
+  useDeletePrototypeFile,
+  usePrototypeFiles,
   usePrototypeVersions,
   usePrototypes,
   useRestorePrototypeVersion,
   useUpdatePrototype,
   useUploadPrototypeImage,
+  useUpsertPrototypeFile,
 } from "./api";
 import { buildSandboxDocument } from "./sandboxDocument";
 import { useProjects, useWorkItems } from "@/features/projects/api";
@@ -57,7 +60,52 @@ export function PrototypeStudioPage() {
   const [requirementId, setRequirementId] = useState("");
   const [currentId, setCurrentId] = useState<string | null>(null);
   const versions = usePrototypeVersions(currentId);
+  const files = usePrototypeFiles(currentId ?? undefined);
+  const upsertFile = useUpsertPrototypeFile(currentId ?? "");
+  const deleteFile = useDeletePrototypeFile(currentId ?? "");
+  const [filePath, setFilePath] = useState("index.html");
+  const [fileContent, setFileContent] = useState("");
+  const [editingFileId, setEditingFileId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  const hasIndexHtml = (files.data ?? []).some((file) => file.path === "index.html");
+
+  const handleSaveFile = async () => {
+    if (currentId === null || filePath.trim() === "") {
+      return;
+    }
+    try {
+      await upsertFile.mutateAsync({
+        path: filePath.trim(),
+        content: fileContent,
+      });
+      toast.success(t("prototype:fileSaved"));
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
+  const handleDeleteFile = async (fileId: string) => {
+    const approved = await confirm({
+      title: t("common:delete"),
+      description: t("prototype:deleteFileConfirm"),
+      confirmText: t("common:delete"),
+      destructive: true,
+    });
+    if (!approved) {
+      return;
+    }
+    try {
+      await deleteFile.mutateAsync(fileId);
+      if (editingFileId === fileId) {
+        setEditingFileId(null);
+        setFileContent("");
+      }
+      toast.success(t("prototype:fileDeleted"));
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
 
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
@@ -313,12 +361,21 @@ export function PrototypeStudioPage() {
               </CardHeader>
               <CardContent className="flex-1">
                 {type === "html" ? (
-                  <iframe
-                    title={t("prototype:preview")}
-                    sandbox="allow-scripts"
-                    srcDoc={buildSandboxDocument(content)}
-                    className="h-80 w-full rounded-md border border-border bg-white"
-                  />
+                  hasIndexHtml && currentId !== null ? (
+                    <iframe
+                      title={t("prototype:preview")}
+                      sandbox="allow-scripts"
+                      src={`/api/prototypes/${currentId}/preview/index.html`}
+                      className="h-80 w-full rounded-md border border-border bg-white"
+                    />
+                  ) : (
+                    <iframe
+                      title={t("prototype:preview")}
+                      sandbox="allow-scripts"
+                      srcDoc={buildSandboxDocument(content)}
+                      className="h-80 w-full rounded-md border border-border bg-white"
+                    />
+                  )
                 ) : type === "url" ? (
                   urlValid ? (
                     <div className="space-y-2">
@@ -376,6 +433,74 @@ export function PrototypeStudioPage() {
               </CardContent>
             </Card>
           </div>
+
+          {currentId !== null && type === "html" ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("prototype:files")}</CardTitle>
+                <p className="text-xs text-muted-foreground">{t("prototype:filesHint")}</p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex flex-wrap gap-2">
+                  {(files.data ?? []).map((file) => (
+                    <span key={file.id} className="flex items-center gap-1">
+                      <Button
+                        size="sm"
+                        variant={editingFileId === file.id ? "primary" : "outline"}
+                        onClick={() => {
+                          setEditingFileId(file.id);
+                          setFilePath(file.path);
+                          setFileContent(file.content);
+                        }}
+                      >
+                        {file.path}
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        aria-label={t("common:delete")}
+                        onClick={() => void handleDeleteFile(file.id)}
+                      >
+                        <Trash2 className="h-3 w-3 text-destructive" />
+                      </Button>
+                    </span>
+                  ))}
+                  {(files.data ?? []).length === 0 ? (
+                    <p className="text-sm text-muted-foreground">{t("prototype:noFiles")}</p>
+                  ) : null}
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <label className="block space-y-1 text-sm">
+                    <span className="font-medium">{t("prototype:filePath")}</span>
+                    <Input
+                      value={filePath}
+                      onChange={(event) => {
+                        setFilePath(event.target.value);
+                        setEditingFileId(null);
+                      }}
+                      placeholder="index.html / styles.css"
+                    />
+                  </label>
+                  <div className="flex items-end">
+                    <Button
+                      size="sm"
+                      onClick={() => void handleSaveFile()}
+                      disabled={upsertFile.isPending || filePath.trim() === ""}
+                    >
+                      <Save className="h-3.5 w-3.5" />
+                      {t("prototype:saveFile")}
+                    </Button>
+                  </div>
+                </div>
+                <Textarea
+                  value={fileContent}
+                  onChange={(event) => setFileContent(event.target.value)}
+                  placeholder={t("prototype:fileEditorPlaceholder")}
+                  className="min-h-40 font-mono text-xs"
+                />
+              </CardContent>
+            </Card>
+          ) : null}
 
           {currentId !== null ? (
             <Card>

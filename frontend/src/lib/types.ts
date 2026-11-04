@@ -59,6 +59,9 @@ export type PrototypeVersion = Api["PrototypeVersionDto"];
 
 export type PrototypeImage = Api["PrototypeImageDto"];
 
+/** 原型多文件（文本资源） */
+export type PrototypeFile = Api["PrototypeFileDto"];
+
 export type IterationStatus = "planned" | "active" | "completed";
 
 export type IterationListItem = Omit<Api["IterationListItemDto"], "status"> & {

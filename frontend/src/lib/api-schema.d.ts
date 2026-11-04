@@ -2633,6 +2633,145 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/prototypes/{id}/files": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["PrototypeFileDto"][];
+            "application/json": components["schemas"]["PrototypeFileDto"][];
+            "text/json": components["schemas"]["PrototypeFileDto"][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["UpsertPrototypeFileRequest"];
+          "text/json": components["schemas"]["UpsertPrototypeFileRequest"];
+          "application/*+json": components["schemas"]["UpsertPrototypeFileRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["PrototypeFileDto"];
+            "application/json": components["schemas"]["PrototypeFileDto"];
+            "text/json": components["schemas"]["PrototypeFileDto"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/prototype-files/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/prototypes/{id}/preview/{path}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          path: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/projects/{projectId}/prototype-images": {
     parameters: {
       query?: never;
@@ -5303,6 +5442,16 @@ export interface components {
       /** Format: date-time */
       updatedAt: string;
     };
+    PrototypeFileDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      prototypeId: string;
+      path: string;
+      content: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
     PrototypeImageDto: {
       path: string;
       url: string;
@@ -5532,6 +5681,10 @@ export interface components {
       platform: string;
       token: null | string;
       repository: null | string;
+    };
+    UpsertPrototypeFileRequest: {
+      path: string;
+      content: string;
     };
     WeeklyReportDto: {
       /** Format: date */

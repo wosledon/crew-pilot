@@ -1,11 +1,43 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Prototype, PrototypeImage, PrototypeVersion } from "@/lib/types";
+import type { Prototype, PrototypeFile, PrototypeImage, PrototypeVersion } from "@/lib/types";
 
 export const prototypeKeys = {
   list: (projectId: string) => ["projects", projectId, "prototypes"] as const,
   versions: (prototypeId: string) => ["prototypes", prototypeId, "versions"] as const,
+  files: (prototypeId: string) => ["prototypes", prototypeId, "files"] as const,
 };
+
+export function usePrototypeFiles(prototypeId: string | undefined) {
+  return useQuery({
+    queryKey: prototypeKeys.files(prototypeId ?? ""),
+    queryFn: () => api.get<PrototypeFile[]>(`/prototypes/${prototypeId}/files`),
+    enabled: prototypeId !== undefined,
+  });
+}
+
+export function useUpsertPrototypeFile(prototypeId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { path: string; content: string }) =>
+      api.post<PrototypeFile>(`/prototypes/${prototypeId}/files`, body),
+    onSuccess: () =>
+      void queryClient.invalidateQueries({
+        queryKey: prototypeKeys.files(prototypeId),
+      }),
+  });
+}
+
+export function useDeletePrototypeFile(prototypeId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (fileId: string) => api.delete(`/prototype-files/${fileId}`),
+    onSuccess: () =>
+      void queryClient.invalidateQueries({
+        queryKey: prototypeKeys.files(prototypeId),
+      }),
+  });
+}
 
 export function usePrototypes(projectId: string | undefined) {
   return useQuery({

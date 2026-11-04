@@ -45,5 +45,14 @@
   "restore": "恢复此版本",
   "restored": "已恢复到 v{{version}}（生成新版本）",
   "previewTitle": "预览",
-  "saveVersionHint": "每次保存自动留档"
+  "saveVersionHint": "每次保存自动留档",
+  "files": "多文件",
+  "filesHint": "为 HTML 原型添加样式/脚本等文件；存在 index.html 时预览走相对路径",
+  "filePath": "文件路径",
+  "saveFile": "保存文件",
+  "fileSaved": "文件已保存",
+  "fileDeleted": "文件已删除",
+  "noFiles": "还没有多文件资源",
+  "deleteFileConfirm": "删除后该文件将从预览中移除",
+  "fileEditorPlaceholder": "文件内容（html/css/js/json/svg/txt/md）"
 }
