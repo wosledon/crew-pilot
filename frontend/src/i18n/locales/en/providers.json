@@ -50,5 +50,11 @@
   },
   "created": "Provider created",
   "deleted": "Provider deleted",
-  "empty": "No providers yet — click \"New provider\""
+  "empty": "No providers yet — click \"New provider\"",
+  "edit": "Edit",
+  "editTitle": "Edit provider",
+  "updated": "Provider updated",
+  "enabledLabel": "Enabled",
+  "apiKeyRotatePlaceholder": "Leave blank to keep current key",
+  "apiKeyRotateHint": "Enter a new key to rotate it; the old key stops working"
 }

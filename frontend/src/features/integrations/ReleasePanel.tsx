@@ -4,7 +4,9 @@ import { Rocket } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input, Textarea } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { toast } from "@/components/ui/Toast";
+import { useProject, useSetReleaseApproval } from "@/features/projects/api";
 import type { ReleaseResult } from "@/lib/types";
 import { useCreateRelease } from "./api";
 
@@ -12,14 +14,26 @@ export interface ReleasePanelProps {
   projectId: string;
 }
 
-/** 发布面板：通过 gh/glab 打 tag 并创建 Release。 */
+/** 发布面板：通过 gh/glab 打 tag 并创建 Release，可开启发布审批。 */
 export function ReleasePanel({ projectId }: ReleasePanelProps) {
   const { t } = useTranslation(["integrations", "common"]);
+  const project = useProject(projectId);
   const createRelease = useCreateRelease(projectId);
+  const setReleaseApproval = useSetReleaseApproval(projectId);
   const [tag, setTag] = useState("");
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
   const [result, setResult] = useState<ReleaseResult | null>(null);
+  const requiresApproval = project.data?.releaseRequiresApproval ?? false;
+
+  const handleApprovalChange = async (value: string) => {
+    try {
+      await setReleaseApproval.mutateAsync(value === "true");
+      toast.success(t("integrations:releaseApprovalSaved"));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("common:error"));
+    }
+  };
 
   const handleCreate = async () => {
     try {
@@ -44,6 +58,25 @@ export function ReleasePanel({ projectId }: ReleasePanelProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
+        <label className="block space-y-1.5 text-sm">
+          <span className="font-medium">{t("integrations:releaseApproval")}</span>
+          <Select
+            value={requiresApproval ? "true" : "false"}
+            onValueChange={(value) => void handleApprovalChange(value)}
+            options={[
+              { value: "false", label: t("integrations:releaseApprovalOff") },
+              { value: "true", label: t("integrations:releaseApprovalOn") },
+            ]}
+            ariaLabel={t("integrations:releaseApproval")}
+            disabled={setReleaseApproval.isPending}
+          />
+          <span className="text-xs text-muted-foreground">
+            {t("integrations:releaseApprovalHint")}
+          </span>
+        </label>
+        {requiresApproval ? (
+          <p className="text-xs text-warning">{t("integrations:releaseApprovalRequired")}</p>
+        ) : null}
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block space-y-1.5 text-sm">
             <span className="font-medium">{t("integrations:tag")}</span>
@@ -65,7 +98,7 @@ export function ReleasePanel({ projectId }: ReleasePanelProps) {
         <div className="flex items-center gap-3">
           <Button
             onClick={() => void handleCreate()}
-            disabled={createRelease.isPending || tag.trim() === ""}
+            disabled={createRelease.isPending || tag.trim() === "" || requiresApproval}
           >
             {t("integrations:createRelease")}
           </Button>

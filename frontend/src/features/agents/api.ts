@@ -51,6 +51,26 @@ export function useCreateProvider() {
   });
 }
 
+export function useUpdateProvider() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: {
+      id: string;
+      name: string;
+      baseUrl: string;
+      enabled: boolean;
+      apiKey?: string;
+    }) =>
+      api.put<ProviderDetail>(`/providers/${variables.id}`, {
+        name: variables.name,
+        baseUrl: variables.baseUrl,
+        enabled: variables.enabled,
+        apiKey: variables.apiKey,
+      }),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: agentKeys.providers }),
+  });
+}
+
 export function useDeleteProvider() {
   const queryClient = useQueryClient();
   return useMutation({

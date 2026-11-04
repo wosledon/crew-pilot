@@ -2184,6 +2184,51 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/projects/{id}/release-approval": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["SetReleaseApprovalRequest"];
+          "text/json": components["schemas"]["SetReleaseApprovalRequest"];
+          "application/*+json": components["schemas"]["SetReleaseApprovalRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["ProjectDetailDto"];
+            "application/json": components["schemas"]["ProjectDetailDto"];
+            "text/json": components["schemas"]["ProjectDetailDto"];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/projects/{id}/type-teams": {
     parameters: {
       query?: never;
@@ -3582,6 +3627,131 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/skills/{id}/bundle": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/skills/{id}/files": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": string[];
+            "application/json": string[];
+            "text/json": string[];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/skills/import-bundle": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/x-www-form-urlencoded": {
+            ContentType?: string;
+            ContentDisposition?: string;
+            Headers?: {
+              [key: string]: string[];
+            };
+            /** Format: int64 */
+            Length?: number;
+            Name?: string;
+            FileName?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "text/plain": components["schemas"]["SkillDto"];
+            "application/json": components["schemas"]["SkillDto"];
+            "text/json": components["schemas"]["SkillDto"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/projects/{projectId}/workflows": {
     parameters: {
       query?: never;
@@ -4843,6 +5013,7 @@ export interface components {
       defectTeamId: null | string;
       /** Format: uuid */
       taskTeamId: null | string;
+      releaseRequiresApproval: boolean;
     };
     ProjectIntegrationDto: {
       /** Format: uuid */
@@ -4974,6 +5145,9 @@ export interface components {
       defectTeamId: null | string;
       /** Format: uuid */
       taskTeamId: null | string;
+    };
+    SetReleaseApprovalRequest: {
+      required: boolean;
     };
     SkillDto: {
       /** Format: uuid */

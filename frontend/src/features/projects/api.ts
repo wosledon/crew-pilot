@@ -73,6 +73,17 @@ export function useSetDefaultTeam(projectId: string) {
   });
 }
 
+export function useSetReleaseApproval(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (required: boolean) =>
+      api.put<ProjectDetail>(`/projects/${projectId}/release-approval`, { required }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
+
 export function useSetTypeTeams(projectId: string) {
   const queryClient = useQueryClient();
   return useMutation({

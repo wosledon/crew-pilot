@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plug, Plus, RefreshCw, Star, Trash2 } from "lucide-react";
+import { Pencil, Plug, Plus, RefreshCw, Star, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
@@ -16,6 +17,7 @@ import {
   useSetDefaultProvider,
   useSyncProviderModels,
   useTestProvider,
+  useUpdateProvider,
 } from "./api";
 import { ProviderModels } from "./ProviderModels";
 
@@ -23,6 +25,7 @@ import { ProviderModels } from "./ProviderModels";
   const { t } = useTranslation(["providers", "common"]);
   const providers = useProviders();
   const createProvider = useCreateProvider();
+  const updateProvider = useUpdateProvider();
   const deleteProvider = useDeleteProvider();
   const testProvider = useTestProvider();
   const syncModels = useSyncProviderModels();
@@ -33,13 +36,31 @@ import { ProviderModels } from "./ProviderModels";
   const [baseUrl, setBaseUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editEnabled, setEditEnabled] = useState(true);
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
   const handleCreate = async () => {
     try {
-      await createProvider.mutateAsync({ name: name.trim(), baseUrl: baseUrl.trim(), apiKey });
-      toast.success(t("providers:created"));
+      if (editingId === null) {
+        await createProvider.mutateAsync({
+          name: name.trim(),
+          baseUrl: baseUrl.trim(),
+          apiKey,
+        });
+        toast.success(t("providers:created"));
+      } else {
+        await updateProvider.mutateAsync({
+          id: editingId,
+          name: name.trim(),
+          baseUrl: baseUrl.trim(),
+          enabled: editEnabled,
+          apiKey: apiKey.trim() || undefined,
+        });
+        toast.success(t("providers:updated"));
+      }
       setDialogOpen(false);
+      setEditingId(null);
       setName("");
       setBaseUrl("");
       setApiKey("");
@@ -109,7 +130,15 @@ import { ProviderModels } from "./ProviderModels";
           <h1 className="text-xl font-semibold">{t("providers:title")}</h1>{" "}
           <p className="text-sm text-muted-foreground">{t("providers:description")}</p>{" "}
         </div>{" "}
-        <Button onClick={() => setDialogOpen(true)}>
+        <Button
+          onClick={() => {
+            setEditingId(null);
+            setName("");
+            setBaseUrl("");
+            setApiKey("");
+            setDialogOpen(true);
+          }}
+        >
           {" "}
           <Plus className="h-4 w-4" /> {t("providers:create")}{" "}
         </Button>{" "}
@@ -182,6 +211,21 @@ import { ProviderModels } from "./ProviderModels";
                   ) : null}{" "}
                   <Button
                     size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setEditingId(provider.id);
+                      setName(provider.name);
+                      setBaseUrl(provider.baseUrl);
+                      setApiKey("");
+                      setEditEnabled(provider.enabled);
+                      setDialogOpen(true);
+                    }}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                    {t("providers:edit")}
+                  </Button>
+                  <Button
+                    size="sm"
                     variant="ghost"
                     onClick={() => setExpandedId(expandedId === provider.id ? null : provider.id)}
                   >
@@ -205,8 +249,13 @@ import { ProviderModels } from "./ProviderModels";
       )}{" "}
       <Dialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        title={t("providers:createTitle")}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) {
+            setEditingId(null);
+          }
+        }}
+        title={editingId === null ? t("providers:createTitle") : t("providers:editTitle")}
         closeLabel={t("common:cancel")}
       >
         {" "}
@@ -237,10 +286,30 @@ import { ProviderModels } from "./ProviderModels";
               type="password"
               value={apiKey}
               onChange={(event) => setApiKey(event.target.value)}
-              placeholder={t("providers:apiKeyPlaceholder")}
+              placeholder={
+                editingId === null
+                  ? t("providers:apiKeyPlaceholder")
+                  : t("providers:apiKeyRotatePlaceholder")
+              }
             />{" "}
-            <span className="text-xs text-muted-foreground">{t("providers:apiKeyHint")}</span>{" "}
+            <span className="text-xs text-muted-foreground">
+              {editingId === null ? t("providers:apiKeyHint") : t("providers:apiKeyRotateHint")}
+            </span>{" "}
           </label>{" "}
+          {editingId !== null ? (
+            <label className="block space-y-1.5 text-sm">
+              <span className="font-medium">{t("providers:enabledLabel")}</span>
+              <Select
+                value={editEnabled ? "true" : "false"}
+                onValueChange={(value) => setEditEnabled(value === "true")}
+                options={[
+                  { value: "true", label: t("providers:enabled") },
+                  { value: "false", label: t("providers:disabled") },
+                ]}
+                ariaLabel={t("providers:enabledLabel")}
+              />
+            </label>
+          ) : null}
           <div className="flex justify-end gap-2">
             {" "}
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
@@ -251,13 +320,14 @@ import { ProviderModels } from "./ProviderModels";
               onClick={() => void handleCreate()}
               disabled={
                 createProvider.isPending ||
+                updateProvider.isPending ||
                 name.trim() === "" ||
                 baseUrl.trim() === "" ||
-                apiKey.trim() === ""
+                (editingId === null && apiKey.trim() === "")
               }
             >
               {" "}
-              {t("common:create")}{" "}
+              {editingId === null ? t("common:create") : t("common:save")}{" "}
             </Button>{" "}
           </div>{" "}
         </div>{" "}

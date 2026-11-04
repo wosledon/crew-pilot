@@ -55,5 +55,11 @@
   "mergePr": "Merge PR",
   "merged": "PR merged",
   "mergeConfirmTitle": "Merge PR/MR?",
-  "mergeConfirmDescription": "Merge via gh/glab and sync status automatically. This cannot be undone."
+  "mergeConfirmDescription": "Merge via gh/glab and sync status automatically. This cannot be undone.",
+  "releaseApproval": "Release approval",
+  "releaseApprovalOff": "Direct release (no approval)",
+  "releaseApprovalOn": "Require approval (release workflow)",
+  "releaseApprovalHint": "When enabled, direct release API is rejected; use the release workflow",
+  "releaseApprovalRequired": "Release approval enabled: direct release is disabled",
+  "releaseApprovalSaved": "Release approval updated"
 }
