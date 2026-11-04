@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:5102/"
+      "url": "http://127.0.0.1:5103/"
     }
   ],
   "paths": {
@@ -10009,7 +10009,8 @@
           "approvalPolicy",
           "maxRetries",
           "inputContract",
-          "outputContract"
+          "outputContract",
+          "parallel"
         ],
         "type": "object",
         "properties": {
@@ -10075,6 +10076,9 @@
               "null",
               "string"
             ]
+          },
+          "parallel": {
+            "type": "boolean"
           }
         }
       },
@@ -10088,7 +10092,8 @@
           "approvalPolicy",
           "maxRetries",
           "inputContract",
-          "outputContract"
+          "outputContract",
+          "parallel"
         ],
         "type": "object",
         "properties": {
@@ -10098,6 +10103,7 @@
           "order": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
+              "null",
               "integer",
               "string"
             ],
@@ -10147,6 +10153,12 @@
             "type": [
               "null",
               "string"
+            ]
+          },
+          "parallel": {
+            "type": [
+              "null",
+              "boolean"
             ]
           }
         }

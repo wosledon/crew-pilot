@@ -1283,6 +1283,9 @@ namespace CrewPilot.Infrastructure.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Parallel")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("RequiredJob")
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");

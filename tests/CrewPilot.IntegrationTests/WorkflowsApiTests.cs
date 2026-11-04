@@ -194,6 +194,34 @@ public sealed class WorkflowsApiTests(CrewPilotApiFactory factory) : IClassFixtu
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
+    [Fact]
+    public async Task ParallelSteps_StartTogether_ThenAdvanceAfterAllSucceed()
+    {
+        var client = factory.CreateClient();
+        var project = await ApiTestHelpers.CreateProjectAsync(client);
+        var provider = await ApiTestHelpers.CreateProviderAsync(client);
+        var first = await ApiTestHelpers.CreateAgentAsync(client, provider.Id, "并行 Agent 1");
+        var second = await ApiTestHelpers.CreateAgentAsync(client, provider.Id, "并行 Agent 2");
+        var item = await ApiTestHelpers.CreateRequirementAsync(client, project.Id);
+        var workflow = await CreateWorkflowAsync(client, project.Id, "并行流", new object[]
+        {
+            new { name = "并行步骤 A", order = 0, parallel = true, agentId = first.Id, approvalPolicy = "auto" },
+            new { name = "并行步骤 B", order = 0, parallel = true, agentId = second.Id, approvalPolicy = "auto" },
+            new { name = "汇总步骤", order = 1, agentId = first.Id, approvalPolicy = "auto" },
+        });
+
+        var run = await StartRunAsync(client, workflow.Id, item.Id);
+        var started = await ApiTestHelpers.WaitForAsync(
+            () => client.GetFromJsonAsync<WorkflowRunDetailDto>($"/api/workflow-runs/{run.Id}"),
+            detail => detail is not null && detail.AgentRuns.Count >= 2,
+            attempts: 100);
+        started!.AgentRuns.Should().HaveCountGreaterThanOrEqualTo(2);
+
+        var detail = await WaitForFinishedAsync(client, run.Id);
+        detail.Run.Status.Should().Be("succeeded");
+        detail.AgentRuns.Should().HaveCount(3);
+    }
+
     private static async Task<WorkflowDto> CreateWorkflowAsync(
         HttpClient client, Guid projectId, string name, object[] steps)
     {

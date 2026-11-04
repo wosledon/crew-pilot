@@ -396,10 +396,11 @@ public sealed class WorkflowsController(
         var order = 0;
         foreach (var step in steps)
         {
+            var effectiveOrder = step.Order ?? order;
             workflow.Steps.Add(new WorkflowStep
             {
                 Name = step.Name.Trim(),
-                Order = order++,
+                Order = effectiveOrder,
                 AgentId = step.AgentId == Guid.Empty ? null : step.AgentId,
                 RequiredJob = ParseJob(step.RequiredJob),
                 Instruction = step.Instruction,
@@ -407,7 +408,9 @@ public sealed class WorkflowsController(
                 MaxRetries = Math.Clamp(step.MaxRetries ?? 1, 0, 10),
                 InputContract = step.InputContract,
                 OutputContract = step.OutputContract,
+                Parallel = step.Parallel ?? false,
             });
+            order = Math.Max(order, effectiveOrder) + 1;
         }
     }
 
@@ -439,7 +442,8 @@ public sealed class WorkflowsController(
                 step.ApprovalPolicy.ToString().ToLowerInvariant(),
                 step.MaxRetries,
                 step.InputContract,
-                step.OutputContract))
+                step.OutputContract,
+                step.Parallel))
             .ToList(),
         workflow.CreatedAt,
         workflow.UpdatedAt);

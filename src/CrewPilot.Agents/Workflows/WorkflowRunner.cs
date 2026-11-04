@@ -65,7 +65,14 @@ public sealed class WorkflowRunner(
         AddActivity(workItem.ProjectId, workItem.Id, "workflow.started", new { workflow = workflow.Name });
         await db.SaveChangesAsync(ct);
 
-        await StartStepAsync(run, steps[0], previousOutput: null, humanInstruction: null, ct);
+        var initialSteps = steps.Where(s => s.Order == steps[0].Order).ToList();
+        var toStart = initialSteps.Count > 1 && initialSteps.Any(s => s.Parallel)
+            ? initialSteps
+            : [steps[0]];
+        foreach (var initial in toStart)
+        {
+            await StartStepAsync(run, initial, previousOutput: null, humanInstruction: null, ct);
+        }
         logger.LogInformation(
             "工作流启动：workflow={WorkflowId} workItem={WorkItemId} run={RunId}",
             workflow.Id, workItem.Id, run.Id);
@@ -142,6 +149,28 @@ public sealed class WorkflowRunner(
                 $"步骤「{step.Name}」已完成，等待确认后继续",
                 BuildSnapshot(run, step, agentRun), ct);
             return;
+        }
+
+        // 并行组：同 Order 的 Parallel 步骤全部成功后，才推进到下一 Order。
+        if (step.Parallel)
+        {
+            var siblingIds = await db.WorkflowSteps
+                .Where(s => s.WorkflowId == run.WorkflowId && s.Order == step.Order)
+                .Select(s => s.Id)
+                .ToListAsync(ct);
+            var completedSiblings = await db.AgentRuns
+                .Where(r => r.WorkflowRunId == run.Id &&
+                            r.WorkflowStepId != null &&
+                            siblingIds.Contains(r.WorkflowStepId.Value) &&
+                            r.Status == AgentRunStatus.Succeeded)
+                .Select(r => r.WorkflowStepId)
+                .Distinct()
+                .CountAsync(ct);
+            if (completedSiblings < siblingIds.Count)
+            {
+                await db.SaveChangesAsync(ct);
+                return;
+            }
         }
 
         await AdvanceAsync(run, step, output, ct);
@@ -336,13 +365,30 @@ public sealed class WorkflowRunner(
     private async Task AdvanceAsync(
         WorkflowRun run, WorkflowStep step, string? output, CancellationToken ct)
     {
-        var next = await db.WorkflowSteps
+        var nextOrder = await db.WorkflowSteps
             .Where(s => s.WorkflowId == run.WorkflowId && s.Order > step.Order)
             .OrderBy(s => s.Order)
+            .Select(s => (int?)s.Order)
             .FirstOrDefaultAsync(ct);
-        if (next is not null)
+        var nextSteps = nextOrder is null
+            ? []
+            : await db.WorkflowSteps
+                .Where(s => s.WorkflowId == run.WorkflowId && s.Order == nextOrder)
+                .OrderBy(s => s.Id)
+                .ToListAsync(ct);
+        if (nextSteps.Count > 0)
         {
-            await StartStepAsync(run, next, output, null, ct);
+            if (nextSteps.Count > 1 && nextSteps.Any(s => s.Parallel))
+            {
+                foreach (var parallelStep in nextSteps)
+                {
+                    await StartStepAsync(run, parallelStep, output, null, ct);
+                }
+
+                return;
+            }
+
+            await StartStepAsync(run, nextSteps[0], output, null, ct);
             return;
         }
 

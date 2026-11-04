@@ -1288,6 +1288,9 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
 
+                    b.Property<bool>("Parallel")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("RequiredJob")
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");

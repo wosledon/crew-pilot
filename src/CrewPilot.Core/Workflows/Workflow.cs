@@ -74,4 +74,7 @@ public class WorkflowStep : Entity
 
     /// <summary>输出契约（说明文字）。</summary>
     public string? OutputContract { get; set; }
+
+    /// <summary>并行步骤：与相邻同 Order 且 Parallel 的步骤并发执行。</summary>
+    public bool Parallel { get; set; }
 }

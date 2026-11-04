@@ -11,7 +11,8 @@ public sealed record WorkflowStepDto(
     string ApprovalPolicy,
     int MaxRetries,
     string? InputContract,
-    string? OutputContract);
+    string? OutputContract,
+    bool Parallel);
 
 public sealed record WorkflowDto(
     Guid Id,
@@ -26,14 +27,15 @@ public sealed record WorkflowDto(
 
 public sealed record WorkflowStepRequest(
     string Name,
-    int Order,
+    int? Order,
     Guid? AgentId,
     string? RequiredJob,
     string? Instruction,
     string? ApprovalPolicy,
     int? MaxRetries,
     string? InputContract,
-    string? OutputContract);
+    string? OutputContract,
+    bool? Parallel);
 
 public sealed record CreateWorkflowRequest(
     string Name,
