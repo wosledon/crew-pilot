@@ -63,5 +63,23 @@
   "nextStatus": "Next status",
   "detail": "Details",
   "detailTitle": "Work item details",
-  "acceptanceCriteriaEmpty": "No acceptance criteria"
+  "acceptanceCriteriaEmpty": "No acceptance criteria",
+  "edit": "Edit",
+  "editTitle": "Edit work item",
+  "updated": "Work item updated",
+  "deleted": "Work item deleted",
+  "deleteConfirm": {
+    "title": "Delete work item?",
+    "description": "Comments, attachments and work logs will be removed permanently."
+  },
+  "tags": "Tags",
+  "tagsPlaceholder": "Comma separated, e.g. frontend,UX",
+  "storyPoints": "Story points",
+  "dueDate": "Due date",
+  "iteration": "Iteration",
+  "iterationNone": "No iteration",
+  "taskParent": "Parent work item",
+  "taskParentNone": "No parent",
+  "branchUrl": "Branch/PR URL",
+  "noTags": "No tags"
 }

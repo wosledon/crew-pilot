@@ -8,7 +8,10 @@ import { Select } from "@/components/ui/Select";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { CreateWorkItemDialog } from "./components/CreateWorkItemDialog";
+import { EditWorkItemDialog } from "./components/EditWorkItemDialog";
 import { LogWorkDialog } from "./components/LogWorkDialog";
+import { ProjectMembersCard } from "./components/ProjectMembersCard";
+import { ProjectOverview } from "./components/ProjectOverview";
 import { WorkItemCard } from "./components/WorkItemCard";
 import { WorkItemDetailDialog } from "./components/WorkItemDetailDialog";
 import { ActivityFeed } from "./ActivityFeed";
@@ -20,7 +23,7 @@ import {
   useTransitionWorkItem,
   useWorkItems,
 } from "./api";
-import type { WorkItemListItem } from "@/lib/types";
+import type { WorkItemDetail, WorkItemListItem } from "@/lib/types";
 
 export function ProjectDetailPage() {
   const { projectId = "" } = useParams();
@@ -36,6 +39,7 @@ export function ProjectDetailPage() {
   const [logTarget, setLogTarget] = useState<WorkItemListItem | null>(null);
   const [assignTarget, setAssignTarget] = useState<WorkItemListItem | null>(null);
   const [detailTarget, setDetailTarget] = useState<WorkItemListItem | null>(null);
+  const [editTarget, setEditTarget] = useState<WorkItemDetail | null>(null);
 
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
@@ -97,6 +101,8 @@ export function ProjectDetailPage() {
       </div>
 
       <ProjectSubNav projectId={projectId} />
+
+      <ProjectOverview projectId={projectId} />
 
       <div className="flex flex-wrap items-center gap-3">
         <Select
@@ -182,10 +188,30 @@ export function ProjectDetailPage() {
               setDetailTarget(null);
             }
           }}
+          onEdit={(detail) => {
+            setDetailTarget(null);
+            setEditTarget(detail);
+          }}
         />
       ) : null}
 
-      <ActivityFeed projectId={projectId} />
+      {editTarget ? (
+        <EditWorkItemDialog
+          open
+          item={editTarget}
+          projectId={projectId}
+          onOpenChange={(open) => {
+            if (!open) {
+              setEditTarget(null);
+            }
+          }}
+        />
+      ) : null}
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ProjectMembersCard projectId={projectId} />
+        <ActivityFeed projectId={projectId} />
+      </div>
 
       <section className="space-y-3">
         <h2 className="text-base font-semibold">{t("agentruns:title")}</h2>

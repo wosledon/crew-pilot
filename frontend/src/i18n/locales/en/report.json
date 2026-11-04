@@ -5,6 +5,7 @@
   "totalLogged": "Total logged hours",
   "byType": "By type",
   "byAssignee": "By assignee",
+  "byMember": "By member",
   "empty": "No hours data",
   "unassigned": "Unassigned",
   "group": "Group",

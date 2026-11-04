@@ -40,6 +40,7 @@ export interface WorkItemListItem {
   dueDate: string | null;
   prUrl: string | null;
   updatedAt: string;
+  tags: string | null;
 }
 
 export interface WorkItemDetail {
@@ -64,6 +65,8 @@ export interface WorkItemDetail {
   prUrl: string | null;
   createdAt: string;
   updatedAt: string;
+  tags: string | null;
+  parentWorkItemId: string | null;
 }
 
 export interface WorkLog {
@@ -168,6 +171,16 @@ export interface HoursReport {
   totalLoggedHours: number;
   byType: HoursByGroup[];
   byAssignee: HoursByGroup[];
+  byMember: HoursByGroup[];
+}
+
+export interface ProjectMember {
+  id: string;
+  projectId: string;
+  kind: "user" | "agent";
+  role: string;
+  displayName: string;
+  createdAt: string;
 }
 
 export interface Activity {

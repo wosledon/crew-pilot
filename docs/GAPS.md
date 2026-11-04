@@ -28,16 +28,16 @@
 - [x] 前端 ESLint 9 flat config + Prettier，`npm run lint` / `format:check` 通过
 - [x] AgentRun 异常兜底：Worker 未捕获异常时落 Failed，避免永久 Running
 
-### P1 补齐 M1 欠账（Round 2 完成协作/里程碑部分）
+### P1 补齐 M1 欠账（Round 2 协作/里程碑；Round 3 工作项/项目/工时）
 
 - [x] 评论（CRUD、用户/Agent 区分、@Agent 触发 AgentRun 并回写回复）
 - [x] 附件（上传/下载/删除、本地存储、20MB 限制）
 - [x] 活动流 UI（项目时间线）
 - [x] 里程碑（CRUD API + 甘特图标记/列表 + 迭代归属）
-- [ ] 项目：编辑/归档、成员管理（Agent 作为成员）、项目首页仪表盘（迭代进度/活动/待办/卡点）
-- [ ] 工作项：标签、编辑/删除 UI、指派人变更、列表视图 + 批量操作、看板筛选（指派人/优先级/标签/WIP）
-- [ ] 工作项：迭代/截止日/故事点录入 UI；Task 父子关系与状态流转
-- [ ] 工时：登记人归属（MemberId）、剩余工时自动扣减、成本视图、报表迭代/日期过滤
+- [x] 项目：编辑/归档、成员管理（Agent 作为成员）、概览（Round 3；待办/卡点队列依赖 M3）
+- [~] 工作项：标签/编辑/删除/指派人变更已完成；列表视图 + 批量操作 + 看板筛选待补
+- [x] 工作项：迭代/截止日/故事点录入 UI；Task 父子关系与状态流转
+- [~] 工时：登记人归属/剩余工时扣减/按成员报表已完成；成本视图与迭代/日期过滤待补
 - [ ] 原型：URL/图片/MCP 渲染、图片上传、版本历史、需求关联 UI、CSP 加固
 - [ ] 模型供应商：默认供应商切换、模型手动增删改/启停、定时刷新
 
@@ -85,29 +85,30 @@
 ### 4.1 项目管理（P0）
 
 - [x] 项目创建/查询/删除
-- [ ] 项目编辑 UI（后端 `PUT` 已有）
-- [ ] 归档（`ProjectStatus.Archived` 从未被设置）
-- [ ] 项目首页仪表盘（迭代进度/最近活动/我的待办/卡点队列）
-- [ ] 成员管理（唯一 Owner 之外无法添加 Agent 成员）
+- [x] 项目编辑 UI（Round 3）
+- [x] 归档（Round 3：archive/unarchive）
+- [x] 项目首页概览（Round 3：工作项数/工时/进行中迭代进度）
+- [x] 成员管理（Round 3：Agent 作为成员、角色调整、移除保护）
 - [ ] 项目可见性字段
 - [ ] Git 仓库绑定（仅 `repoUrl` 字符串，无鉴权与校验）
 - [x] 本地工作目录 `LocalPath` 可配置（Round 1）
+- [ ] 我的待办 / 卡点队列（依赖 M3）
 
 ### 4.2 需求管理（P0）
 
 - [x] CRUD 后端（含验收标准、优先级、故事点、迭代、截止日）
 - [x] 状态流转（状态机 + 非法流转 400）
-- [ ] 标签
+- [x] 标签（Round 3）
 - [ ] 富文本描述（当前纯文本）
 - [ ] 关联缺陷
 - [ ] 关联原型 UI（`RequirementId` 无法在 UI 设置）
-- [ ] 详情页 / 编辑 UI / 指派人变更
-- [ ] 删除 UI（后端已有）
+- [x] 详情页 / 编辑 UI / 指派人变更（Round 3）
+- [x] 删除 UI（后端已有，Round 3）
 
 ### 4.3 缺陷管理（P0）
 
 - [x] 创建/查询、严重级别、复现步骤、环境、状态机
-- [ ] 编辑缺陷字段（`UpdateWorkItemRequest` 不含 severity/repro/env）
+- [x] 编辑缺陷字段（Round 3）
 - [ ] 测试 Agent 验证后自动流转
 - [ ] 关联需求 UI
 
@@ -126,8 +127,8 @@
 
 - [x] 预估/已耗/剩余字段；手动登记；AgentRun 1:1 折算
 - [x] 燃尽图、甘特图、工时报表（基础版）
-- [ ] 登记人归属（`WorkLog.MemberId` 从未写入）
-- [ ] 剩余工时自动扣减
+- [x] 登记人归属（Round 3：Owner / Agent 成员）
+- [x] 剩余工时自动扣减（Round 3）
 - [ ] 成本视图（人力成本 + token 费用）
 - [ ] 报表按迭代/日期过滤、估算偏差分析
 - [ ] 甘特图按成员泳道汇总
@@ -137,8 +138,8 @@
 - [x] 迭代 CRUD/开始/完成/删除、燃尽图
 - [x] 看板拖拽流转（前端状态表 + 后端状态机）
 - [ ] 迭代编辑 UI（后端 `PUT` 已有）
-- [ ] 工作项排入迭代的 UI
-- [ ] Task 拆解（父子关系）/ 独立流转
+- [x] 工作项排入迭代的 UI（Round 3：编辑弹窗）
+- [x] Task 拆解（父子关系）/ 独立流转（Round 3）
 - [ ] 看板筛选（指派人/优先级/标签）、WIP 提示
 - [ ] 列表视图 + 批量操作
 - [ ] 500+ 卡片性能验证
@@ -261,14 +262,31 @@
 | 7 | `Project.LocalPath` 无 API/UI，worktree 永不生效 | `ProjectsController` | ✅ Round 1 |
 | 8 | `npm run lint` 失败（无 eslint.config.js） | `frontend/` | ✅ Round 1（含 Prettier） |
 | 9 | Worker 未捕获异常导致 Run 永久 Running | `AgentRunWorker` | ✅ Round 1 |
-| 10 | 工时登记人缺失 | `WorkItemsController.AddWorkLog` | P1 |
-| 11 | `UpdateWorkItemRequest` 无法改指派人/缺陷字段 | `Contracts/WorkItems.cs` | P1 |
-| 12 | Task 状态流转 400、父子关系无法设置 | `WorkItemsController` | P1 |
+| 10 | 工时登记人缺失 | `WorkItemsController.AddWorkLog` | ✅ Round 3 |
+| 11 | `UpdateWorkItemRequest` 无法改指派人/缺陷字段 | `Contracts/WorkItems.cs` | ✅ Round 3 |
+| 12 | Task 状态流转 400、父子关系无法设置 | `WorkItemsController` | ✅ Round 3 |
 | 13 | 前端手写 API 类型，未用 OpenAPI 生成 | `frontend/src/lib/types.ts` | P5 |
 | 14 | 无 PostgreSQL provider，连接串切换无效 | `Program.cs` | P5 |
 | 15 | 无认证 / 无审计日志 | 全局 | P4/P5 |
 
 ## 4. 每轮工作日志
+
+### Round 3（2026-11-04）
+
+- 工作项：
+  - `Tags` 字段 + 迁移，列表按标签过滤；前端卡片展示标签、新建/编辑可填
+  - `PUT /api/workitems/{id}` 支持指派人、缺陷字段、分支/PR、Task 父项；前端编辑弹窗
+  - Task 支持父子关系与 todo/done 状态流转（走 Core 状态机）
+  - 详情弹窗提供编辑/删除入口
+- 项目：
+  - 项目编辑弹窗；archive/unarchive API 与前端按钮
+  - 成员 API（Agent 作为成员、角色调整、Owner 保护、删除前评论保护）+ 前端成员卡片
+  - 项目概览（工作项数 / 工时 / 进行中迭代进度）
+- 工时：
+  - 手登工时归属 Owner、AgentRun 折算归属 Agent 成员
+  - 剩余工时随登记自动扣减；报表新增按登记成员分组
+- 测试：72 → 80（工作项 5 / 项目 3 / 报表断言），`dotnet test` 全绿
+- 验证：`npm run lint` 0 error、`format:check` 通过、`npm run build` 通过
 
 ### Round 2（2026-11-04）
 

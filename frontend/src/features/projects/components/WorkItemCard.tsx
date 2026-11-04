@@ -49,6 +49,19 @@ export function WorkItemCard({
               estimated: item.estimatedHours ?? "—",
             })}
           </p>
+          {item.tags ? (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {item.tags
+                .split(",")
+                .filter((tag) => tag !== "")
+                .slice(0, 4)
+                .map((tag) => (
+                  <Badge key={tag} tone="neutral">
+                    {tag}
+                  </Badge>
+                ))}
+            </div>
+          ) : null}
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {options.length > 0 ? (

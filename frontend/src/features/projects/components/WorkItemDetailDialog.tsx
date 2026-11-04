@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Download, Paperclip, Send, Trash2 } from "lucide-react";
+import { Download, Paperclip, Pencil, Send, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
@@ -11,6 +11,7 @@ import { ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import { useAgents } from "@/features/agents/api";
 import { formatDateTime } from "@/lib/format";
+import type { WorkItemDetail } from "@/lib/types";
 import { priorityTone, statusTone } from "../statusFlow";
 import {
   useAddComment,
@@ -18,6 +19,7 @@ import {
   useComments,
   useDeleteAttachment,
   useDeleteComment,
+  useDeleteWorkItem,
   useUploadAttachment,
   useWorkItem,
   useWorkLogs,
@@ -27,6 +29,7 @@ export interface WorkItemDetailDialogProps {
   workItemId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onEdit: (item: WorkItemDetail) => void;
 }
 
 /** 工作项详情：描述/验收标准、工时记录、评论（可 @Agent）、附件。 */
@@ -34,6 +37,7 @@ export function WorkItemDetailDialog({
   workItemId,
   open,
   onOpenChange,
+  onEdit,
 }: WorkItemDetailDialogProps) {
   const { t } = useTranslation(["workitems", "collaboration", "common"]);
   const item = useWorkItem(workItemId);
@@ -45,6 +49,7 @@ export function WorkItemDetailDialog({
   const deleteComment = useDeleteComment();
   const uploadAttachment = useUploadAttachment();
   const deleteAttachment = useDeleteAttachment();
+  const deleteWorkItem = useDeleteWorkItem();
   const confirm = useConfirm();
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -128,6 +133,25 @@ export function WorkItemDetailDialog({
     }
   };
 
+  const handleDeleteWorkItem = async () => {
+    const approved = await confirm({
+      title: t("workitems:deleteConfirm.title"),
+      description: t("workitems:deleteConfirm.description"),
+      confirmText: t("common:delete"),
+      destructive: true,
+    });
+    if (!approved) {
+      return;
+    }
+    try {
+      await deleteWorkItem.mutateAsync(workItemId);
+      toast.success(t("workitems:deleted"));
+      onOpenChange(false);
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
   const detail = item.data;
   const agentOptions = (agents.data ?? [])
     .filter((agent) => agent.enabled)
@@ -166,6 +190,21 @@ export function WorkItemDetailDialog({
                 estimated: detail.estimatedHours ?? "—",
               })}
             </p>
+            <div className="mt-3 flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => onEdit(detail)}>
+                <Pencil className="h-3.5 w-3.5" />
+                {t("workitems:edit")}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void handleDeleteWorkItem()}
+                disabled={deleteWorkItem.isPending}
+              >
+                <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                {t("common:delete")}
+              </Button>
+            </div>
           </div>
 
           {detail.description ? (

@@ -63,5 +63,23 @@
   "nextStatus": "下一状态",
   "detail": "详情",
   "detailTitle": "工作项详情",
-  "acceptanceCriteriaEmpty": "暂无验收标准"
+  "acceptanceCriteriaEmpty": "暂无验收标准",
+  "edit": "编辑",
+  "editTitle": "编辑工作项",
+  "updated": "工作项已更新",
+  "deleted": "工作项已删除",
+  "deleteConfirm": {
+    "title": "删除工作项？",
+    "description": "评论、附件与工时记录将一并删除，且不可恢复。"
+  },
+  "tags": "标签",
+  "tagsPlaceholder": "逗号分隔，如 前端,体验",
+  "storyPoints": "故事点",
+  "dueDate": "截止日期",
+  "iteration": "所属迭代",
+  "iterationNone": "不关联迭代",
+  "taskParent": "父工作项",
+  "taskParentNone": "无父工作项",
+  "branchUrl": "分支/PR 地址",
+  "noTags": "无标签"
 }

@@ -5,6 +5,7 @@
   "totalLogged": "总已耗工时",
   "byType": "按类型",
   "byAssignee": "按指派人",
+  "byMember": "按登记成员",
   "empty": "暂无工时数据",
   "unassigned": "未指派",
   "group": "分组",

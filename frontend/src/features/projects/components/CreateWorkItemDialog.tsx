@@ -19,6 +19,10 @@ export interface CreateWorkItemDialogProps {
     severity?: string;
     reproSteps?: string;
     environment?: string;
+    tags?: string;
+    iterationId?: string;
+    dueDate?: string;
+    parentWorkItemId?: string;
   }) => Promise<unknown>;
 }
 
@@ -34,6 +38,7 @@ export function CreateWorkItemDialog({ open, onOpenChange, onSubmit }: CreateWor
   const [severity, setSeverity] = useState("normal");
   const [reproSteps, setReproSteps] = useState("");
   const [environment, setEnvironment] = useState("");
+  const [tags, setTags] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const reset = () => {
@@ -44,6 +49,7 @@ export function CreateWorkItemDialog({ open, onOpenChange, onSubmit }: CreateWor
     setAssigneeName("");
     setReproSteps("");
     setEnvironment("");
+    setTags("");
   };
 
   const handleSubmit = async () => {
@@ -60,6 +66,7 @@ export function CreateWorkItemDialog({ open, onOpenChange, onSubmit }: CreateWor
         severity: type === "defect" ? severity : undefined,
         reproSteps: type === "defect" ? reproSteps.trim() || undefined : undefined,
         environment: type === "defect" ? environment.trim() || undefined : undefined,
+        tags: tags.trim() || undefined,
       });
       reset();
       onOpenChange(false);
@@ -145,6 +152,15 @@ export function CreateWorkItemDialog({ open, onOpenChange, onSubmit }: CreateWor
             value={assigneeName}
             onChange={(event) => setAssigneeName(event.target.value)}
             placeholder={t("workitems:assigneePlaceholder")}
+          />
+        </label>
+
+        <label className="block space-y-1.5 text-sm">
+          <span className="font-medium">{t("workitems:tags")}</span>
+          <Input
+            value={tags}
+            onChange={(event) => setTags(event.target.value)}
+            placeholder={t("workitems:tagsPlaceholder")}
           />
         </label>
 

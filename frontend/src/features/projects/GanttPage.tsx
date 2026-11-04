@@ -420,6 +420,15 @@ function HoursReportSection({
             loggedHours: group.loggedHours,
           }))}
         />
+        <HoursGroupTable
+          title={t("report:byMember")}
+          rows={report.byMember.map((group) => ({
+            key: group.key,
+            label: group.label,
+            estimatedHours: group.estimatedHours,
+            loggedHours: group.loggedHours,
+          }))}
+        />
       </CardContent>
     </Card>
   );

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Plus, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, Pencil, Plus, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import {
   Card,
@@ -16,7 +17,8 @@ import { Input, Textarea } from "@/components/ui/Input";
 import { toast } from "@/components/ui/Toast";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
-import { useCreateProject, useDeleteProject, useProjects } from "./api";
+import { ProjectEditDialog } from "./components/ProjectEditDialog";
+import { useArchiveProject, useCreateProject, useDeleteProject, useProjects } from "./api";
 import { formatDateTime } from "@/lib/format";
 
 export function ProjectsPage() {
@@ -24,9 +26,11 @@ export function ProjectsPage() {
   const projects = useProjects();
   const createProject = useCreateProject();
   const deleteProject = useDeleteProject();
+  const archiveProject = useArchiveProject();
   const confirm = useConfirm();
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [key, setKey] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -75,6 +79,15 @@ export function ProjectsPage() {
     }
   };
 
+  const handleArchive = async (id: string, archive: boolean) => {
+    try {
+      await archiveProject.mutateAsync({ id, archive });
+      toast.success(archive ? t("projects:archived") : t("projects:unarchived"));
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
   if (projects.isPending) {
     return <LoadingState />;
   }
@@ -105,10 +118,13 @@ export function ProjectsPage() {
           {items.map((project) => (
             <Card key={project.id}>
               <CardHeader>
-                <CardTitle>
-                  <Link to={`/projects/${project.id}`} className="hover:underline">
+                <CardTitle className="flex items-center justify-between gap-2">
+                  <Link to={`/projects/${project.id}`} className="truncate hover:underline">
                     {project.name}
                   </Link>
+                  {project.status === "archived" ? (
+                    <Badge tone="warning">{t("projects:archivedBadge")}</Badge>
+                  ) : null}
                 </CardTitle>
                 <CardDescription>
                   {project.key} · {t("projects:createdAt")} {formatDateTime(project.createdAt)}
@@ -121,14 +137,40 @@ export function ProjectsPage() {
                 <span className="text-sm text-muted-foreground">
                   {project.workItemCount} {t("projects:workItemCount")}
                 </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={t("common:delete")}
-                  onClick={() => void handleDelete(project.id)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={t("projects:edit")}
+                    onClick={() => setEditingId(project.id)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={
+                      project.status === "archived"
+                        ? t("projects:unarchive")
+                        : t("projects:archive")
+                    }
+                    onClick={() => void handleArchive(project.id, project.status !== "archived")}
+                  >
+                    {project.status === "archived" ? (
+                      <ArchiveRestore className="h-4 w-4" />
+                    ) : (
+                      <Archive className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={t("common:delete")}
+                    onClick={() => void handleDelete(project.id)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </CardFooter>
             </Card>
           ))}
@@ -196,6 +238,18 @@ export function ProjectsPage() {
           </div>
         </div>
       </Dialog>
+
+      {editingId !== null ? (
+        <ProjectEditDialog
+          open
+          projectId={editingId}
+          onOpenChange={(open) => {
+            if (!open) {
+              setEditingId(null);
+            }
+          }}
+        />
+      ) : null}
     </div>
   );
 }

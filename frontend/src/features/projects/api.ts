@@ -10,6 +10,7 @@ import type {
   IterationListItem,
   Milestone,
   ProjectDetail,
+  ProjectMember,
   ProjectSummary,
   WorkItemDetail,
   WorkItemListItem,
@@ -288,6 +289,126 @@ export function useDeleteProject() {
   });
 }
 
+export function useUpdateProject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: {
+      id: string;
+      name: string;
+      description?: string;
+      repoUrl?: string;
+      localPath?: string;
+    }) =>
+      api.put<ProjectDetail>(`/projects/${variables.id}`, {
+        name: variables.name,
+        description: variables.description,
+        repoUrl: variables.repoUrl,
+        localPath: variables.localPath,
+      }),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: projectKeys.all }),
+  });
+}
+
+export function useArchiveProject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: { id: string; archive: boolean }) =>
+      api.post<ProjectDetail>(
+        `/projects/${variables.id}/${variables.archive ? "archive" : "unarchive"}`,
+      ),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: projectKeys.all }),
+  });
+}
+
+export function useProjectMembers(projectId: string | undefined) {
+  return useQuery({
+    queryKey: ["projects", projectId ?? "", "members"] as const,
+    queryFn: () => api.get<ProjectMember[]>(`/projects/${projectId}/members`),
+    enabled: projectId !== undefined,
+  });
+}
+
+export function useAddProjectMember(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { displayName?: string; role?: string; agentId?: string }) =>
+      api.post<ProjectMember>(`/projects/${projectId}/members`, body),
+    onSuccess: () =>
+      void queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "members"] as const,
+      }),
+  });
+}
+
+export function useUpdateProjectMember(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: { id: string; displayName: string; role: string }) =>
+      api.put<ProjectMember>(`/members/${variables.id}`, {
+        displayName: variables.displayName,
+        role: variables.role,
+      }),
+    onSuccess: () =>
+      void queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "members"] as const,
+      }),
+  });
+}
+
+export function useDeleteProjectMember(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/members/${id}`),
+    onSuccess: () =>
+      void queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "members"] as const,
+      }),
+  });
+}
+
+export interface UpdateWorkItemBody {
+  title: string;
+  description?: string;
+  acceptanceCriteria?: string;
+  priority?: string;
+  storyPoints?: number;
+  estimatedHours?: number;
+  remainingHours?: number;
+  dueDate?: string;
+  iterationId?: string;
+  assigneeName?: string;
+  severity?: string;
+  reproSteps?: string;
+  environment?: string;
+  tags?: string;
+  parentWorkItemId?: string;
+  branchUrl?: string;
+  prUrl?: string;
+}
+
+export function useUpdateWorkItem() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: { id: string; body: UpdateWorkItemBody }) =>
+      api.put<WorkItemDetail>(`/workitems/${variables.id}`, variables.body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["workitems"] });
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
+
+export function useDeleteWorkItem() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/workitems/${id}`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["workitems"] });
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
+
 export interface CreateWorkItemBody {
   type: string;
   title: string;
@@ -299,6 +420,10 @@ export interface CreateWorkItemBody {
   severity?: string;
   reproSteps?: string;
   environment?: string;
+  tags?: string;
+  iterationId?: string;
+  dueDate?: string;
+  parentWorkItemId?: string;
 }
 
 export function useCreateWorkItem(projectId: string) {

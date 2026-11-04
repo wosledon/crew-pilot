@@ -14,6 +14,7 @@ export interface SelectProps {
   placeholder?: string;
   className?: string;
   ariaLabel?: string;
+  disabled?: boolean;
 }
 
 /** 下拉选择：Radix Select 封装。禁止使用原生 <select>（见 AGENTS.md 5.3） */
@@ -24,11 +25,13 @@ export function Select({
   placeholder,
   className,
   ariaLabel,
+  disabled,
 }: SelectProps) {
   return (
     <SelectPrimitive.Root value={value} onValueChange={onValueChange}>
       <SelectPrimitive.Trigger
         aria-label={ariaLabel}
+        disabled={disabled}
         className={cn(
           "flex h-9 w-full items-center justify-between gap-2 rounded-md border border-input bg-card px-3 text-sm disabled:opacity-50",
           className,
