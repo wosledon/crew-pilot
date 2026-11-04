@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 142 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 144 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -67,7 +67,8 @@
 ### P4 M5 打磨（Round 6 完成主体）
 
 - [x] Skills：实体 + CRUD + Agent 装配 + 运行时注入系统提示词
-- [ ] Skills 收尾：SKILL.md 目录/脚本/资源、导入导出、脚本执行
+- [x] SKILL.md 导入/导出（Round 26：front matter + 正文、工具归一、同名冲突 409）
+- [ ] Skills 脚本/资源目录执行与文件同步
 - [x] MCP：Server 配置、认证加密、启停、连通性测试、按 Agent 授权
 - [x] MCP 运行时：Streamable HTTP 客户端（initialize / tools/list / tools/call，Round 9）
 - [x] MCP 运行时：stdio 传输（Round 15）、旧版 HTTP+SSE 双通道（Round 20）
@@ -102,7 +103,7 @@
 - [ ] 项目可见性字段
 - [ ] Git 仓库绑定（仅 `repoUrl` 字符串，无鉴权与校验）
 - [x] 本地工作目录 `LocalPath` 可配置（Round 1）
-- [ ] 我的待办 / 卡点队列（依赖 M3）
+- [x] 我的待办 / 卡点队列（卡点队列页 + 项目概览）
 
 ### 4.2 需求管理（P0）
 
@@ -217,7 +218,7 @@
 - [x] 实体与 CRUD（名称/描述/提示词/工具白名单/脚本目录）
 - [x] Agent 装配（AgentSkill）与运行时注入系统提示词
 - [x] 前端管理页与 Agent 能力装配 UI
-- [ ] SKILL.md 目录结构、脚本/资源、导入导出
+- [x] SKILL.md 目录结构、脚本/资源字段、导入导出（Round 26）
 
 ### 5.6 运行引擎（P0）
 
@@ -250,7 +251,7 @@
 - [x] 指派 → 入队 → 执行 → 日志/产物/token → 工时 → PR 回填
 - [x] 看板卡片显示 Agent 头像/实时状态（Round 18：最近 Run 徽标 + 5s 刷新/SignalR）
 - [x] 工作流完成时自动流转工作项状态（InProgress→InReview / Fixing→PendingVerification）
-- [ ] Agent 作为项目成员/指派人
+- [x] Agent 作为项目成员/指派人（Round 3 成员；assign-agent 认领闭环）
 - [x] PR 创建与合并（Round 24：创建/同步已有，新增 `POST .../pull-request/merge` + 前端确认合并）
 - [x] 失败重试（Round 25：失败/取消 Run 一键重试，工作流 Run 走卡点重试）
 
@@ -266,8 +267,8 @@
 
 - [x] 分层（Api → Agents/Infrastructure → Core）
 - [x] ProblemDetails 错误处理
-- [ ] SignalR
-- [ ] PostgreSQL
+- [x] SignalR（Round 7）
+- [x] PostgreSQL（Round 10）
 - [x] 审计日志（Round 6）
 - [ ] 多用户 / RBAC（单用户产品不在范围）
 - [x] CSP（原型，Round 11）
@@ -293,6 +294,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 26（2026-11-04）
+
+- Skills SKILL.md（PRD 5.5）：`GET /api/skills/{id}/export` 导出 YAML front matter + 提示词；`POST /api/skills/import` 解析导入（tools 支持 JSON/逗号列表归一、同名 409、非法格式 400、审计 `skill.import`）
+- 前端 Skills 页：导出按钮下载 `.SKILL.md`、导入弹窗支持粘贴或选择文件；中英文案补齐
+- 测试：142 → 144（导出格式、导入/重复/非法），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
+- 文档：修正 GAPS 陈旧勾选（SignalR / PostgreSQL / Agent 成员 / 待办卡点队列）
 
 ### Round 25（2026-11-04）
 
