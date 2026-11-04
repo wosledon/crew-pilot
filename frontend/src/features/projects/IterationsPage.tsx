@@ -9,6 +9,7 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Input";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
+import { Select } from "@/components/ui/Select";
 import { toast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { BurndownChart } from "./BurndownChart";
@@ -18,6 +19,7 @@ import {
   useCreateIteration,
   useDeleteIteration,
   useIterations,
+  useMilestones,
   useStartIteration,
 } from "./api";
 import type { IterationStatus } from "@/lib/types";
@@ -33,6 +35,7 @@ export function IterationsPage() {
   const { projectId = "" } = useParams();
   const { t } = useTranslation(["iterations", "common"]);
   const iterations = useIterations(projectId);
+  const milestones = useMilestones(projectId);
   const createIteration = useCreateIteration(projectId);
   const startIteration = useStartIteration();
   const completeIteration = useCompleteIteration();
@@ -44,6 +47,7 @@ export function IterationsPage() {
   const [goal, setGoal] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [milestoneId, setMilestoneId] = useState("");
 
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
@@ -64,6 +68,7 @@ export function IterationsPage() {
         goal: goal.trim() || undefined,
         startDate,
         endDate,
+        milestoneId: milestoneId || undefined,
       });
       toast.success(t("iterations:created"));
       setDialogOpen(false);
@@ -71,6 +76,7 @@ export function IterationsPage() {
       setGoal("");
       setStartDate("");
       setEndDate("");
+      setMilestoneId("");
     } catch (error) {
       toast.error(errorMessage(error));
     }
@@ -238,6 +244,21 @@ export function IterationsPage() {
               />
             </label>
           </div>
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("iterations:milestone")}</span>
+            <Select
+              value={milestoneId}
+              onValueChange={setMilestoneId}
+              options={[
+                { value: "", label: t("iterations:milestoneNone") },
+                ...(milestones.data ?? []).map((milestone) => ({
+                  value: milestone.id,
+                  label: `${milestone.name}（${milestone.date}）`,
+                })),
+              ]}
+              ariaLabel={t("iterations:milestone")}
+            />
+          </label>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               {t("common:cancel")}

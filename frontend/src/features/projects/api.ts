@@ -2,10 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type {
   Activity,
+  Attachment,
   Burndown,
+  Comment,
   HoursReport,
   IterationDetail,
   IterationListItem,
+  Milestone,
   ProjectDetail,
   ProjectSummary,
   WorkItemDetail,
@@ -18,7 +21,11 @@ export const projectKeys = {
   iterations: (projectId: string) => ["projects", projectId, "iterations"] as const,
   workItems: (projectId: string, type?: string) =>
     ["projects", projectId, "workitems", type ?? "all"] as const,
+  workItem: (workItemId: string) => ["workitems", workItemId] as const,
   workLogs: (workItemId: string) => ["workitems", workItemId, "worklogs"] as const,
+  comments: (workItemId: string) => ["workitems", workItemId, "comments"] as const,
+  attachments: (workItemId: string) => ["workitems", workItemId, "attachments"] as const,
+  milestones: (projectId: string) => ["projects", projectId, "milestones"] as const,
   prototypes: (projectId: string) => ["projects", projectId, "prototypes"] as const,
   activities: (projectId: string) => ["projects", projectId, "activities"] as const,
   burndown: (iterationId: string) => ["iterations", iterationId, "burndown"] as const,
@@ -54,6 +61,134 @@ export function useWorkLogs(workItemId: string | undefined) {
     queryKey: projectKeys.workLogs(workItemId ?? ""),
     queryFn: () => api.get<WorkLog[]>(`/workitems/${workItemId}/worklogs`),
     enabled: workItemId !== undefined,
+  });
+}
+
+export function useWorkItem(workItemId: string | undefined) {
+  return useQuery({
+    queryKey: projectKeys.workItem(workItemId ?? ""),
+    queryFn: () => api.get<WorkItemDetail>(`/workitems/${workItemId}`),
+    enabled: workItemId !== undefined,
+  });
+}
+
+export function useComments(workItemId: string | undefined) {
+  return useQuery({
+    queryKey: projectKeys.comments(workItemId ?? ""),
+    queryFn: () => api.get<Comment[]>(`/workitems/${workItemId}/comments`),
+    enabled: workItemId !== undefined,
+  });
+}
+
+export function useAddComment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: { workItemId: string; content: string; mentionAgentId?: string }) =>
+      api.post<{ comment: Comment; agentRunId: string | null }>(
+        `/workitems/${variables.workItemId}/comments`,
+        { content: variables.content, mentionAgentId: variables.mentionAgentId },
+      ),
+    onSuccess: (_result, variables) => {
+      void queryClient.invalidateQueries({
+        queryKey: projectKeys.comments(variables.workItemId),
+      });
+      void queryClient.invalidateQueries({ queryKey: ["agent-runs"] });
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
+
+export function useDeleteComment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/comments/${id}`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["workitems"] });
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
+
+export function useAttachments(workItemId: string | undefined) {
+  return useQuery({
+    queryKey: projectKeys.attachments(workItemId ?? ""),
+    queryFn: () => api.get<Attachment[]>(`/workitems/${workItemId}/attachments`),
+    enabled: workItemId !== undefined,
+  });
+}
+
+export function useUploadAttachment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: { workItemId: string; file: File }) => {
+      const form = new FormData();
+      form.append("file", variables.file);
+      return api.postForm<Attachment>(`/workitems/${variables.workItemId}/attachments`, form);
+    },
+    onSuccess: (_result, variables) => {
+      void queryClient.invalidateQueries({
+        queryKey: projectKeys.attachments(variables.workItemId),
+      });
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
+
+export function useDeleteAttachment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/attachments/${id}`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["workitems"] });
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
+
+export function useMilestones(projectId: string | undefined) {
+  return useQuery({
+    queryKey: projectKeys.milestones(projectId ?? ""),
+    queryFn: () => api.get<Milestone[]>(`/projects/${projectId}/milestones`),
+    enabled: projectId !== undefined,
+  });
+}
+
+export function useCreateMilestone(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { name: string; description?: string; date: string }) =>
+      api.post<Milestone>(`/projects/${projectId}/milestones`, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: projectKeys.milestones(projectId) });
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
+
+export function useUpdateMilestone(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: { id: string; name: string; description?: string; date: string }) =>
+      api.put<Milestone>(`/milestones/${variables.id}`, {
+        name: variables.name,
+        description: variables.description,
+        date: variables.date,
+      }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: projectKeys.milestones(projectId) });
+    },
+  });
+}
+
+export function useDeleteMilestone(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/milestones/${id}`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: projectKeys.milestones(projectId) });
+      void queryClient.invalidateQueries({ queryKey: projectKeys.iterations(projectId) });
+      void queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
   });
 }
 
@@ -108,8 +243,13 @@ export function useCompleteIteration() {
 export function useCreateIteration(projectId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (body: { name: string; goal?: string; startDate: string; endDate: string }) =>
-      api.post<IterationDetail>(`/projects/${projectId}/iterations`, body),
+    mutationFn: (body: {
+      name: string;
+      goal?: string;
+      startDate: string;
+      endDate: string;
+      milestoneId?: string;
+    }) => api.post<IterationDetail>(`/projects/${projectId}/iterations`, body),
     onSuccess: () =>
       void queryClient.invalidateQueries({ queryKey: projectKeys.iterations(projectId) }),
   });

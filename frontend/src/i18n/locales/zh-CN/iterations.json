@@ -33,5 +33,7 @@
   "burndownEmpty": "暂无燃尽数据",
   "selectActive": "选择进行中的迭代查看燃尽图",
   "invalidDates": "结束日期不能早于开始日期",
-  "noActive": "暂无进行中的迭代"
+  "noActive": "暂无进行中的迭代",
+  "milestone": "里程碑",
+  "milestoneNone": "不关联里程碑"
 }

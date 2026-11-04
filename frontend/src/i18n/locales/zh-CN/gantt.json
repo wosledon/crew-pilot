@@ -10,5 +10,14 @@
   "progress": "进度",
   "loggedOfEstimated": "{{logged}}/{{estimated}}h",
   "undated": "未排期",
-  "milestoneHint": "里程碑与版本计划联动将在 M2 提供"
+  "milestones": "里程碑",
+  "noMilestones": "还没有里程碑",
+  "createMilestone": "新建里程碑",
+  "milestoneName": "里程碑名称",
+  "milestoneDate": "日期",
+  "milestoneDescription": "描述",
+  "milestoneCreated": "里程碑已创建",
+  "milestoneDeleted": "里程碑已删除",
+  "deleteMilestoneConfirm": "删除后迭代将解除与该里程碑的关联。",
+  "iterationCount": "{{count}} 个迭代"
 }

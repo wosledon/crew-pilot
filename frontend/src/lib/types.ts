@@ -100,6 +100,7 @@ export interface IterationListItem {
   workItemCount: number;
   estimatedHours: number;
   loggedHours: number;
+  milestoneId: string | null;
 }
 
 export interface IterationDetail {
@@ -111,6 +112,36 @@ export interface IterationDetail {
   endDate: string;
   status: IterationStatus;
   workItemCount: number;
+  milestoneId: string | null;
+}
+
+export interface Milestone {
+  id: string;
+  projectId: string;
+  name: string;
+  description: string | null;
+  date: string;
+  iterationCount: number;
+}
+
+export type CommentAuthorKind = "user" | "agent";
+
+export interface Comment {
+  id: string;
+  workItemId: string;
+  content: string;
+  authorName: string;
+  authorKind: CommentAuthorKind;
+  createdAt: string;
+}
+
+export interface Attachment {
+  id: string;
+  workItemId: string;
+  fileName: string;
+  contentType: string;
+  size: number;
+  createdAt: string;
 }
 
 export interface BurndownPoint {

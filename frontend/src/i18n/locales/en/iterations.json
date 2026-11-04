@@ -33,5 +33,7 @@
   "burndownEmpty": "No burndown data",
   "selectActive": "Select an active iteration to view its burndown",
   "invalidDates": "End date cannot be earlier than start date",
-  "noActive": "No active iteration"
+  "noActive": "No active iteration",
+  "milestone": "Milestone",
+  "milestoneNone": "No milestone"
 }

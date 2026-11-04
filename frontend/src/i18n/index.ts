@@ -14,6 +14,7 @@ import reportZh from "./locales/zh-CN/report.json";
 import providersZh from "./locales/zh-CN/providers.json";
 import agentsZh from "./locales/zh-CN/agents.json";
 import agentrunsZh from "./locales/zh-CN/agentruns.json";
+import collaborationZh from "./locales/zh-CN/collaboration.json";
 import commonEn from "./locales/en/common.json";
 import layoutEn from "./locales/en/layout.json";
 import projectsEn from "./locales/en/projects.json";
@@ -26,6 +27,7 @@ import reportEn from "./locales/en/report.json";
 import providersEn from "./locales/en/providers.json";
 import agentsEn from "./locales/en/agents.json";
 import agentrunsEn from "./locales/en/agentruns.json";
+import collaborationEn from "./locales/en/collaboration.json";
 
 /** 默认语言：简体中文 */
 export const defaultLanguage = "zh-CN";
@@ -53,6 +55,7 @@ void i18n
         providers: providersZh,
         agents: agentsZh,
         agentruns: agentrunsZh,
+        collaboration: collaborationZh,
       },
       en: {
         common: commonEn,
@@ -67,6 +70,7 @@ void i18n
         providers: providersEn,
         agents: agentsEn,
         agentruns: agentrunsEn,
+        collaboration: collaborationEn,
       },
     },
     fallbackLng: defaultLanguage,

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Clock, Bot } from "lucide-react";
+import { Clock, Bot, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
@@ -11,6 +11,7 @@ export interface WorkItemCardProps {
   onTransition: (id: string, toStatus: string) => void;
   onLogWork: (item: WorkItemListItem) => void;
   onAssign: (item: WorkItemListItem) => void;
+  onOpenDetail: (item: WorkItemListItem) => void;
   transitioning: boolean;
 }
 
@@ -19,6 +20,7 @@ export function WorkItemCard({
   onTransition,
   onLogWork,
   onAssign,
+  onOpenDetail,
   transitioning,
 }: WorkItemCardProps) {
   const { t } = useTranslation(["workitems", "common", "agentruns"]);
@@ -62,6 +64,15 @@ export function WorkItemCard({
               className="w-32"
             />
           ) : null}
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label={t("workitems:detail")}
+            disabled={transitioning}
+            onClick={() => onOpenDetail(item)}
+          >
+            <FileText className="h-4 w-4" />
+          </Button>
           <Button
             variant="outline"
             size="icon"

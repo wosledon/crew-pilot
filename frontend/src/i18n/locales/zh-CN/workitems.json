@@ -60,5 +60,8 @@
   "transitionFailed": "状态流转失败",
   "statusUpdated": "状态已更新",
   "hoursSummary": "{{logged}} / {{estimated}} 小时",
-  "nextStatus": "下一状态"
+  "nextStatus": "下一状态",
+  "detail": "详情",
+  "detailTitle": "工作项详情",
+  "acceptanceCriteriaEmpty": "暂无验收标准"
 }

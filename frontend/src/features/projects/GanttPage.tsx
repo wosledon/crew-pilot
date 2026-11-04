@@ -1,11 +1,25 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
+import { Plus, Trash2 } from "lucide-react";
 import { Badge, type BadgeTone } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { Dialog } from "@/components/ui/Dialog";
+import { Input, Textarea } from "@/components/ui/Input";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
-import { useHoursReport, useIterations, useWorkItems } from "./api";
+import { toast } from "@/components/ui/Toast";
+import {
+  useCreateMilestone,
+  useDeleteMilestone,
+  useHoursReport,
+  useIterations,
+  useMilestones,
+  useWorkItems,
+} from "./api";
 import { priorityTone, statusTone } from "./statusFlow";
-import type { WorkItemListItem } from "@/lib/types";
+import type { Milestone, WorkItemListItem } from "@/lib/types";
 import { cn } from "@/lib/cn";
 
 /** 甘特图：迭代时间线 + 工作项截止日标记（工时维度），纯 CSS 定位自绘 */
@@ -15,6 +29,52 @@ export function GanttPage() {
   const iterations = useIterations(projectId);
   const workItems = useWorkItems(projectId);
   const report = useHoursReport(projectId);
+  const milestones = useMilestones(projectId);
+  const createMilestone = useCreateMilestone(projectId);
+  const deleteMilestone = useDeleteMilestone(projectId);
+  const confirm = useConfirm();
+  const [milestoneOpen, setMilestoneOpen] = useState(false);
+  const [milestoneName, setMilestoneName] = useState("");
+  const [milestoneDate, setMilestoneDate] = useState("");
+  const [milestoneDescription, setMilestoneDescription] = useState("");
+
+  const errorMessage = (error: unknown) =>
+    error instanceof Error ? error.message : t("common:error");
+
+  const handleCreateMilestone = async () => {
+    try {
+      await createMilestone.mutateAsync({
+        name: milestoneName.trim(),
+        description: milestoneDescription.trim() || undefined,
+        date: milestoneDate,
+      });
+      toast.success(t("gantt:milestoneCreated"));
+      setMilestoneOpen(false);
+      setMilestoneName("");
+      setMilestoneDate("");
+      setMilestoneDescription("");
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
+
+  const handleDeleteMilestone = async (milestone: Milestone) => {
+    const approved = await confirm({
+      title: t("common:delete"),
+      description: t("gantt:deleteMilestoneConfirm"),
+      confirmText: t("common:delete"),
+      destructive: true,
+    });
+    if (!approved) {
+      return;
+    }
+    try {
+      await deleteMilestone.mutateAsync(milestone.id);
+      toast.success(t("gantt:milestoneDeleted"));
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
 
   if (iterations.isPending || workItems.isPending) {
     return <LoadingState />;
@@ -33,13 +93,15 @@ export function GanttPage() {
 
   const iterationList = iterations.data ?? [];
   const items = workItems.data ?? [];
+  const milestoneList = milestones.data ?? [];
   const datedItems = items.filter((item) => item.dueDate !== null);
   const undatedItems = items.filter((item) => item.dueDate === null);
 
-  // 时间范围：迭代起止 + 工作项截止日
+  // 时间范围：迭代起止 + 工作项截止日 + 里程碑日期
   const dates: string[] = [
     ...iterationList.flatMap((iteration) => [iteration.startDate, iteration.endDate]),
     ...datedItems.map((item) => item.dueDate as string),
+    ...milestoneList.map((milestone) => milestone.date),
   ];
   const today = new Date().toISOString().slice(0, 10);
   dates.push(today);
@@ -92,6 +154,21 @@ export function GanttPage() {
               );
             })
           )}
+          {/* 里程碑标记 */}
+          {milestoneList.length > 0 ? (
+            <div className="relative h-5">
+              {milestoneList.map((milestone) => (
+                <span
+                  key={milestone.id}
+                  className="absolute -translate-x-1/2 text-[11px] text-amber-600"
+                  style={{ left: `${percent(milestone.date)}%` }}
+                  title={`${milestone.name} · ${milestone.date}`}
+                >
+                  ◆
+                </span>
+              ))}
+            </div>
+          ) : null}
           {/* 今日参考线 */}
           <div className="relative h-4">
             <span
@@ -105,6 +182,57 @@ export function GanttPage() {
               {t("gantt:today")}
             </span>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>{t("gantt:milestones")}</CardTitle>
+          <Button size="sm" variant="outline" onClick={() => setMilestoneOpen(true)}>
+            <Plus className="h-3.5 w-3.5" />
+            {t("gantt:createMilestone")}
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {milestones.isPending ? (
+            <LoadingState />
+          ) : milestones.isError ? (
+            <ErrorState onRetry={() => void milestones.refetch()} />
+          ) : milestoneList.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t("gantt:noMilestones")}</p>
+          ) : (
+            <ul className="space-y-2">
+              {milestoneList.map((milestone) => (
+                <li
+                  key={milestone.id}
+                  className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">
+                      {milestone.name}
+                      <span className="ml-2 text-xs text-muted-foreground">{milestone.date}</span>
+                    </p>
+                    {milestone.description ? (
+                      <p className="truncate text-xs text-muted-foreground">
+                        {milestone.description}
+                      </p>
+                    ) : null}
+                    <p className="text-xs text-muted-foreground">
+                      {t("gantt:iterationCount", { count: milestone.iterationCount })}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={t("common:delete")}
+                    onClick={() => void handleDeleteMilestone(milestone)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
         </CardContent>
       </Card>
 
@@ -140,7 +268,51 @@ export function GanttPage() {
         onRetry={() => void report.refetch()}
       />
 
-      <p className="text-xs text-muted-foreground">{t("gantt:milestoneHint")}</p>
+      <Dialog
+        open={milestoneOpen}
+        onOpenChange={setMilestoneOpen}
+        title={t("gantt:createMilestone")}
+        closeLabel={t("common:cancel")}
+      >
+        <div className="space-y-4">
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("gantt:milestoneName")}</span>
+            <Input
+              value={milestoneName}
+              onChange={(event) => setMilestoneName(event.target.value)}
+              placeholder={t("gantt:milestoneName")}
+            />
+          </label>
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("gantt:milestoneDate")}</span>
+            <Input
+              type="date"
+              value={milestoneDate}
+              onChange={(event) => setMilestoneDate(event.target.value)}
+            />
+          </label>
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("gantt:milestoneDescription")}</span>
+            <Textarea
+              value={milestoneDescription}
+              onChange={(event) => setMilestoneDescription(event.target.value)}
+            />
+          </label>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setMilestoneOpen(false)}>
+              {t("common:cancel")}
+            </Button>
+            <Button
+              onClick={() => void handleCreateMilestone()}
+              disabled={
+                createMilestone.isPending || milestoneName.trim() === "" || milestoneDate === ""
+              }
+            >
+              {t("common:create")}
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

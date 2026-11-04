@@ -60,5 +60,8 @@
   "transitionFailed": "Transition failed",
   "statusUpdated": "Status updated",
   "hoursSummary": "{{logged}} / {{estimated}} h",
-  "nextStatus": "Next status"
+  "nextStatus": "Next status",
+  "detail": "Details",
+  "detailTitle": "Work item details",
+  "acceptanceCriteriaEmpty": "No acceptance criteria"
 }

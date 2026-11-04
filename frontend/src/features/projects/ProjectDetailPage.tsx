@@ -10,6 +10,8 @@ import { toast } from "@/components/ui/Toast";
 import { CreateWorkItemDialog } from "./components/CreateWorkItemDialog";
 import { LogWorkDialog } from "./components/LogWorkDialog";
 import { WorkItemCard } from "./components/WorkItemCard";
+import { WorkItemDetailDialog } from "./components/WorkItemDetailDialog";
+import { ActivityFeed } from "./ActivityFeed";
 import { AssignAgentDialog, AgentRunPanel } from "@/features/agents/components/AgentRunPanel";
 import {
   useAddWorkLog,
@@ -33,6 +35,7 @@ export function ProjectDetailPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [logTarget, setLogTarget] = useState<WorkItemListItem | null>(null);
   const [assignTarget, setAssignTarget] = useState<WorkItemListItem | null>(null);
+  const [detailTarget, setDetailTarget] = useState<WorkItemListItem | null>(null);
 
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
@@ -125,6 +128,7 @@ export function ProjectDetailPage() {
               onTransition={(id, toStatus) => void handleTransition(id, toStatus)}
               onLogWork={setLogTarget}
               onAssign={setAssignTarget}
+              onOpenDetail={setDetailTarget}
               transitioning={transitionWorkItem.isPending}
             />
           ))}
@@ -168,6 +172,20 @@ export function ProjectDetailPage() {
           workItemId={assignTarget.id}
         />
       ) : null}
+
+      {detailTarget ? (
+        <WorkItemDetailDialog
+          open
+          workItemId={detailTarget.id}
+          onOpenChange={(open) => {
+            if (!open) {
+              setDetailTarget(null);
+            }
+          }}
+        />
+      ) : null}
+
+      <ActivityFeed projectId={projectId} />
 
       <section className="space-y-3">
         <h2 className="text-base font-semibold">{t("agentruns:title")}</h2>

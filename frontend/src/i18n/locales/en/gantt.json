@@ -10,5 +10,14 @@
   "progress": "Progress",
   "loggedOfEstimated": "{{logged}}/{{estimated}}h",
   "undated": "Unscheduled",
-  "milestoneHint": "Milestone and release planning arrives in M2"
+  "milestones": "Milestones",
+  "noMilestones": "No milestones yet",
+  "createMilestone": "New milestone",
+  "milestoneName": "Milestone name",
+  "milestoneDate": "Date",
+  "milestoneDescription": "Description",
+  "milestoneCreated": "Milestone created",
+  "milestoneDeleted": "Milestone deleted",
+  "deleteMilestoneConfirm": "Iterations will lose the association with this milestone.",
+  "iterationCount": "{{count}} iterations"
 }
