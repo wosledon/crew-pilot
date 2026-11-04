@@ -12,6 +12,7 @@ import {
   Cable,
   ScrollText,
   LogOut,
+  Gauge,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
@@ -22,6 +23,7 @@ import { useAuthStatus, useLogout } from "@/features/auth/api";
 import { cn } from "@/lib/cn";
 
 const navItems = [
+  { to: "/dashboard", icon: Gauge, labelKey: "layout:nav.dashboard" },
   { to: "/projects", icon: FolderKanban, labelKey: "layout:nav.projects" },
   { to: "/prototypes", icon: LayoutTemplate, labelKey: "layout:nav.prototype" },
   { to: "/providers", icon: Plug, labelKey: "layout:nav.providers" },
@@ -48,41 +50,44 @@ export function AppLayout() {
   const currentLanguage = i18n.language.startsWith("zh") ? "zh-CN" : "en";
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="fixed inset-y-0 left-0 flex w-56 flex-col border-r border-border bg-card">
-        <div className="flex h-14 items-center gap-2 border-b border-border px-4">
-          <span aria-hidden="true" className="text-lg">
+    <div className="flex min-h-screen bg-surface">
+      <aside className="fixed inset-y-0 left-0 flex w-64 flex-col bg-surface-container-low px-3 py-3">
+        <div className="flex h-14 items-center gap-3 px-3">
+          <span
+            aria-hidden="true"
+            className="grid h-10 w-10 place-items-center rounded-full bg-primary-container text-lg text-on-primary-container"
+          >
             🧭
           </span>
           <div className="leading-tight">
-            <div className="text-sm font-semibold">{t("layout:sidebar.title")}</div>
-            <div className="text-xs text-muted-foreground">{t("layout:sidebar.subtitle")}</div>
+            <div className="text-sm font-medium">{t("layout:sidebar.title")}</div>
+            <div className="text-xs text-on-surface-variant">{t("layout:sidebar.subtitle")}</div>
           </div>
         </div>
-        <nav className="flex flex-col gap-1 p-2">
+        <nav className="mt-2 flex flex-col gap-0.5">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
+                  "flex h-12 items-center gap-3 rounded-full px-4 text-sm transition-colors duration-200",
                   isActive
-                    ? "bg-accent font-medium text-accent-foreground"
-                    : "text-muted-foreground hover:bg-muted",
+                    ? "bg-secondary-container font-medium text-on-secondary-container"
+                    : "text-on-surface-variant hover:bg-on-surface/10",
                 )
               }
             >
-              <item.icon className="h-4 w-4" />
+              <item.icon className="h-5 w-5" />
               {t(item.labelKey)}
             </NavLink>
           ))}
         </nav>
       </aside>
 
-      <div className="ml-56 flex min-h-screen flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-card/80 px-6 backdrop-blur">
-          <span className="text-sm text-muted-foreground">{t("common:appName")}</span>
+      <div className="ml-64 flex min-h-screen flex-1 flex-col bg-surface">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-surface/80 px-6 backdrop-blur">
+          <span className="text-lg font-normal tracking-[0.15px]">{t("common:appName")}</span>
           <div className="flex items-center gap-2">
             {auth.data?.enabled ? (
               <Tooltip content={t("auth:logout")}>
@@ -116,7 +121,7 @@ export function AppLayout() {
           </div>
         </header>
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 lg:p-8">
           <Outlet />
         </main>
       </div>

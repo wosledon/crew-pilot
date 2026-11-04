@@ -57,6 +57,9 @@ export type Prototype = Omit<Api["PrototypeDto"], "type"> & {
 
 export type PrototypeVersion = Api["PrototypeVersionDto"];
 
+/** 原型生成任务（产品 Agent 产出 HTML） */
+export type PrototypeGeneration = Api["PrototypeGenerationDto"];
+
 export type PrototypeImage = Api["PrototypeImageDto"];
 
 /** 原型多文件（文本资源） */
@@ -193,6 +196,38 @@ export type ReleaseResult = Api["ReleaseDto"];
 export type WorkItemAgentActivity = Omit<Api["WorkItemAgentActivityDto"], "status"> & {
   status: AgentRunStatus;
 };
+
+/** 驾驶舱聚合视图（PRD 4.1 / 5.8） */
+export type DashboardStats = Api["DashboardStatsDto"];
+
+export type DashboardProject = Omit<Api["DashboardProjectDto"], "status"> & {
+  status: ProjectStatus;
+};
+
+export type DashboardBlocker = Omit<Api["DashboardBlockerDto"], "kind"> & {
+  kind: BlockerKind;
+};
+
+export type DashboardTodo = Omit<Api["DashboardTodoDto"], "type"> & {
+  type: WorkItemType;
+};
+
+export type DashboardRun = Omit<Api["DashboardRunDto"], "status"> & {
+  status: AgentRunStatus;
+};
+
+export type DashboardActivity = Omit<Api["DashboardActivityDto"], "actorKind"> & {
+  actorKind: "user" | "agent" | null;
+};
+
+export interface Dashboard {
+  stats: DashboardStats;
+  projects: DashboardProject[];
+  blockers: DashboardBlocker[];
+  todos: DashboardTodo[];
+  activeRuns: DashboardRun[];
+  recentActivities: DashboardActivity[];
+}
 
 /** M5：Skills / MCP / 审计 / 成本 */
 export type Skill = Api["SkillDto"];

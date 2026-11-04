@@ -31,22 +31,22 @@ export function EstimateDeviationCard({ projectId }: EstimateDeviationCardProps)
             <div className="grid grid-cols-4 gap-3">
               <div className="rounded-lg border border-border p-3">
                 <p className="text-xs text-muted-foreground">{t("report:estimated")}</p>
-                <p className="text-lg font-semibold">{report.data!.estimatedHours}h</p>
+                <p className="text-lg font-medium">{report.data!.estimatedHours}h</p>
               </div>
               <div className="rounded-lg border border-border p-3">
                 <p className="text-xs text-muted-foreground">{t("report:logged")}</p>
-                <p className="text-lg font-semibold">{report.data!.loggedHours}h</p>
+                <p className="text-lg font-medium">{report.data!.loggedHours}h</p>
               </div>
               <div className="rounded-lg border border-border p-3">
                 <p className="text-xs text-muted-foreground">{t("report:deviation")}</p>
-                <p className="text-lg font-semibold">
+                <p className="text-lg font-medium">
                   {report.data!.deviationHours > 0 ? "+" : ""}
                   {report.data!.deviationHours}h
                 </p>
               </div>
               <div className="rounded-lg border border-border p-3">
                 <p className="text-xs text-muted-foreground">{t("report:overruns")}</p>
-                <p className="text-lg font-semibold">
+                <p className="text-lg font-medium">
                   {report.data!.overrunCount} / {report.data!.itemCount}
                 </p>
               </div>

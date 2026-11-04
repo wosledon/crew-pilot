@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Prototype, PrototypeFile, PrototypeImage, PrototypeVersion } from "@/lib/types";
+import type {
+  Prototype,
+  PrototypeFile,
+  PrototypeGeneration,
+  PrototypeImage,
+  PrototypeVersion,
+} from "@/lib/types";
 
 export const prototypeKeys = {
   list: (projectId: string) => ["projects", projectId, "prototypes"] as const,
@@ -25,6 +31,25 @@ export function useUpsertPrototypeFile(prototypeId: string) {
       void queryClient.invalidateQueries({
         queryKey: prototypeKeys.files(prototypeId),
       }),
+  });
+}
+
+export interface GeneratePrototypeBody {
+  brief: string;
+  agentId?: string;
+  prototypeId?: string;
+}
+
+/** 产品 Agent 生成/迭代原型：返回排队中的 AgentRun，生成完成后自动写回原型。 */
+export function useGeneratePrototype(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: GeneratePrototypeBody) =>
+      api.post<PrototypeGeneration>(`/projects/${projectId}/prototypes/generate`, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: prototypeKeys.list(projectId) });
+      void queryClient.invalidateQueries({ queryKey: ["agent-runs"] });
+    },
   });
 }
 

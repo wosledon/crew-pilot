@@ -7,9 +7,13 @@ export function Toaster() {
       position="top-right"
       toastOptions={{
         style: {
-          background: "var(--card)",
-          color: "var(--card-foreground)",
-          border: "1px solid var(--border)",
+          background: "var(--md-inverse-surface)",
+          color: "var(--md-inverse-on-surface)",
+          border: "none",
+          borderRadius: "var(--md-shape-xs)",
+          boxShadow: "var(--md-elevation-3)",
+          fontSize: "14px",
+          letterSpacing: "0.25px",
         },
       }}
     />

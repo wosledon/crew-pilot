@@ -18,6 +18,11 @@ public class AgentRun : Entity
 
     public WorkItem? WorkItem { get; set; }
 
+    /// <summary>原型生成/迭代的目标原型（由产品 Agent 产出，与工作项互斥）。</summary>
+    public Guid? PrototypeId { get; set; }
+
+    public Prototypes.Prototype? Prototype { get; set; }
+
     /// <summary>由工作流触发时的实例 Id。</summary>
     public Guid? WorkflowRunId { get; set; }
 

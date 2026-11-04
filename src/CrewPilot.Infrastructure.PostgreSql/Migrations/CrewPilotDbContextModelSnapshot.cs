@@ -115,6 +115,9 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                     b.Property<int?>("PromptTokens")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("PrototypeId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset?>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -144,6 +147,8 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AgentId");
+
+                    b.HasIndex("PrototypeId");
 
                     b.HasIndex("WorkItemId");
 
@@ -1381,6 +1386,10 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CrewPilot.Core.Prototypes.Prototype", "Prototype")
+                        .WithMany()
+                        .HasForeignKey("PrototypeId");
+
                     b.HasOne("CrewPilot.Core.WorkItems.WorkItem", "WorkItem")
                         .WithMany()
                         .HasForeignKey("WorkItemId")
@@ -1397,6 +1406,8 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Agent");
+
+                    b.Navigation("Prototype");
 
                     b.Navigation("WorkItem");
 

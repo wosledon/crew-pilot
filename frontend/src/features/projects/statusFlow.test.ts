@@ -4,13 +4,13 @@ import { nextStatuses, priorityTone, statusTone } from "./statusFlow";
 describe("statusFlow", () => {
   it("需求状态流转表与后端状态机一致", () => {
     expect(nextStatuses("requirement", "backlog")).toEqual(["ready", "rejected"]);
-    expect(nextStatuses("requirement", "inProgress")).toEqual(["inReview", "ready"]);
+    expect(nextStatuses("requirement", "inprogress")).toEqual(["inreview", "ready"]);
     expect(nextStatuses("requirement", "done")).toEqual([]);
   });
 
   it("缺陷状态流转包含验证与延期分支", () => {
-    expect(nextStatuses("defect", "new")).toEqual(["confirmed", "notADefect"]);
-    expect(nextStatuses("defect", "fixing")).toEqual(["pendingVerification", "confirmed"]);
+    expect(nextStatuses("defect", "new")).toEqual(["confirmed", "notadefect"]);
+    expect(nextStatuses("defect", "fixing")).toEqual(["pendingverification", "confirmed"]);
     expect(nextStatuses("defect", "deferred")).toEqual(["confirmed"]);
     expect(nextStatuses("defect", "closed")).toEqual([]);
   });
@@ -25,7 +25,7 @@ describe("statusFlow", () => {
 
   it("状态与优先级映射到语义色", () => {
     expect(statusTone("done")).toBe("success");
-    expect(statusTone("inProgress")).toBe("info");
+    expect(statusTone("inprogress")).toBe("info");
     expect(statusTone("ready")).toBe("primary");
     expect(statusTone("rejected")).toBe("danger");
     expect(statusTone("deferred")).toBe("warning");

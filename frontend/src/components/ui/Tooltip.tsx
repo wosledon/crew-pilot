@@ -22,11 +22,11 @@ export function Tooltip({ content, children, side = "top" }: TooltipProps) {
           side={side}
           sideOffset={6}
           className={cn(
-            "z-50 rounded-md bg-foreground px-2.5 py-1.5 text-xs text-background shadow-md",
+            "z-50 rounded-xs bg-inverse-surface px-2.5 py-1.5 text-xs text-inverse-on-surface shadow-elevation-2",
           )}
         >
           {content}
-          <TooltipPrimitive.Arrow className="fill-foreground" />
+          <TooltipPrimitive.Arrow className="fill-inverse-surface" />
         </TooltipPrimitive.Content>
       </TooltipPrimitive.Portal>
     </TooltipPrimitive.Root>

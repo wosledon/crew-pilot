@@ -143,7 +143,7 @@ export function IterationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">{t("iterations:title")}</h1>
+          <h1 className="text-2xl font-normal">{t("iterations:title")}</h1>
           <p className="text-sm text-muted-foreground">{t("iterations:description")}</p>
         </div>
         <Button onClick={openCreate}>

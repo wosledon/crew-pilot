@@ -2,7 +2,7 @@
 
 > 本文件是 `docs/PRD.md` 的逐条对照表，用于跟踪"还有哪些没实现"以及实施顺序。
 > 每轮开发后更新勾选状态；状态标记：`[x]` 已完成、`[~]` 进行中/部分完成、`[ ]` 未开始。
-> 最后更新：2026-11-04
+> 最后更新：2026-11-05
 > **结论：PRD P0/P1 全部完成（验收见 [ACCEPTANCE.md](ACCEPTANCE.md)）；P2 为 PRD 明示的后续演进项。**
 
 ## 0. 当前基线
@@ -10,7 +10,7 @@
 | 项 | 状态 |
 | --- | --- |
 | 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 168 项测试全绿 |
-| 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
+| 前端 | React 18 + TS + Vite；**Material Design 3** 设计系统；lint / format / build / Vitest / Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
 | M2 | 完成并硬化（取消/沙箱/工具权限/LocalPath 已修） |
@@ -105,6 +105,7 @@
 - [x] Git 仓库绑定（repoUrl + ProjectIntegration Token；OAuth 流程不纳入）
 - [x] 本地工作目录 `LocalPath` 可配置（Round 1）
 - [x] 我的待办 / 卡点队列（卡点队列页 + 项目概览）
+- [x] 驾驶舱默认首页（Round 42：全局卡点、我的待办、进行中 AgentRun、项目进度、最近活动一次聚合）
 
 ### 4.2 需求管理（P0）
 
@@ -127,6 +128,7 @@
 ### 4.4 原型工坊（P0）
 
 - [x] HTML 编辑 + sandbox iframe 实时预览
+- [x] 产品 Agent 生成/迭代原型（Round 43：自然语言 → Agent 产出 HTML → 自动留版本；人工编辑器为兜底）
 - [x] 原型多文件支持（Round 35：多文件 API/相对路径预览/CSP，前端文件管理）
 - [x] 版本历史（Round 11：自动快照 + 恢复）
 - [x] URL / 图片 / MCP 原型渲染（Round 11）
@@ -246,6 +248,7 @@
 - [x] 取消/接管入口（Round 1）
 - [x] @Agent 触发（Round 2：评论提及 → AgentRun → 回复写回）
 - [x] 项目概览 + 工作流运行面板 + SignalR 实时刷新（"看而不等"）
+- [x] 跨项目卡点队列与我的待办集中呈现（Round 42：驾驶舱 `GET /api/dashboard`）
 
 ### 5.9 Agent 认领闭环（P0）
 
@@ -295,6 +298,24 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 43（2026-11-05，原型工坊改为 Agent 主路径）
+
+- 产品纠偏（PRD 4.4）：原型工坊此前是"人写 HTML"，与"Agent 是员工、人只做决策与评审"的定位冲突；PRD 已改为 **产品 Agent 生成/迭代原型为主路径，人工编辑器为兜底**
+- 后端：`AgentRun` 新增 `PrototypeId`（SQLite + PostgreSQL 双迁移）；新增 `POST /api/projects/{projectId}/prototypes/generate`（brief + 可选 agentId/prototypeId），只接受岗位为「产品」的 Agent，缺省自动选第一个可用产品 Agent；生成完成后把输出中的 HTML 写回原型并自动生成版本快照，活动流记录 `prototype.generation.queued` / `prototype.generated`
+- 前端：原型工坊左侧新增「让产品 Agent 生成原型」面板（Agent 选择 + 产品意图 + 生成/迭代状态轮询），生成完成自动载入编辑器继续人工微调；无产品 Agent 时给出创建引导
+- 测试：新增 2 项集成测试（无产品 Agent → 400；Agent 输出 HTML 写入原型并留版本），后端 170 → 172 项全绿
+- 验证：前端 lint / tsc / Vitest / build 全绿；浏览器走查原型工坊
+
+### Round 42（2026-11-05，PRD 对齐 + MD3 视觉重构）
+
+- 缺陷修复（PRD 4.2/4.3/4.6）：工作项状态字符串前后端不一致（API 返回 `inprogress`/`inreview`/`pendingverification`/`notadefect`，前端状态表与看板列使用 camelCase），导致「进行中/待评审/待验证」列始终为空、中间状态无法继续流转；统一为小写并同步单测
+- 新增驾驶舱（PRD 4.1 / 5.8）：`GET /api/dashboard` 跨项目聚合——统计卡、卡点队列、我的待办（Owner 指派且未完结）、进行中 AgentRun、项目进度（含进行中迭代）、最近活动；前端新增 `/dashboard` 并作为默认首页与侧边栏首项
+- 「我的待办」判定收紧为 `MemberKind.User && ProjectRole.Owner`，避免把岗位为 Agent 但历史数据 kind 记为 user 的成员误计入
+- 视觉重构为 **Material Design 3**：重写设计令牌（primary/secondary/tertiary/error + surface 容器层级 / shape / elevation / 字体），重制 Button（胶囊 filled/outlined/text/error）、Card（elevated）、Input/Textarea/Select（outlined）、Dialog/ConfirmDialog（28px + elevation-3）、Badge（tonal chip）、Tooltip 与 Toast（snackbar）；导航改为 MD3 navigation drawer + small top app bar；项目子导航改为胶囊 tabs；工作项卡片改为「信息在上、操作在下」避免操作区挤压标题
+- 修复 UI 组件缺陷：Radix Select 不接受空字符串 value，此前「全部/未选择」选项在页面上显示为空；Select 统一用哨兵值承载空值语义
+- 文档：PRD 8.3 / 11.2（新增 MD3 与驾驶舱决策）、AGENTS 5.1/5.5 同步为 MD3 规范
+- 验证：`dotnet build` / `dotnet test`（168 项）全绿；前端 `lint` / `tsc -b` / Vitest 全绿；浏览器逐页走查（驾驶舱/项目/看板/Agent/原型工坊）
 
 ### Round 41（2026-11-05，P2 演进 Round 10）
 

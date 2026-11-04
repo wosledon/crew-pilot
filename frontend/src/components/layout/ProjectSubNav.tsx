@@ -19,7 +19,7 @@ export function ProjectSubNav({ projectId }: ProjectSubNavProps) {
   ];
 
   return (
-    <nav className="flex gap-1 border-b border-border">
+    <nav className="flex flex-wrap gap-1 rounded-full bg-surface-container-high p-1">
       {tabs.map((tab) => (
         <NavLink
           key={tab.to}
@@ -27,10 +27,10 @@ export function ProjectSubNav({ projectId }: ProjectSubNavProps) {
           end
           className={({ isActive }) =>
             cn(
-              "-mb-px border-b-2 px-3 py-2 text-sm transition-colors",
+              "rounded-full px-4 py-2 text-sm transition-colors duration-200",
               isActive
-                ? "border-primary font-medium text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground",
+                ? "bg-secondary-container font-medium text-on-secondary-container"
+                : "text-on-surface-variant hover:bg-on-surface/10",
             )
           }
         >

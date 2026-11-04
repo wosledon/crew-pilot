@@ -4,6 +4,7 @@ import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 import { TooltipProvider } from "@/components/ui/Tooltip";
 import { Toaster } from "@/components/ui/Toast";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { DashboardPage } from "@/features/dashboard/DashboardPage";
 import { ProjectsPage } from "@/features/projects/ProjectsPage";
 import { ProjectDetailPage } from "@/features/projects/ProjectDetailPage";
 import { BoardPage } from "@/features/projects/BoardPage";
@@ -37,7 +38,8 @@ export default function App() {
             <AuthGate>
               <Routes>
                 <Route element={<AppLayout />}>
-                  <Route index element={<Navigate to="/projects" replace />} />
+                  <Route index element={<Navigate to="/dashboard" replace />} />
+                  <Route path="dashboard" element={<DashboardPage />} />
                   <Route path="projects" element={<ProjectsPage />} />
                   <Route path="projects/:projectId" element={<ProjectDetailPage />} />
                   <Route path="projects/:projectId/board" element={<BoardPage />} />

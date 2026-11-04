@@ -1,5 +1,6 @@
 {
   "nav": {
+    "dashboard": "Cockpit",
     "projects": "Projects",
     "prototype": "Prototype Studio",
     "providers": "Providers",

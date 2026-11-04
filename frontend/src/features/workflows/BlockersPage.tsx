@@ -46,7 +46,7 @@ export function BlockersPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">{t("workflows:blockerQueue")}</h1>
+          <h1 className="text-2xl font-normal">{t("workflows:blockerQueue")}</h1>
           <p className="text-sm text-muted-foreground">{t("workflows:blockerQueueHint")}</p>
         </div>
         <Select

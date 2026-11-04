@@ -32,8 +32,8 @@ const activityTones: Record<string, BadgeTone> = {
   canceled: "neutral",
 };
 
-const requirementColumns = ["backlog", "ready", "inProgress", "inReview", "done"];
-const defectColumns = ["new", "confirmed", "fixing", "pendingVerification", "closed"];
+const requirementColumns = ["backlog", "ready", "inprogress", "inreview", "done"];
+const defectColumns = ["new", "confirmed", "fixing", "pendingverification", "closed"];
 
 function columnsFor(type: WorkItemType): string[] {
   return type === "defect" ? defectColumns : requirementColumns;
@@ -57,7 +57,7 @@ function DraggableCard({
       {...listeners}
       {...attributes}
       className={cn(
-        "cursor-grab rounded-md border border-border bg-card p-3 shadow-sm active:cursor-grabbing",
+        "cursor-grab rounded-xl bg-card p-3 shadow-elevation-1 transition-shadow active:cursor-grabbing",
         isDragging && "opacity-50",
       )}
     >
@@ -109,8 +109,8 @@ function Column({
     <div
       ref={setNodeRef}
       className={cn(
-        "flex min-h-40 w-64 shrink-0 flex-col gap-2 rounded-lg border border-border p-2 transition-colors",
-        isOver ? "border-primary bg-accent" : "bg-muted/40",
+        "flex min-h-40 w-64 shrink-0 flex-col gap-2 rounded-xl p-2 transition-colors",
+        isOver ? "bg-secondary-container ring-2 ring-primary" : "bg-surface-container-low",
       )}
     >
       <div className="flex items-center justify-between px-1">
@@ -217,7 +217,7 @@ export function BoardPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">{t("kanban:title")}</h1>
+        <h1 className="text-2xl font-normal">{t("kanban:title")}</h1>
         <div className="flex items-center gap-2">
           <Select
             value={tag}

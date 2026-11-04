@@ -29,7 +29,7 @@ export function ProjectOverview({ projectId }: ProjectOverviewProps) {
       <Card>
         <CardContent className="p-4">
           <p className="text-xs text-muted-foreground">{t("projects:workItemCount")}</p>
-          <p className="mt-1 text-xl font-semibold">{items.length}</p>
+          <p className="mt-1 text-2xl font-normal">{items.length}</p>
         </CardContent>
       </Card>
       <Card>
@@ -37,7 +37,7 @@ export function ProjectOverview({ projectId }: ProjectOverviewProps) {
           <p className="text-xs text-muted-foreground">
             {t("report:totalEstimated")} / {t("report:totalLogged")}
           </p>
-          <p className="mt-1 text-xl font-semibold">
+          <p className="mt-1 text-2xl font-normal">
             {totalEstimated}h / {totalLogged}h
           </p>
         </CardContent>

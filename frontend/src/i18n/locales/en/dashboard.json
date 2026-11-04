@@ -1,0 +1,28 @@
+{
+  "title": "Cockpit",
+  "subtitle": "One dashboard for blockers, to-dos and agent activity — quiet by default, speak up only when needed",
+  "statsLabel": "Cockpit statistics",
+  "stats": {
+    "blockers": "Open blockers",
+    "runs": "Active agents",
+    "todos": "My to-dos",
+    "projects": "Active projects"
+  },
+  "weekHours": "Hours this week",
+  "blockerQueue": "Blocker queue",
+  "blockerEmpty": "No blockers — agents are moving on their own",
+  "activeRuns": "Running agent tasks",
+  "runsEmpty": "No agent is running right now",
+  "running": "Running",
+  "noWorkItem": "No work item",
+  "myTodos": "My to-dos",
+  "todosEmpty": "Nothing needs your attention",
+  "overdue": "Overdue",
+  "projectProgress": "Project progress",
+  "noProjects": "No projects yet — create one to get started",
+  "progress": "{{done}} / {{total}} done",
+  "iteration": "Iteration: {{name}} · until {{date}}",
+  "noActiveIteration": "No active iteration",
+  "recentActivity": "Recent activity",
+  "activityEmpty": "No activity yet"
+}

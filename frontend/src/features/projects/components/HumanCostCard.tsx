@@ -30,11 +30,11 @@ export function HumanCostCard({ projectId }: HumanCostCardProps) {
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg border border-border p-3">
                 <p className="text-xs text-muted-foreground">{t("report:humanCostTotal")}</p>
-                <p className="text-lg font-semibold">{report.data!.totalCost.toFixed(2)}</p>
+                <p className="text-lg font-medium">{report.data!.totalCost.toFixed(2)}</p>
               </div>
               <div className="rounded-lg border border-border p-3">
                 <p className="text-xs text-muted-foreground">{t("report:hours")}</p>
-                <p className="text-lg font-semibold">{report.data!.totalHours}</p>
+                <p className="text-lg font-medium">{report.data!.totalHours}</p>
               </div>
             </div>
             <table className="w-full text-sm">

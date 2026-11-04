@@ -1,6 +1,6 @@
 {
   "title": "原型工坊",
-  "description": "自己画 HTML 直接运行，也可以引用 URL / 图片 / 设计 MCP",
+  "description": "描述想法，产品 Agent 产出可运行原型；也可手动编辑或引用 URL / 图片 / 设计 MCP",
   "project": "所属项目",
   "selectProject": "选择项目",
   "name": "原型名称",
@@ -12,7 +12,7 @@
     "image": "图片",
     "mcp": "设计 MCP"
   },
-  "editor": "HTML 编辑器",
+  "editor": "手动编辑（兜底）",
   "editorPlaceholder": "在此编写 HTML/CSS/JS，右侧实时预览",
   "preview": "实时预览",
   "save": "保存原型",
@@ -56,5 +56,21 @@
   "deleteFileConfirm": "删除后该文件将从预览中移除",
   "fileEditorPlaceholder": "文件内容（html/css/js/json/svg/txt/md）",
   "draftRequirement": "生成需求草稿",
-  "requirementDrafted": "已创建需求：{{title}}"
+  "requirementDrafted": "已创建需求：{{title}}",
+  "ai": {
+    "title": "让产品 Agent 生成原型",
+    "hint": "你只描述意图与评审意见，HTML 由产品 Agent 产出并自动留版本。",
+    "agent": "产品 Agent",
+    "brief": "产品意图",
+    "briefPlaceholder": "例如：做一个 SaaS 首页，顶部导航 + 三列功能卡片 + 底部 CTA，主色紫色，风格接近 Material Design 3",
+    "newHint": "将新建一个原型并交给产品 Agent 生成。",
+    "iterateHint": "将在当前选中的原型上迭代（生成新版本）。",
+    "generate": "生成原型",
+    "running": "生成中…",
+    "runningHint": "{{agent}} 正在编写原型，完成后自动载入编辑器。",
+    "succeeded": "原型已生成并载入，可继续提意见让它迭代",
+    "failed": "原型生成失败",
+    "noAgent": "还没有可用的产品 Agent。",
+    "createAgent": "去创建一个"
+  }
 }

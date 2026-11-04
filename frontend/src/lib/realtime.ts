@@ -30,13 +30,13 @@ export function useRealtimeUpdates() {
     };
 
     connection.on(reconnectedEvents.workItem, () =>
-      invalidate(["workitems", "projects", "agent-runs"]),
+      invalidate(["workitems", "projects", "agent-runs", "dashboard"]),
     );
     connection.on(reconnectedEvents.agentRun, () =>
-      invalidate(["agent-runs", "workitems", "projects"]),
+      invalidate(["agent-runs", "workitems", "projects", "dashboard"]),
     );
     connection.on(reconnectedEvents.blocker, () =>
-      invalidate(["blockers", "workflows", "projects"]),
+      invalidate(["blockers", "workflows", "projects", "dashboard"]),
     );
 
     let disposed = false;

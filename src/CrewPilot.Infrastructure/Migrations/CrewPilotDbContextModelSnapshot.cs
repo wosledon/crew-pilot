@@ -110,6 +110,9 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Property<int?>("PromptTokens")
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid?>("PrototypeId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTimeOffset?>("StartedAt")
                         .HasColumnType("TEXT");
 
@@ -139,6 +142,8 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AgentId");
+
+                    b.HasIndex("PrototypeId");
 
                     b.HasIndex("WorkItemId");
 
@@ -1376,6 +1381,10 @@ namespace CrewPilot.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CrewPilot.Core.Prototypes.Prototype", "Prototype")
+                        .WithMany()
+                        .HasForeignKey("PrototypeId");
+
                     b.HasOne("CrewPilot.Core.WorkItems.WorkItem", "WorkItem")
                         .WithMany()
                         .HasForeignKey("WorkItemId")
@@ -1392,6 +1401,8 @@ namespace CrewPilot.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Agent");
+
+                    b.Navigation("Prototype");
 
                     b.Navigation("WorkItem");
 

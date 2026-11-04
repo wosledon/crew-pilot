@@ -31,7 +31,9 @@ public sealed class AgentRunsController(
         var query = db.AgentRuns.AsNoTracking().AsQueryable();
         if (projectId.HasValue)
         {
-            query = query.Where(r => r.WorkItem != null && r.WorkItem.ProjectId == projectId);
+            query = query.Where(r =>
+                (r.WorkItem != null && r.WorkItem.ProjectId == projectId) ||
+                (r.Prototype != null && r.Prototype.ProjectId == projectId));
         }
 
         if (workItemId.HasValue)

@@ -68,7 +68,7 @@ docs/PRD.md                 # 产品需求文档（事实来源）
 ### 5.1 技术选型（已定）
 
 - React + TypeScript + Vite，`strict` 模式开启，**禁止 `any`**（用 `unknown` + 收窄）；
-- 样式：Tailwind CSS + CSS 变量设计令牌；组件基于 Radix 原语封装（shadcn/ui 模式）；
+- 样式：Tailwind CSS + CSS 变量设计令牌，视觉遵循 **Material Design 3（MD3）**；组件基于 Radix 原语封装（shadcn/ui 模式），按 MD3 规范实现（filled/tonal/outlined/text 按钮、elevated 卡片、outlined 输入、胶囊导航）；
 - 图标：lucide-react；表单：react-hook-form + zod；服务端状态：TanStack Query；轻量客户端状态：Zustand（不引 Redux）；
 - 表格：TanStack Table；看板拖拽：dnd-kit；甘特图：自绘或轻量库（M1 前定稿）；
 - 国际化：i18next + react-i18next（见 5.4）；轻提示：sonner（或等价方案）；
@@ -119,9 +119,14 @@ docs/PRD.md                 # 产品需求文档（事实来源）
 ### 5.5 视觉与 UI 风格
 
 - 布局：左侧固定导航 + 主内容区；**卡片是本产品的核心视觉语言**——列表项、面板、详情分区、空状态、统计块一律用卡片承载；
-- 卡片令牌统一：`rounded-lg` + 1px 细边框 + 轻投影（shadow-sm） + 内边距 16/24px 两档；hover 时边框加深、轻微抬升；卡片网格响应式（`grid` + `auto-fill minmax`）；
-- 设计令牌经 CSS 变量定义于 `frontend/src/styles/tokens.css`：中性灰阶（slate）+ 单一主色（indigo，呼应"领航"主题），浅色/深色两套，`class` 策略切换、默认跟随系统；
-- 间距按 4px 网格（Tailwind 默认刻度），圆角 `rounded-md/lg`，字号基准 14px，中文优先字体栈（PingFang SC / Microsoft YaHei / system-ui）；
+- 设计系统：**Material Design 3（MD3）**。颜色角色（primary / secondary / tertiary / error + surface 容器层级）、字体比例、形状（shape scale）、海拔（elevation 1-5）全部以 CSS 变量定义于 `frontend/src/index.css`，浅色/深色两套，`class` 策略切换、默认跟随系统；
+- 主色采用 MD3 基线紫色方案（`#6750A4` / 深色 `#D0BCFF`）；语义状态色（成功/警告/信息）按同一色调体系扩展为 container/on-container 成对令牌；
+- 卡片 = MD3 elevated card：`surface-container-low` 底色 + `shadow-elevation-1`，hover 升到 `elevation-2`，圆角 16px（`rounded-lg`），内边距 16/20px；卡片网格响应式（`grid` + `auto-fill minmax`）；
+- 按钮 = MD3 胶囊型（`rounded-full`，高 40px）：filled（主操作）/ outlined / text / error（破坏性）；状态层用 10% 主色 overlay，禁用态 40% 透明度；
+- 输入与下拉 = MD3 outlined 风格：4px 圆角 + `outline` 描边，聚焦切换主色描边，不使用 glow；下拉菜单用 `surface-container-high` + elevation-2，选中项 `secondary-container`；
+- 对话框 = 28px 圆角 + `surface-container-high` + elevation-3，标题 headline-small（24px/400）；Toast = MD3 snackbar（`inverse-surface` 底 + `inverse-on-surface` 字）；
+- 布局：MD3 navigation drawer（宽 256px，选中项为 `secondary-container` 胶囊）+ small top app bar（高 64px），内容区 `surface` 底色；
+- 间距按 4px 网格（Tailwind 默认刻度），字号基准 14px，中文优先字体栈（Roboto / Noto Sans SC / PingFang SC / Microsoft YaHei）；
 - 状态色语义化：成功=emerald、警告=amber、危险=rose、信息=sky；Agent 相关元素用统一视觉标识（如 Agent 头像/徽标），与人类用户可区分；
 - 交互反馈：所有异步操作有 loading 态；破坏性操作经统一 `ConfirmDialog` 二次确认；表单即时校验（zod 错误经 i18n 中文展示）；
 - 可访问性：键盘可达、焦点可见、对比度 ≥ 4.5:1、图标按钮必须有 `aria-label`；

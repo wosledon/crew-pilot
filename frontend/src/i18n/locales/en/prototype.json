@@ -1,6 +1,6 @@
 {
   "title": "Prototype Studio",
-  "description": "Sketch HTML and run it live, or reference URL / image / design MCP",
+  "description": "Describe the idea and the Product Agent produces a runnable prototype; you can still edit manually or reference URL / image / design MCP",
   "project": "Project",
   "selectProject": "Select project",
   "name": "Prototype name",
@@ -12,7 +12,7 @@
     "image": "Image",
     "mcp": "Design MCP"
   },
-  "editor": "HTML editor",
+  "editor": "Manual editor (fallback)",
   "editorPlaceholder": "Write HTML/CSS/JS here, preview updates live on the right",
   "preview": "Live preview",
   "save": "Save prototype",
@@ -56,5 +56,21 @@
   "deleteFileConfirm": "The file will be removed from the preview",
   "fileEditorPlaceholder": "File content (html/css/js/json/svg/txt/md)",
   "draftRequirement": "Draft requirement",
-  "requirementDrafted": "Requirement created: {{title}}"
+  "requirementDrafted": "Requirement created: {{title}}",
+  "ai": {
+    "title": "Generate with Product Agent",
+    "hint": "You describe intent and review; the Product Agent writes the HTML and snapshots every version.",
+    "agent": "Product Agent",
+    "brief": "Product intent",
+    "briefPlaceholder": "e.g. A SaaS landing page: top nav, three feature cards, bottom CTA, purple accent, Material Design 3 style",
+    "newHint": "Creates a new prototype and hands it to the Product Agent.",
+    "iterateHint": "Iterates on the selected prototype (creates a new version).",
+    "generate": "Generate prototype",
+    "running": "Generating…",
+    "runningHint": "{{agent}} is writing the prototype; it will load into the editor when done.",
+    "succeeded": "Prototype generated and loaded — keep giving feedback to iterate",
+    "failed": "Prototype generation failed",
+    "noAgent": "No Product Agent available.",
+    "createAgent": "Create one"
+  }
 }

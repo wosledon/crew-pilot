@@ -1,56 +1,156 @@
 @import "tailwindcss";
 
-/* 深色模式：class 策略，默认跟随系统（见 components/layout/ThemeToggle） */
+/* 深色模式：class 策略，默认跟随系统（见 components/layout/AppLayout） */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * 设计令牌：中性灰阶（slate）+ 单一主色（indigo，呼应"领航"主题）
- * 浅色 / 深色两套，均以 CSS 变量定义
+ * Material Design 3 设计令牌（基线紫色方案）
+ * 颜色角色 / 形状 / 海拔 / 字体全部以 CSS 变量定义，浅色与深色两套。
+ * 业务代码只使用语义化角色（surface / primary / on-surface-variant ...），
+ * 兼容层别名（background / card / muted / border ...）映射到 MD3 角色。
  */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #eef2ff;
-  --accent-foreground: #3730a3;
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #4f46e5;
-  --destructive: #e11d48;
-  --destructive-foreground: #ffffff;
-  --success: #059669;
-  --warning: #d97706;
-  --info: #0284c7;
-  --radius: 0.5rem;
+  color-scheme: light;
+
+  /* Primary */
+  --md-primary: #6750a4;
+  --md-on-primary: #ffffff;
+  --md-primary-container: #eaddff;
+  --md-on-primary-container: #21005d;
+
+  /* Secondary */
+  --md-secondary: #625b71;
+  --md-on-secondary: #ffffff;
+  --md-secondary-container: #e8def8;
+  --md-on-secondary-container: #1d192b;
+
+  /* Tertiary */
+  --md-tertiary: #7d5260;
+  --md-on-tertiary: #ffffff;
+  --md-tertiary-container: #ffd8e4;
+  --md-on-tertiary-container: #31111d;
+
+  /* Error */
+  --md-error: #b3261e;
+  --md-on-error: #ffffff;
+  --md-error-container: #f9dedc;
+  --md-on-error-container: #410e0b;
+
+  /* Surfaces */
+  --md-surface: #fef7ff;
+  --md-surface-dim: #ded8e1;
+  --md-surface-bright: #fef7ff;
+  --md-surface-container-lowest: #ffffff;
+  --md-surface-container-low: #f7f2fa;
+  --md-surface-container: #f3edf7;
+  --md-surface-container-high: #ece6f0;
+  --md-surface-container-highest: #e6e0e9;
+  --md-on-surface: #1d1b20;
+  --md-on-surface-variant: #49454f;
+  --md-outline: #79747e;
+  --md-outline-variant: #cac4d0;
+  --md-inverse-surface: #322f35;
+  --md-inverse-on-surface: #f5eff7;
+  --md-scrim: #000000;
+
+  /* 语义状态色（MD3 未定义，按同一色调体系扩展） */
+  --md-success: #386a20;
+  --md-success-container: #b7f397;
+  --md-on-success-container: #052100;
+  --md-warning: #7d5700;
+  --md-warning-container: #ffdea6;
+  --md-on-warning-container: #271900;
+  --md-info: #0061a4;
+  --md-info-container: #d1e4ff;
+  --md-on-info-container: #001d36;
+
+  /* 形状 */
+  --md-shape-xs: 4px;
+  --md-shape-sm: 8px;
+  --md-shape-md: 12px;
+  --md-shape-lg: 16px;
+  --md-shape-xl: 28px;
+  --md-shape-full: 9999px;
+
+  /* 海拔 */
+  --md-elevation-1: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
+  --md-elevation-2: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 2px 6px 2px rgb(0 0 0 / 0.15);
+  --md-elevation-3: 0 4px 8px 3px rgb(0 0 0 / 0.15), 0 1px 3px 0 rgb(0 0 0 / 0.3);
+  --md-elevation-4: 0 6px 10px 4px rgb(0 0 0 / 0.15), 0 2px 3px 0 rgb(0 0 0 / 0.3);
+  --md-elevation-5: 0 8px 12px 6px rgb(0 0 0 / 0.15), 0 4px 4px 0 rgb(0 0 0 / 0.3);
+
+  /* 兼容层：旧语义名 → MD3 角色 */
+  --background: var(--md-surface);
+  --foreground: var(--md-on-surface);
+  --card: var(--md-surface-container-low);
+  --card-foreground: var(--md-on-surface);
+  --muted: var(--md-surface-container-high);
+  --muted-foreground: var(--md-on-surface-variant);
+  --accent: var(--md-secondary-container);
+  --accent-foreground: var(--md-on-secondary-container);
+  --primary: var(--md-primary);
+  --primary-foreground: var(--md-on-primary);
+  --border: var(--md-outline-variant);
+  --input: var(--md-outline);
+  --ring: var(--md-primary);
+  --destructive: var(--md-error);
+  --destructive-foreground: var(--md-on-error);
+  --success: var(--md-success);
+  --warning: var(--md-warning);
+  --info: var(--md-info);
 }
 
 .dark {
-  --background: #020617;
-  --foreground: #e2e8f0;
-  --card: #0f172a;
-  --card-foreground: #e2e8f0;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1e1b4b;
-  --accent-foreground: #e0e7ff;
-  --primary: #6366f1;
-  --primary-foreground: #ffffff;
-  --border: #1e293b;
-  --input: #1e293b;
-  --ring: #6366f1;
-  --destructive: #f43f5e;
-  --destructive-foreground: #ffffff;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --info: #0ea5e9;
+  color-scheme: dark;
+
+  --md-primary: #d0bcff;
+  --md-on-primary: #381e72;
+  --md-primary-container: #4f378b;
+  --md-on-primary-container: #eaddff;
+
+  --md-secondary: #ccc2dc;
+  --md-on-secondary: #332d41;
+  --md-secondary-container: #4a4458;
+  --md-on-secondary-container: #e8def8;
+
+  --md-tertiary: #efb8c8;
+  --md-on-tertiary: #492532;
+  --md-tertiary-container: #633b48;
+  --md-on-tertiary-container: #ffd8e4;
+
+  --md-error: #f2b8b5;
+  --md-on-error: #601410;
+  --md-error-container: #8c1d18;
+  --md-on-error-container: #f9dedc;
+
+  --md-surface: #141218;
+  --md-surface-dim: #141218;
+  --md-surface-bright: #3b383e;
+  --md-surface-container-lowest: #0f0d13;
+  --md-surface-container-low: #1d1b20;
+  --md-surface-container: #211f26;
+  --md-surface-container-high: #2b2930;
+  --md-surface-container-highest: #36343b;
+  --md-on-surface: #e6e0e9;
+  --md-on-surface-variant: #cac4d0;
+  --md-outline: #938f99;
+  --md-outline-variant: #49454f;
+  --md-inverse-surface: #e6e0e9;
+  --md-inverse-on-surface: #322f35;
+  --md-scrim: #000000;
+
+  --md-success: #9bd67f;
+  --md-success-container: #205107;
+  --md-on-success-container: #b7f397;
+  --md-warning: #f8bd48;
+  --md-warning-container: #5e4200;
+  --md-on-warning-container: #ffdea6;
+  --md-info: #9fcaff;
+  --md-info-container: #00497d;
+  --md-on-info-container: #d1e4ff;
 }
 
-/* 暴露给 Tailwind 的工具类（bg-background / text-foreground / border-border ...） */
+/* 暴露给 Tailwind 的工具类（bg-surface-container / text-on-surface-variant / rounded-xl ...） */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -70,8 +170,62 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-info: var(--info);
-  --radius-md: var(--radius);
-  --radius-lg: var(--radius);
+
+  --color-surface: var(--md-surface);
+  --color-surface-dim: var(--md-surface-dim);
+  --color-surface-bright: var(--md-surface-bright);
+  --color-surface-container-lowest: var(--md-surface-container-lowest);
+  --color-surface-container-low: var(--md-surface-container-low);
+  --color-surface-container: var(--md-surface-container);
+  --color-surface-container-high: var(--md-surface-container-high);
+  --color-surface-container-highest: var(--md-surface-container-highest);
+  --color-on-surface: var(--md-on-surface);
+  --color-on-surface-variant: var(--md-on-surface-variant);
+  --color-outline: var(--md-outline);
+  --color-outline-variant: var(--md-outline-variant);
+  --color-inverse-surface: var(--md-inverse-surface);
+  --color-inverse-on-surface: var(--md-inverse-on-surface);
+  --color-primary-container: var(--md-primary-container);
+  --color-on-primary-container: var(--md-on-primary-container);
+  --color-secondary: var(--md-secondary);
+  --color-on-secondary: var(--md-on-secondary);
+  --color-secondary-container: var(--md-secondary-container);
+  --color-on-secondary-container: var(--md-on-secondary-container);
+  --color-tertiary: var(--md-tertiary);
+  --color-on-tertiary: var(--md-on-tertiary);
+  --color-tertiary-container: var(--md-tertiary-container);
+  --color-on-tertiary-container: var(--md-on-tertiary-container);
+  --color-error: var(--md-error);
+  --color-on-error: var(--md-on-error);
+  --color-error-container: var(--md-error-container);
+  --color-on-error-container: var(--md-on-error-container);
+  --color-success-container: var(--md-success-container);
+  --color-on-success-container: var(--md-on-success-container);
+  --color-warning-container: var(--md-warning-container);
+  --color-on-warning-container: var(--md-on-warning-container);
+  --color-info-container: var(--md-info-container);
+  --color-on-info-container: var(--md-on-info-container);
+
+  --radius-xs: var(--md-shape-xs);
+  --radius-sm: var(--md-shape-sm);
+  --radius-md: var(--md-shape-md);
+  --radius-lg: var(--md-shape-lg);
+  --radius-xl: var(--md-shape-xl);
+  --radius-2xl: var(--md-shape-xl);
+  --radius-full: var(--md-shape-full);
+
+  --shadow-elevation-1: var(--md-elevation-1);
+  --shadow-elevation-2: var(--md-elevation-2);
+  --shadow-elevation-3: var(--md-elevation-3);
+  --shadow-elevation-4: var(--md-elevation-4);
+  --shadow-elevation-5: var(--md-elevation-5);
+  --shadow-sm: var(--md-elevation-1);
+  --shadow-md: var(--md-elevation-2);
+  --shadow-lg: var(--md-elevation-3);
+  --shadow-xl: var(--md-elevation-4);
+
+  --font-sans:
+    Roboto, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
 }
 
 @layer base {
@@ -79,23 +233,62 @@
     border-color: var(--border);
   }
 
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     margin: 0;
     min-height: 100vh;
-    background-color: var(--background);
-    color: var(--foreground);
+    background-color: var(--md-surface);
+    color: var(--md-on-surface);
     font-family:
-      "PingFang SC",
-      "Microsoft YaHei",
-      system-ui,
-      -apple-system,
+      Roboto, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system,
       sans-serif;
     font-size: 14px;
+    line-height: 1.43;
+    letter-spacing: 0.25px;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
+  /* MD3 键盘焦点指示：3px 主色外描边 */
   :focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 3px solid var(--md-primary);
     outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  /* MD3 滚动条：低对比、悬浮时加深 */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--md-outline-variant);
+    border: 3px solid transparent;
+    border-radius: var(--md-shape-full);
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--md-outline);
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
   }
 }

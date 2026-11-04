@@ -229,7 +229,7 @@ export function GanttPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">{t("gantt:title")}</h1>
+        <h1 className="text-2xl font-normal">{t("gantt:title")}</h1>
         <p className="text-sm text-muted-foreground">{t("gantt:description")}</p>
       </div>
 
@@ -750,11 +750,11 @@ function HoursReportSection({
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-lg border border-border p-3">
             <p className="text-xs text-muted-foreground">{t("report:totalEstimated")}</p>
-            <p className="text-lg font-semibold">{report.totalEstimatedHours}h</p>
+            <p className="text-lg font-medium">{report.totalEstimatedHours}h</p>
           </div>
           <div className="rounded-lg border border-border p-3">
             <p className="text-xs text-muted-foreground">{t("report:totalLogged")}</p>
-            <p className="text-lg font-semibold">{report.totalLoggedHours}h</p>
+            <p className="text-lg font-medium">{report.totalLoggedHours}h</p>
           </div>
         </div>
 

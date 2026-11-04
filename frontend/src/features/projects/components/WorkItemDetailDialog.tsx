@@ -249,7 +249,7 @@ export function WorkItemDetailDialog({
                 {t(`workitems:priorities.${detail.priority}`)}
               </Badge>
             </div>
-            <h3 className="mt-2 text-base font-semibold">{detail.title}</h3>
+            <h3 className="mt-2 text-base font-medium">{detail.title}</h3>
             <p className="mt-1 text-xs text-muted-foreground">
               {t("collaboration:assignee")}：{detail.assigneeName ? `@${detail.assigneeName}` : "—"}{" "}
               ·{" "}

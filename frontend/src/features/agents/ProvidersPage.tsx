@@ -127,7 +127,7 @@ import { ProviderModels } from "./ProviderModels";
         {" "}
         <div>
           {" "}
-          <h1 className="text-xl font-semibold">{t("providers:title")}</h1>{" "}
+          <h1 className="text-2xl font-normal">{t("providers:title")}</h1>{" "}
           <p className="text-sm text-muted-foreground">{t("providers:description")}</p>{" "}
         </div>{" "}
         <Button

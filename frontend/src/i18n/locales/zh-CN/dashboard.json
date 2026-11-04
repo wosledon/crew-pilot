@@ -1,0 +1,28 @@
+{
+  "title": "驾驶舱",
+  "subtitle": "一个仪表盘看清卡点、待办与 Agent 动态——没事不打扰，出事才叫你",
+  "statsLabel": "驾驶舱统计",
+  "stats": {
+    "blockers": "待处理卡点",
+    "runs": "进行中的 Agent",
+    "todos": "我的待办",
+    "projects": "活跃项目"
+  },
+  "weekHours": "本周工时",
+  "blockerQueue": "卡点队列",
+  "blockerEmpty": "暂无卡点，Agent 正在自动推进",
+  "activeRuns": "进行中的 Agent 执行",
+  "runsEmpty": "当前没有 Agent 在执行",
+  "running": "执行中",
+  "noWorkItem": "未关联工作项",
+  "myTodos": "我的待办",
+  "todosEmpty": "没有需要你处理的工作项",
+  "overdue": "已逾期",
+  "projectProgress": "项目进度",
+  "noProjects": "还没有项目，先创建一个项目",
+  "progress": "完成 {{done}} / {{total}}",
+  "iteration": "迭代：{{name}} · 至 {{date}}",
+  "noActiveIteration": "暂无进行中的迭代",
+  "recentActivity": "最近活动",
+  "activityEmpty": "暂无活动"
+}

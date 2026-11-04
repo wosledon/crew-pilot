@@ -3,23 +3,24 @@ import type { WorkItemType } from "@/lib/types";
 /**
  * 前端可见的状态流转表，与后端 WorkItemStateMachine 保持一致。
  * 用于「下一状态」下拉，避免展示非法流转。
+ * 状态字符串统一小写（与 API 响应及 i18n key 一致）。
  */
 const requirementFlow: Record<string, string[]> = {
   backlog: ["ready", "rejected"],
-  ready: ["inProgress", "backlog", "rejected"],
-  inProgress: ["inReview", "ready"],
-  inReview: ["done", "inProgress"],
+  ready: ["inprogress", "backlog", "rejected"],
+  inprogress: ["inreview", "ready"],
+  inreview: ["done", "inprogress"],
   done: [],
   rejected: [],
 };
 
 const defectFlow: Record<string, string[]> = {
-  new: ["confirmed", "notADefect"],
+  new: ["confirmed", "notadefect"],
   confirmed: ["fixing", "deferred"],
-  fixing: ["pendingVerification", "confirmed"],
-  pendingVerification: ["closed", "fixing"],
+  fixing: ["pendingverification", "confirmed"],
+  pendingverification: ["closed", "fixing"],
   closed: [],
-  notADefect: [],
+  notadefect: [],
   deferred: ["confirmed"],
 };
 
@@ -40,15 +41,15 @@ export function statusTone(
     case "done":
     case "closed":
       return "success";
-    case "inProgress":
+    case "inprogress":
     case "fixing":
-    case "pendingVerification":
+    case "pendingverification":
       return "info";
-    case "inReview":
+    case "inreview":
     case "ready":
       return "primary";
     case "rejected":
-    case "notADefect":
+    case "notadefect":
       return "danger";
     case "deferred":
       return "warning";

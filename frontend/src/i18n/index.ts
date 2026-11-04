@@ -4,6 +4,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 
 import commonZh from "./locales/zh-CN/common.json";
 import layoutZh from "./locales/zh-CN/layout.json";
+import dashboardZh from "./locales/zh-CN/dashboard.json";
 import projectsZh from "./locales/zh-CN/projects.json";
 import workitemsZh from "./locales/zh-CN/workitems.json";
 import prototypeZh from "./locales/zh-CN/prototype.json";
@@ -23,6 +24,7 @@ import auditZh from "./locales/zh-CN/audit.json";
 import authZh from "./locales/zh-CN/auth.json";
 import commonEn from "./locales/en/common.json";
 import layoutEn from "./locales/en/layout.json";
+import dashboardEn from "./locales/en/dashboard.json";
 import projectsEn from "./locales/en/projects.json";
 import workitemsEn from "./locales/en/workitems.json";
 import prototypeEn from "./locales/en/prototype.json";
@@ -57,6 +59,7 @@ void i18n
       "zh-CN": {
         common: commonZh,
         layout: layoutZh,
+        dashboard: dashboardZh,
         projects: projectsZh,
         workitems: workitemsZh,
         prototype: prototypeZh,
@@ -78,6 +81,7 @@ void i18n
       en: {
         common: commonEn,
         layout: layoutEn,
+        dashboard: dashboardEn,
         projects: projectsEn,
         workitems: workitemsEn,
         prototype: prototypeEn,

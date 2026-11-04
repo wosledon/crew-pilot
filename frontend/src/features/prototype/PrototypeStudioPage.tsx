@@ -24,6 +24,7 @@ import {
   useUpsertPrototypeFile,
 } from "./api";
 import { buildSandboxDocument } from "./sandboxDocument";
+import { PrototypeAiPanel } from "./PrototypeAiPanel";
 import { useProjects, useWorkItems } from "@/features/projects/api";
 import { formatDateTime } from "@/lib/format";
 
@@ -188,6 +189,20 @@ export function PrototypeStudioPage() {
     }
   };
 
+  /** Agent 生成完成后刷新列表并把结果载入编辑器（人工可继续微调）。 */
+  const handleAiGenerated = async (prototypeId: string) => {
+    const result = await prototypes.refetch();
+    const prototype = result.data?.find((item) => item.id === prototypeId);
+    if (prototype === undefined) {
+      return;
+    }
+    setName(prototype.name);
+    setType(prototype.type);
+    setContent(prototype.content);
+    setRequirementId(prototype.requirementId ?? "");
+    setCurrentId(prototype.id);
+  };
+
   const handleTypeChange = (value: string) => {
     setType(value);
     if (currentId === null) {
@@ -249,99 +264,109 @@ export function PrototypeStudioPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">{t("prototype:title")}</h1>
+        <h1 className="text-2xl font-normal">{t("prototype:title")}</h1>
         <p className="text-sm text-muted-foreground">{t("prototype:description")}</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("prototype:project")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Select
-              value={projectId}
-              onValueChange={(value) => {
-                setProjectId(value);
-                setCurrentId(null);
-                setRequirementId("");
-              }}
-              options={projectOptions}
-              placeholder={t("prototype:selectProject")}
-              ariaLabel={t("prototype:project")}
-            />
-            <label className="block space-y-1.5 text-sm">
-              <span className="font-medium">{t("prototype:name")}</span>
-              <Input
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder={t("prototype:namePlaceholder")}
-              />
-            </label>
-            <label className="block space-y-1.5 text-sm">
-              <span className="font-medium">{t("prototype:type")}</span>
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("prototype:project")}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
               <Select
-                value={type}
-                onValueChange={handleTypeChange}
-                options={[
-                  { value: "html", label: t("prototype:types.html") },
-                  { value: "url", label: t("prototype:types.url") },
-                  { value: "image", label: t("prototype:types.image") },
-                  { value: "mcp", label: t("prototype:types.mcp") },
-                ]}
-                ariaLabel={t("prototype:type")}
+                value={projectId}
+                onValueChange={(value) => {
+                  setProjectId(value);
+                  setCurrentId(null);
+                  setRequirementId("");
+                }}
+                options={projectOptions}
+                placeholder={t("prototype:selectProject")}
+                ariaLabel={t("prototype:project")}
               />
-            </label>
-            <label className="block space-y-1.5 text-sm">
-              <span className="font-medium">{t("prototype:requirement")}</span>
-              <Select
-                value={requirementId}
-                onValueChange={setRequirementId}
-                options={[
-                  { value: "", label: t("prototype:noRequirement") },
-                  ...requirementOptions,
-                ]}
-                ariaLabel={t("prototype:requirement")}
-              />
-            </label>
-            {type === "image" ? (
               <label className="block space-y-1.5 text-sm">
-                <span className="font-medium">{t("prototype:uploadImage")}</span>
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp,image/gif"
-                  disabled={uploading}
-                  onChange={(event) => {
-                    void handleImageUpload(event.target.files?.[0]);
-                    event.target.value = "";
-                  }}
-                  className="block w-full text-xs text-muted-foreground file:mr-2 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-accent-foreground"
+                <span className="font-medium">{t("prototype:name")}</span>
+                <Input
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  placeholder={t("prototype:namePlaceholder")}
                 />
-                <span className="text-xs text-muted-foreground">{t("prototype:imageHint")}</span>
               </label>
-            ) : null}
-            <Button
-              className="w-full"
-              onClick={() => void handleSave()}
-              disabled={
-                activeProjectId === undefined || name.trim() === "" || content.trim() === ""
-              }
-            >
-              <Save className="h-4 w-4" />
-              {currentId === null ? t("prototype:save") : t("common:save")}
-            </Button>
-            {currentId !== null ? (
+              <label className="block space-y-1.5 text-sm">
+                <span className="font-medium">{t("prototype:type")}</span>
+                <Select
+                  value={type}
+                  onValueChange={handleTypeChange}
+                  options={[
+                    { value: "html", label: t("prototype:types.html") },
+                    { value: "url", label: t("prototype:types.url") },
+                    { value: "image", label: t("prototype:types.image") },
+                    { value: "mcp", label: t("prototype:types.mcp") },
+                  ]}
+                  ariaLabel={t("prototype:type")}
+                />
+              </label>
+              <label className="block space-y-1.5 text-sm">
+                <span className="font-medium">{t("prototype:requirement")}</span>
+                <Select
+                  value={requirementId}
+                  onValueChange={setRequirementId}
+                  options={[
+                    { value: "", label: t("prototype:noRequirement") },
+                    ...requirementOptions,
+                  ]}
+                  ariaLabel={t("prototype:requirement")}
+                />
+              </label>
+              {type === "image" ? (
+                <label className="block space-y-1.5 text-sm">
+                  <span className="font-medium">{t("prototype:uploadImage")}</span>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif"
+                    disabled={uploading}
+                    onChange={(event) => {
+                      void handleImageUpload(event.target.files?.[0]);
+                      event.target.value = "";
+                    }}
+                    className="block w-full text-xs text-muted-foreground file:mr-2 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-accent-foreground"
+                  />
+                  <span className="text-xs text-muted-foreground">{t("prototype:imageHint")}</span>
+                </label>
+              ) : null}
               <Button
                 className="w-full"
-                variant="outline"
-                disabled={draftRequirement.isPending}
-                onClick={() => void handleDraftRequirement()}
+                onClick={() => void handleSave()}
+                disabled={
+                  activeProjectId === undefined || name.trim() === "" || content.trim() === ""
+                }
               >
-                {t("prototype:draftRequirement")}
+                <Save className="h-4 w-4" />
+                {currentId === null ? t("prototype:save") : t("common:save")}
               </Button>
-            ) : null}
-          </CardContent>
-        </Card>
+              {currentId !== null ? (
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  disabled={draftRequirement.isPending}
+                  onClick={() => void handleDraftRequirement()}
+                >
+                  {t("prototype:draftRequirement")}
+                </Button>
+              ) : null}
+            </CardContent>
+          </Card>
+
+          {activeProjectId === undefined ? null : (
+            <PrototypeAiPanel
+              projectId={activeProjectId}
+              currentPrototypeId={currentId}
+              onGenerated={handleAiGenerated}
+            />
+          )}
+        </div>
 
         <div className="space-y-4">
           <div className="grid gap-4 xl:grid-cols-2">
@@ -574,7 +599,7 @@ export function PrototypeStudioPage() {
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-base font-semibold">{t("prototype:savedList")}</h2>
+        <h2 className="text-base font-medium">{t("prototype:savedList")}</h2>
         {activeProjectId === undefined ? (
           <EmptyState>{t("prototype:selectProjectFirst")}</EmptyState>
         ) : prototypes.isPending ? (

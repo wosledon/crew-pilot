@@ -6,6 +6,7 @@ using CrewPilot.Core.Agents;
 using CrewPilot.Core.Audit;
 using CrewPilot.Core.Collaboration;
 using CrewPilot.Core.Projects;
+using CrewPilot.Core.Prototypes;
 using CrewPilot.Core.WorkItems;
 using CrewPilot.Core.WorkLogs;
 using CrewPilot.Infrastructure.Execution;
@@ -22,6 +23,10 @@ public sealed class AgentRunExecutor
 {
     private static readonly Regex PrUrlPattern = new(
         @"https?://\S+/(?:pull|merge_requests)/\d+",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private static readonly Regex HtmlBlockPattern = new(
+        @"```(?:html)?\s*(?<html>[\s\S]*?)```",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     private readonly CrewPilotDbContext _db;
@@ -80,6 +85,51 @@ public sealed class AgentRunExecutor
 
         await _db.SaveChangesAsync(ct);
         await NotifyRunAsync(run, workItem.ProjectId, ct);
+        return run;
+    }
+
+    /// <summary>
+    /// 原型工坊：让产品 Agent 依据自然语言描述产出/迭代 HTML 原型。
+    /// 运行结果在收尾时写回 Prototype（自动生成新版本快照）。
+    /// </summary>
+    public async Task<AgentRun> EnqueueForPrototypeAsync(
+        Guid agentId,
+        Guid projectId,
+        Guid prototypeId,
+        string brief,
+        CancellationToken ct = default)
+    {
+        var agent = await _db.Agents.FirstOrDefaultAsync(a => a.Id == agentId, ct)
+            ?? throw new InvalidOperationException("Agent 不存在");
+        var prototype = await _db.Prototypes
+            .FirstOrDefaultAsync(p => p.Id == prototypeId && p.ProjectId == projectId, ct)
+            ?? throw new InvalidOperationException("原型不存在");
+
+        var run = new AgentRun
+        {
+            AgentId = agent.Id,
+            PrototypeId = prototype.Id,
+            Trigger = "prototype",
+            Prompt = BuildPrototypePrompt(agent, prototype, brief),
+            Status = AgentRunStatus.Queued,
+        };
+        _db.AgentRuns.Add(run);
+
+        _db.Activities.Add(new Activity
+        {
+            ProjectId = projectId,
+            EventType = "prototype.generation.queued",
+            Payload = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                prototypeId = prototype.Id,
+                prototypeName = prototype.Name,
+                agent = agent.Name,
+            }),
+            ActorKind = MemberKind.Agent,
+        });
+
+        await _db.SaveChangesAsync(ct);
+        await NotifyRunAsync(run, projectId, ct);
         return run;
     }
 
@@ -408,9 +458,10 @@ public sealed class AgentRunExecutor
         AddPrUrlIfFound(run, output);
         AddRunActivity(run, succeeded ? "agentrun.succeeded" : "agentrun.failed", promptTokens, completionTokens);
         await AddMentionReplyAsync(run);
+        await ApplyPrototypeResultAsync(run, ct);
 
         await _db.SaveChangesAsync(ct);
-        await NotifyRunAsync(run, run.WorkItem?.ProjectId ?? Guid.Empty, ct);
+        await NotifyRunAsync(run, await ResolveProjectIdAsync(run, ct), ct);
     }
 
     private async Task FinishCanceledAsync(AgentRun run, CancellationToken ct)
@@ -734,9 +785,128 @@ public sealed class AgentRunExecutor
         }
     }
 
-    private static string BuildPrompt(Agent agent, WorkItem workItem)
+    /// <summary>原型生成完成：把输出中的 HTML 写回原型并留版本快照（失败时只记录日志）。</summary>
+    private async Task ApplyPrototypeResultAsync(AgentRun run, CancellationToken ct)
+    {
+        if (run.PrototypeId is not Guid prototypeId)
+        {
+            return;
+        }
+
+        if (run.Status != AgentRunStatus.Succeeded)
+        {
+            return;
+        }
+
+        var html = ExtractHtml(run.Output);
+        if (html is null)
+        {
+            _db.RunLogs.Add(new RunLog
+            {
+                AgentRunId = run.Id,
+                Sequence = 9_996,
+                Kind = "error",
+                Content = "原型生成失败：Agent 输出中未找到可运行的 HTML。",
+            });
+            return;
+        }
+
+        var prototype = await _db.Prototypes.FirstOrDefaultAsync(p => p.Id == prototypeId, ct);
+        if (prototype is null)
+        {
+            return;
+        }
+
+        prototype.Content = html;
+        prototype.Version += 1;
+        prototype.UpdatedAt = DateTimeOffset.UtcNow;
+        prototype.CreatedByKind = MemberKind.Agent;
+        prototype.CreatedByName = run.Agent.Name;
+        _db.PrototypeVersions.Add(new PrototypeVersion
+        {
+            PrototypeId = prototype.Id,
+            Version = prototype.Version,
+            Name = prototype.Name,
+            Content = html,
+            CreatedByName = run.Agent.Name,
+        });
+        _db.Activities.Add(new Activity
+        {
+            ProjectId = prototype.ProjectId,
+            EventType = "prototype.generated",
+            Payload = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                prototypeId = prototype.Id,
+                prototypeName = prototype.Name,
+                version = prototype.Version,
+                agent = run.Agent.Name,
+            }),
+            ActorKind = MemberKind.Agent,
+        });
+    }
+
+    private async Task<Guid> ResolveProjectIdAsync(AgentRun run, CancellationToken ct)
+    {
+        if (run.WorkItem?.ProjectId is Guid workItemProjectId)
+        {
+            return workItemProjectId;
+        }
+
+        if (run.PrototypeId is Guid prototypeId)
+        {
+            return await _db.Prototypes
+                .AsNoTracking()
+                .Where(p => p.Id == prototypeId)
+                .Select(p => p.ProjectId)
+                .FirstOrDefaultAsync(ct);
+        }
+
+        return Guid.Empty;
+    }
+
+    private static string BuildPrototypePrompt(Agent agent, Prototype prototype, string brief)
     {
         var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"你是 {agent.Name}（岗位：产品）。");
+        sb.AppendLine("请把下面的产品意图变成可运行的 HTML 原型，而不是需求文档。");
+        sb.AppendLine($"原型名称：{prototype.Name}");
+        sb.AppendLine();
+        sb.AppendLine("## 产品意图");
+        sb.AppendLine(brief.Trim());
+        sb.AppendLine();
+        if (!string.IsNullOrWhiteSpace(prototype.Content))
+        {
+            var existing = prototype.Content.Length > 8_000
+                ? prototype.Content[..8_000]
+                : prototype.Content;
+            sb.AppendLine("## 当前原型（在此基础上迭代，保持可用部分）");
+            sb.AppendLine("```html");
+            sb.AppendLine(existing);
+            sb.AppendLine("```");
+            sb.AppendLine();
+        }
+
+        sb.AppendLine("## 输出要求");
+        sb.AppendLine("- 单文件 HTML（内联 CSS/JS），不依赖外部网络资源；");
+        sb.AppendLine("- 适配桌面宽度，结构清晰、可直接评审；");
+        sb.AppendLine("- 只输出 HTML，放在 ```html 代码块中，不要输出解释。");
+        return sb.ToString();
+    }
+
+    private static string? ExtractHtml(string? output)
+    {
+        if (string.IsNullOrWhiteSpace(output))
+        {
+            return null;
+        }
+
+        var match = HtmlBlockPattern.Match(output);
+        var html = (match.Success ? match.Groups["html"].Value : output).Trim();
+        return html.Contains('<') ? html : null;
+    }
+
+    private static string BuildPrompt(Agent agent, WorkItem workItem)
+    {        var sb = new System.Text.StringBuilder();
         sb.AppendLine($"你是 {agent.Name}（岗位：{agent.Job}）。");
         sb.AppendLine($"工作项：{workItem.Title}");
         if (!string.IsNullOrWhiteSpace(workItem.Description))

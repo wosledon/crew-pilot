@@ -48,13 +48,13 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
         }}
       >
         <AlertDialogPrimitive.Portal>
-          <AlertDialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50" />
-          <AlertDialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 w-[92vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border border-border bg-card p-6 shadow-lg">
-            <AlertDialogPrimitive.Title className="text-base font-semibold">
+          <AlertDialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]" />
+          <AlertDialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 w-[92vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl bg-surface-container-high p-6 shadow-elevation-3">
+            <AlertDialogPrimitive.Title className="text-2xl font-normal leading-8 text-on-surface">
               {options?.title}
             </AlertDialogPrimitive.Title>
             {options?.description ? (
-              <AlertDialogPrimitive.Description className="mt-2 text-sm text-muted-foreground">
+              <AlertDialogPrimitive.Description className="mt-2 text-sm text-on-surface-variant">
                 {options.description}
               </AlertDialogPrimitive.Description>
             ) : null}

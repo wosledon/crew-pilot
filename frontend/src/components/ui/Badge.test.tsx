@@ -7,6 +7,6 @@ describe("Badge", () => {
     render(<Badge tone="success">已完成</Badge>);
     const badge = screen.getByText("已完成");
     expect(badge).toBeInTheDocument();
-    expect(badge.className).toContain("text-success");
+    expect(badge.className).toContain("text-on-success-container");
   });
 });

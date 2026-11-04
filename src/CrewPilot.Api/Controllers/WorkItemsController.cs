@@ -1,6 +1,7 @@
 using System.Text.Json;
 using CrewPilot.Api.Contracts;
 using CrewPilot.Core.Abstractions;
+using CrewPilot.Core.Agents;
 using CrewPilot.Core.Collaboration;
 using CrewPilot.Core.Projects;
 using CrewPilot.Core.Services;
@@ -825,16 +826,33 @@ public sealed class WorkItemsController(
             return member;
         }
 
+        // 名称命中数字员工时登记为 Agent 成员（岗位映射自 Agent.Job），
+        // 否则视为人类成员：Owner 已存在则由上方返回，其余按开发者登记。
+        var agent = await db.Agents
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Name == trimmed && a.Enabled, ct);
+
         member = new ProjectMember
         {
             ProjectId = projectId,
-            Kind = MemberKind.User,
-            Role = ProjectRole.Developer,
-            DisplayName = trimmed,
+            Kind = agent is null ? MemberKind.User : MemberKind.Agent,
+            Role = agent is null ? ProjectRole.Developer : MapAgentRole(agent.Job),
+            DisplayName = agent?.Name ?? trimmed,
         };
         db.Members.Add(member);
         return member;
     }
+
+    private static ProjectRole MapAgentRole(AgentJob job) => job switch
+    {
+        AgentJob.Product => ProjectRole.Product,
+        AgentJob.Architect => ProjectRole.Architect,
+        AgentJob.Developer => ProjectRole.Developer,
+        AgentJob.Qa => ProjectRole.Qa,
+        AgentJob.Manager => ProjectRole.Manager,
+        AgentJob.Ops => ProjectRole.Ops,
+        _ => ProjectRole.Developer,
+    };
 
     private static (bool Ok, string? Error, string From, string To) ApplyTransition(
         WorkItem workItem, string to)

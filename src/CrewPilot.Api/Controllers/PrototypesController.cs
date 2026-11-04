@@ -1,4 +1,6 @@
+using CrewPilot.Agents.Execution;
 using CrewPilot.Api.Contracts;
+using CrewPilot.Core.Agents;
 using CrewPilot.Core.Prototypes;
 using CrewPilot.Infrastructure.Persistence;
 using CrewPilot.Infrastructure.Storage;
@@ -14,7 +16,9 @@ namespace CrewPilot.Api.Controllers;
 [ApiController]
 public sealed class PrototypesController(
     CrewPilotDbContext db,
-    IAttachmentStorage storage) : ControllerBase
+    IAttachmentStorage storage,
+    AgentRunExecutor executor,
+    AgentRunQueue queue) : ControllerBase
 {
     private static readonly string[] AllowedImageExtensions =
         [".png", ".jpg", ".jpeg", ".webp", ".gif"];
@@ -215,6 +219,91 @@ public sealed class PrototypesController(
         await db.SaveChangesAsync(ct);
 
         return ToDto(prototype);
+    }
+
+    /// <summary>
+    /// 让产品 Agent 依据自然语言描述生成/迭代 HTML 原型（PRD 4.4 主路径）。
+    /// 返回排队中的 AgentRun；生成完成后自动写回原型并留版本。
+    /// </summary>
+    [HttpPost("api/projects/{projectId:guid}/prototypes/generate")]
+    public async Task<ActionResult<PrototypeGenerationDto>> Generate(
+        Guid projectId, [FromBody] GeneratePrototypeRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.Brief))
+        {
+            return Problem(detail: "请描述想要的原型（brief 必填）", statusCode: 400);
+        }
+
+        if (!await db.Projects.AnyAsync(p => p.Id == projectId, ct))
+        {
+            return Problem(detail: "项目不存在", statusCode: 404);
+        }
+
+        Agent? agent;
+        if (request.AgentId is Guid agentId)
+        {
+            agent = await db.Agents.FirstOrDefaultAsync(a => a.Id == agentId && a.Enabled, ct);
+            if (agent is null)
+            {
+                return Problem(detail: "Agent 不存在或已停用", statusCode: 404);
+            }
+
+            if (agent.Job != AgentJob.Product)
+            {
+                return Problem(
+                    detail: "原型由产品 Agent 产出，请选择岗位为「产品」的 Agent",
+                    statusCode: 400);
+            }
+        }
+        else
+        {
+            agent = await db.Agents
+                .Where(a => a.Enabled && a.Job == AgentJob.Product)
+                .OrderBy(a => a.Name)
+                .FirstOrDefaultAsync(ct);
+            if (agent is null)
+            {
+                return Problem(
+                    detail: "还没有可用的产品 Agent，请先添加岗位为「产品」的数字员工",
+                    statusCode: 400);
+            }
+        }
+
+        Prototype? prototype = null;
+        if (request.PrototypeId is Guid prototypeId)
+        {
+            prototype = await db.Prototypes
+                .FirstOrDefaultAsync(p => p.Id == prototypeId && p.ProjectId == projectId, ct);
+            if (prototype is null)
+            {
+                return Problem(detail: "原型不存在", statusCode: 404);
+            }
+        }
+        else
+        {
+            var name = request.Brief.Trim();
+            prototype = new Prototype
+            {
+                ProjectId = projectId,
+                Name = name.Length > 40 ? name[..40] : name,
+                Type = PrototypeType.Html,
+                Content = string.Empty,
+                CreatedByKind = Core.Projects.MemberKind.Agent,
+                CreatedByName = agent.Name,
+            };
+            db.Prototypes.Add(prototype);
+            await db.SaveChangesAsync(ct);
+        }
+
+        var run = await executor.EnqueueForPrototypeAsync(
+            agent.Id, projectId, prototype.Id, request.Brief, ct);
+        await queue.EnqueueAsync(run.Id);
+
+        return Created(
+            $"/api/agent-runs/{run.Id}",
+            new PrototypeGenerationDto(
+                run.Id, prototype.Id, prototype.Name, agent.Name,
+                run.Status.ToString().ToLowerInvariant()));
     }
 
     /// <summary>从原型生成需求草稿：把原型名称/类型/内容摘要落为 Backlog 需求并回链。</summary>

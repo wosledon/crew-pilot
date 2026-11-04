@@ -28,7 +28,7 @@ export function AuditPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">{t("audit:title")}</h1>
+          <h1 className="text-2xl font-normal">{t("audit:title")}</h1>
           <p className="text-sm text-muted-foreground">{t("audit:description")}</p>
         </div>
         <Select

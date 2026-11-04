@@ -177,12 +177,12 @@ export function ProjectDetailPage() {
         <Link
           to="/projects"
           aria-label={t("projects:detail.back")}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-on-surface/10"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div>
-          <h1 className="text-xl font-semibold">{project.data.name}</h1>
+          <h1 className="text-2xl font-normal">{project.data.name}</h1>
           <p className="text-sm text-muted-foreground">
             {project.data.key} · {project.data.workItemCount} {t("projects:detail.workItems")}
           </p>
@@ -213,7 +213,7 @@ export function ProjectDetailPage() {
           <Plus className="h-4 w-4" />
           {t("workitems:create")}
         </Button>
-        <div className="ml-auto flex items-center gap-1 rounded-md border border-border p-0.5">
+        <div className="ml-auto flex items-center gap-1 rounded-full bg-surface-container-high p-1">
           <Button
             size="sm"
             variant={view === "cards" ? "primary" : "ghost"}
@@ -484,7 +484,7 @@ export function ProjectDetailPage() {
       </div>
 
       <section className="space-y-3">
-        <h2 className="text-base font-semibold">{t("agentruns:title")}</h2>
+        <h2 className="text-base font-medium">{t("agentruns:title")}</h2>
         <AgentRunPanel projectId={projectId} />
       </section>
     </div>

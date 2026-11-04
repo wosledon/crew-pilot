@@ -44,3 +44,16 @@ public sealed record UpdatePrototypeRequest(
     string Name,
     string Content,
     Guid? RequirementId = null);
+
+/// <summary>由产品 Agent 生成/迭代原型：brief = 自然语言产品意图。</summary>
+public sealed record GeneratePrototypeRequest(
+    string Brief,
+    Guid? AgentId = null,
+    Guid? PrototypeId = null);
+
+public sealed record PrototypeGenerationDto(
+    Guid RunId,
+    Guid PrototypeId,
+    string PrototypeName,
+    string AgentName,
+    string Status);

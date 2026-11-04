@@ -102,7 +102,7 @@ export function ProjectsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">{t("projects:title")}</h1>
+          <h1 className="text-2xl font-normal">{t("projects:title")}</h1>
           <p className="text-sm text-muted-foreground">{t("projects:description")}</p>
         </div>
         <Button onClick={() => setDialogOpen(true)}>

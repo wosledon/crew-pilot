@@ -33,15 +33,15 @@ export function CostCard({ projectId, filters }: CostCardProps) {
             <div className="grid grid-cols-3 gap-3">
               <div className="rounded-lg border border-border p-3">
                 <p className="text-xs text-muted-foreground">{t("report:costTotal")}</p>
-                <p className="text-lg font-semibold">${cost.data!.totalCost.toFixed(4)}</p>
+                <p className="text-lg font-medium">${cost.data!.totalCost.toFixed(4)}</p>
               </div>
               <div className="rounded-lg border border-border p-3">
                 <p className="text-xs text-muted-foreground">{t("report:costPromptTokens")}</p>
-                <p className="text-lg font-semibold">{cost.data!.totalPromptTokens}</p>
+                <p className="text-lg font-medium">{cost.data!.totalPromptTokens}</p>
               </div>
               <div className="rounded-lg border border-border p-3">
                 <p className="text-xs text-muted-foreground">{t("report:costCompletionTokens")}</p>
-                <p className="text-lg font-semibold">{cost.data!.totalCompletionTokens}</p>
+                <p className="text-lg font-medium">{cost.data!.totalCompletionTokens}</p>
               </div>
             </div>
             <div>
