@@ -20,7 +20,10 @@ public sealed record ProjectDetailDto(
     int WorkItemCount,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,
-    Guid? DefaultTeamId);
+    Guid? DefaultTeamId,
+    Guid? RequirementTeamId,
+    Guid? DefectTeamId,
+    Guid? TaskTeamId);
 
 public sealed record CreateProjectRequest(
     string Key,
@@ -56,3 +59,9 @@ public sealed record UpdateProjectMemberRequest(
     decimal? HourlyRate = null);
 
 public sealed record SetProjectTeamRequest(Guid? TeamId);
+
+/// <summary>按工作项类型设置默认团队（空表示回退到项目默认团队）。</summary>
+public sealed record SetProjectTypeTeamsRequest(
+    Guid? RequirementTeamId,
+    Guid? DefectTeamId,
+    Guid? TaskTeamId);

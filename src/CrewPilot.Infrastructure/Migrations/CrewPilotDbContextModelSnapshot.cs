@@ -569,6 +569,9 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Property<Guid?>("DefaultTeamId")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("DefectTeamId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
                         .HasMaxLength(4000)
                         .HasColumnType("TEXT");
@@ -590,9 +593,15 @@ namespace CrewPilot.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("RequirementTeamId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("TaskTeamId")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("UpdatedAt")

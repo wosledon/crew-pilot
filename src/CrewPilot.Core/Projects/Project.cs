@@ -23,6 +23,15 @@ public class Project : Entity
     /// <summary>默认 Agent 团队（工作流步骤未显式指定 Agent 时优先从该团队按岗位选择）。</summary>
     public Guid? DefaultTeamId { get; set; }
 
+    /// <summary>需求类型默认团队（优先于项目默认团队）。</summary>
+    public Guid? RequirementTeamId { get; set; }
+
+    /// <summary>缺陷类型默认团队（优先于项目默认团队）。</summary>
+    public Guid? DefectTeamId { get; set; }
+
+    /// <summary>任务类型默认团队（优先于项目默认团队）。</summary>
+    public Guid? TaskTeamId { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;

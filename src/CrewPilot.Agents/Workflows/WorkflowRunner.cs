@@ -277,22 +277,29 @@ public sealed class WorkflowRunner(
         CancellationToken ct)
     {
         var projectId = await GetProjectIdAsync(run, ct);
-        var agent = await ResolveAgentAsync(step, projectId, ct);
-        if (agent is null)
-        {
-            await CreateBlockerAsync(
-                run, null, step, BlockerKind.Failure,
-                $"未找到可执行步骤「{step.Name}」的 Agent（岗位 {step.RequiredJob?.ToString() ?? "未指定"}）",
-                null, ct);
-            return;
-        }
-
         var workItem = await db.WorkItems.FirstOrDefaultAsync(w => w.Id == run.WorkItemId, ct);
         if (workItem is null)
         {
             await CreateBlockerAsync(
                 run, null, step, BlockerKind.Failure,
                 "工作项不存在，无法继续工作流", null, ct);
+            return;
+        }
+
+        var workItemType = workItem switch
+        {
+            Requirement => "requirement",
+            Defect => "defect",
+            TaskItem => "task",
+            _ => string.Empty,
+        };
+        var agent = await ResolveAgentAsync(step, projectId, workItemType, ct);
+        if (agent is null)
+        {
+            await CreateBlockerAsync(
+                run, null, step, BlockerKind.Failure,
+                $"未找到可执行步骤「{step.Name}」的 Agent（岗位 {step.RequiredJob?.ToString() ?? "未指定"}）",
+                null, ct);
             return;
         }
 
@@ -452,7 +459,7 @@ public sealed class WorkflowRunner(
     }
 
     private async Task<Agent?> ResolveAgentAsync(
-        WorkflowStep step, Guid projectId, CancellationToken ct)
+        WorkflowStep step, Guid projectId, string workItemType, CancellationToken ct)
     {
         if (step.AgentId is Guid agentId)
         {
@@ -466,15 +473,29 @@ public sealed class WorkflowRunner(
 
         if (step.RequiredJob is AgentJob job)
         {
-            // 优先项目默认团队中同岗位的 Agent
-            var defaultTeamId = await db.Projects
+            // 类型级默认团队优先，其次项目默认团队
+            var teams = await db.Projects
                 .Where(p => p.Id == projectId)
-                .Select(p => p.DefaultTeamId)
+                .Select(p => new
+                {
+                    p.DefaultTeamId,
+                    p.RequirementTeamId,
+                    p.DefectTeamId,
+                    p.TaskTeamId,
+                })
                 .FirstOrDefaultAsync(ct);
-            if (defaultTeamId is Guid teamId)
+            var typeTeamId = workItemType switch
+            {
+                "requirement" => teams?.RequirementTeamId,
+                "defect" => teams?.DefectTeamId,
+                "task" => teams?.TaskTeamId,
+                _ => null,
+            };
+            var teamId = typeTeamId ?? teams?.DefaultTeamId;
+            if (teamId is Guid selectedTeamId)
             {
                 var teamAgent = await db.AgentTeams
-                    .Where(t => t.Id == teamId)
+                    .Where(t => t.Id == selectedTeamId)
                     .SelectMany(t => t.Members)
                     .Where(m => m.Agent.Enabled && m.Agent.Job == job)
                     .Select(m => m.Agent)

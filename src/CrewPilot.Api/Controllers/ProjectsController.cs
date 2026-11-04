@@ -125,6 +125,56 @@ public sealed class ProjectsController(
     }
 
     /// <summary>设置/清除项目默认 Agent 团队。</summary>
+    /// <summary>按工作项类型设置默认团队（优先于项目默认团队）。</summary>
+    [HttpPut("{id:guid}/type-teams")]
+    public async Task<ActionResult<ProjectDetailDto>> SetTypeTeams(
+        Guid id, [FromBody] SetProjectTypeTeamsRequest request, CancellationToken ct)
+    {
+        var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == id, ct);
+        if (project is null)
+        {
+            return Problem(detail: "项目不存在", statusCode: 404);
+        }
+
+        var requested = new[]
+        {
+            request.RequirementTeamId,
+            request.DefectTeamId,
+            request.TaskTeamId,
+        };
+        foreach (var teamId in requested.Where(t => t.HasValue).Select(t => t!.Value).Distinct())
+        {
+            var exists = await db.AgentTeams.AnyAsync(
+                t => t.Id == teamId && t.ProjectId == id, ct);
+            if (!exists)
+            {
+                return Problem(detail: "团队不存在或不属于该项目", statusCode: 400);
+            }
+        }
+
+        project.RequirementTeamId = request.RequirementTeamId;
+        project.DefectTeamId = request.DefectTeamId;
+        project.TaskTeamId = request.TaskTeamId;
+        project.UpdatedAt = DateTimeOffset.UtcNow;
+        db.Activities.Add(new Activity
+        {
+            ProjectId = project.Id,
+            EventType = "project.typeTeams.changed",
+            Payload = JsonSerializer.Serialize(new
+            {
+                requirementTeamId = request.RequirementTeamId,
+                defectTeamId = request.DefectTeamId,
+                taskTeamId = request.TaskTeamId,
+            }),
+            ActorKind = MemberKind.User,
+        });
+        await db.SaveChangesAsync(ct);
+
+        var dto = await GetAsync(id, ct);
+        return Ok(dto);
+    }
+
+    /// <summary>设置项目默认团队（工作流按岗位解析 Agent 时使用）。</summary>
     [HttpPut("{id:guid}/default-team")]
     public async Task<ActionResult<ProjectDetailDto>> SetDefaultTeam(
         Guid id, [FromBody] SetProjectTeamRequest request, CancellationToken ct)
@@ -261,6 +311,9 @@ public sealed class ProjectsController(
                 p.LocalPath,
                 p.Status,
                 p.DefaultTeamId,
+                p.RequirementTeamId,
+                p.DefectTeamId,
+                p.TaskTeamId,
                 Count = p.WorkItems.Count,
                 p.CreatedAt,
                 p.UpdatedAt,
@@ -272,6 +325,6 @@ public sealed class ProjectsController(
             : new ProjectDetailDto(
                 row.Id, row.Key, row.Name, row.Description, row.RepoUrl, row.LocalPath,
                 row.Status.ToString().ToLowerInvariant(), row.Count, row.CreatedAt, row.UpdatedAt,
-                row.DefaultTeamId);
+                row.DefaultTeamId, row.RequirementTeamId, row.DefectTeamId, row.TaskTeamId);
     }
 }

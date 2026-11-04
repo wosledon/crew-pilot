@@ -574,6 +574,9 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                     b.Property<Guid?>("DefaultTeamId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("DefectTeamId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Description")
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
@@ -595,10 +598,16 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<Guid?>("RequirementTeamId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
+
+                    b.Property<Guid?>("TaskTeamId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
