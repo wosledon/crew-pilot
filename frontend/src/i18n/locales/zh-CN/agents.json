@@ -66,5 +66,16 @@
   "defectTeam": "缺陷",
   "taskTeam": "任务",
   "inheritDefaultTeam": "跟随项目默认",
-  "typeTeamSet": "类型团队已更新"
+  "typeTeamSet": "类型团队已更新",
+  "sandboxPolicy": "沙箱策略",
+  "sandboxPolicyHints": {
+    "workspacewrite": "工作区读写：文件限制在项目目录，命令需白名单",
+    "readonly": "只读：仅可读文件/列目录，禁止写入与执行",
+    "trusted": "受信：文件限制在项目目录，命令免白名单（仍不经 shell）"
+  },
+  "sandboxPolicies": {
+    "workspacewrite": "工作区读写（默认）",
+    "readonly": "只读",
+    "trusted": "受信命令"
+  }
 }

@@ -4334,6 +4334,7 @@ export interface components {
       enabled: boolean;
       skillIds: string[];
       mcpServerIds: string[];
+      sandboxPolicy: string;
     };
     AgentListItemDto: {
       /** Format: uuid */
@@ -4545,6 +4546,7 @@ export interface components {
       commandWhitelist: null | string;
       skillIds?: null | string[];
       mcpServerIds?: null | string[];
+      sandboxPolicy?: null | string;
     };
     CreateAgentTeamRequest: {
       name: string;
@@ -5015,6 +5017,7 @@ export interface components {
       enabled: boolean;
       skillIds?: null | string[];
       mcpServerIds?: null | string[];
+      sandboxPolicy?: null | string;
     };
     UpdateIterationRequest: {
       name: string;

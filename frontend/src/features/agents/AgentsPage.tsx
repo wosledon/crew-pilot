@@ -47,6 +47,7 @@ export function AgentsPage() {
   const [systemPrompt, setSystemPrompt] = useState("");
   const [tools, setTools] = useState(defaultTools);
   const [commandWhitelist, setCommandWhitelist] = useState(defaultWhitelist);
+  const [sandboxPolicy, setSandboxPolicy] = useState("workspacewrite");
   const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
   const [selectedMcpServerIds, setSelectedMcpServerIds] = useState<string[]>([]);
   const [capsAgentId, setCapsAgentId] = useState<string | null>(null);
@@ -68,6 +69,7 @@ export function AgentsPage() {
         systemPrompt,
         tools,
         commandWhitelist,
+        sandboxPolicy,
         skillIds: selectedSkillIds,
         mcpServerIds: selectedMcpServerIds,
       });
@@ -272,6 +274,23 @@ export function AgentsPage() {
             />
             <span className="text-xs text-muted-foreground">
               {t("agents:commandWhitelistHint")}
+            </span>
+          </label>
+
+          <label className="block space-y-1.5 text-sm">
+            <span className="font-medium">{t("agents:sandboxPolicy")}</span>
+            <Select
+              value={sandboxPolicy}
+              onValueChange={setSandboxPolicy}
+              options={[
+                { value: "workspacewrite", label: t("agents:sandboxPolicies.workspacewrite") },
+                { value: "readonly", label: t("agents:sandboxPolicies.readonly") },
+                { value: "trusted", label: t("agents:sandboxPolicies.trusted") },
+              ]}
+              ariaLabel={t("agents:sandboxPolicy")}
+            />
+            <span className="text-xs text-muted-foreground">
+              {t(`agents:sandboxPolicyHints.${sandboxPolicy}`)}
             </span>
           </label>
 

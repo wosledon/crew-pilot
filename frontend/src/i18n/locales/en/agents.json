@@ -66,5 +66,16 @@
   "defectTeam": "Defect",
   "taskTeam": "Task",
   "inheritDefaultTeam": "Inherit project default",
-  "typeTeamSet": "Type teams updated"
+  "typeTeamSet": "Type teams updated",
+  "sandboxPolicy": "Sandbox policy",
+  "sandboxPolicyHints": {
+    "workspacewrite": "Workspace: files limited to project dir, commands require whitelist",
+    "readonly": "Read-only: no writes or command execution",
+    "trusted": "Trusted: files limited to project dir, commands bypass whitelist (no shell)"
+  },
+  "sandboxPolicies": {
+    "workspacewrite": "Workspace write (default)",
+    "readonly": "Read-only",
+    "trusted": "Trusted commands"
+  }
 }

@@ -199,6 +199,7 @@ export function useCreateAgent() {
       systemPrompt: string;
       tools?: string;
       commandWhitelist?: string;
+      sandboxPolicy?: string;
       skillIds?: string[];
       mcpServerIds?: string[];
     }) => api.post<AgentDetail>("/agents", body),
@@ -215,6 +216,7 @@ export function useUpdateAgent(agentId: string) {
       systemPrompt: string;
       tools?: string | null;
       commandWhitelist?: string | null;
+      sandboxPolicy?: string;
       enabled: boolean;
       skillIds?: string[];
       mcpServerIds?: string[];
