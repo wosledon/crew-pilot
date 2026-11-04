@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace CrewPilot.Agents.Execution;
+namespace CrewPilot.Infrastructure.Execution;
 
 /// <summary>
 /// 受控进程执行封装：白名单由调用方保证，超时 + 输出截断 + 审计日志（见 AGENTS.md 第 6 节）。
@@ -15,7 +15,8 @@ public static class ProcessRunner
         string fileName,
         IReadOnlyList<string> arguments,
         TimeSpan timeout,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        IReadOnlyDictionary<string, string?>? environment = null)
     {
         var psi = new ProcessStartInfo(fileName)
         {
@@ -29,6 +30,14 @@ public static class ProcessRunner
         foreach (var argument in arguments)
         {
             psi.ArgumentList.Add(argument);
+        }
+
+        if (environment is not null)
+        {
+            foreach (var pair in environment)
+            {
+                psi.Environment[pair.Key] = pair.Value ?? string.Empty;
+            }
         }
 
         using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);

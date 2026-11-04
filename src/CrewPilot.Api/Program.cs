@@ -3,6 +3,7 @@ using CrewPilot.Agents.Engine;
 using CrewPilot.Agents.Execution;
 using CrewPilot.Agents.Workflows;
 using CrewPilot.Core.Abstractions;
+using CrewPilot.Infrastructure.Cicd;
 using CrewPilot.Infrastructure.Persistence;
 using CrewPilot.Infrastructure.Security;
 using CrewPilot.Infrastructure.Storage;
@@ -39,6 +40,9 @@ if (string.IsNullOrWhiteSpace(attachmentRoot))
 }
 
 builder.Services.AddSingleton<IAttachmentStorage>(new LocalAttachmentStorage(attachmentRoot));
+
+// CI/CD：gh / glab CLI 封装（Token 由项目集成配置加密存储）
+builder.Services.AddSingleton<IGitCliService, GitCliService>();
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();

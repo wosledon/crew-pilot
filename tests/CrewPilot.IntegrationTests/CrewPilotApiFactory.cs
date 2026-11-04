@@ -1,4 +1,5 @@
 using CrewPilot.Agents.Abstractions;
+using CrewPilot.Infrastructure.Cicd;
 using CrewPilot.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -36,6 +37,10 @@ public sealed class CrewPilotApiFactory : WebApplicationFactory<Program>
         Directory.CreateDirectory(_attachmentRoot);
     }
 
+    /// <summary>测试可直接操作 Fake CI/CD 服务（每个工厂实例独立）。</summary>
+    public FakeGitCliService GitCli =>
+        (FakeGitCliService)Services.GetRequiredService<IGitCliService>();
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
@@ -53,6 +58,10 @@ public sealed class CrewPilotApiFactory : WebApplicationFactory<Program>
             // 替换 Agent 引擎为 Fake（不发起真实模型调用）
             services.RemoveAll<IAgentEngine>();
             services.AddSingleton<IAgentEngine, FakeAgentEngine>();
+
+            // 替换 CI/CD CLI 为 Fake（不调用真实 gh/glab）
+            services.RemoveAll<IGitCliService>();
+            services.AddSingleton<IGitCliService, FakeGitCliService>();
         });
     }
 

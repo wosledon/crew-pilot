@@ -1,5 +1,6 @@
 using CrewPilot.Core.Agents;
 using CrewPilot.Core.Collaboration;
+using CrewPilot.Core.Integrations;
 using CrewPilot.Core.Iterations;
 using CrewPilot.Core.Projects;
 using CrewPilot.Core.Prototypes;
@@ -61,6 +62,8 @@ public class CrewPilotDbContext(DbContextOptions<CrewPilotDbContext> options) : 
     public DbSet<WorkflowRun> WorkflowRuns => Set<WorkflowRun>();
 
     public DbSet<Blocker> Blockers => Set<Blocker>();
+
+    public DbSet<ProjectIntegration> ProjectIntegrations => Set<ProjectIntegration>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

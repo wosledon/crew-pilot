@@ -346,6 +346,43 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.ToTable("Comments", (string)null);
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.Integrations.ProjectIntegration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Platform")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Repository")
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TokenProtected")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId")
+                        .IsUnique();
+
+                    b.ToTable("ProjectIntegrations", (string)null);
+                });
+
             modelBuilder.Entity("CrewPilot.Core.Iterations.Iteration", b =>
                 {
                     b.Property<Guid>("Id")
@@ -661,6 +698,10 @@ namespace CrewPilot.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CiStatus")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("TEXT");
 
@@ -676,6 +717,10 @@ namespace CrewPilot.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("IterationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PrState")
+                        .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PrUrl")
@@ -1153,6 +1198,17 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Navigation("Author");
 
                     b.Navigation("WorkItem");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Integrations.ProjectIntegration", b =>
+                {
+                    b.HasOne("CrewPilot.Core.Projects.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.Iterations.Iteration", b =>

@@ -7,6 +7,7 @@ using CrewPilot.Core.Collaboration;
 using CrewPilot.Core.Projects;
 using CrewPilot.Core.WorkItems;
 using CrewPilot.Core.WorkLogs;
+using CrewPilot.Infrastructure.Execution;
 using CrewPilot.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 

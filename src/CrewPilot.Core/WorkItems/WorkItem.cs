@@ -50,6 +50,12 @@ public abstract class WorkItem : Entity
 
     public string? PrUrl { get; set; }
 
+    /// <summary>PR/MR 状态（open/merged/closed，CI/CD 同步回填）。</summary>
+    public string? PrState { get; set; }
+
+    /// <summary>CI 状态（success/failure/pending，CI/CD 同步回填）。</summary>
+    public string? CiStatus { get; set; }
+
     /// <summary>截止日期（甘特图时间线与逾期标红）。</summary>
     public DateOnly? DueDate { get; set; }
 

@@ -20,6 +20,8 @@ public class WorkItemConfiguration : IEntityTypeConfiguration<WorkItem>
         builder.Property(w => w.RemainingHours).HasPrecision(9, 2);
         builder.Property(w => w.BranchUrl).HasMaxLength(500);
         builder.Property(w => w.PrUrl).HasMaxLength(500);
+        builder.Property(w => w.PrState).HasMaxLength(32);
+        builder.Property(w => w.CiStatus).HasMaxLength(32);
         builder.Ignore(w => w.LoggedHours);
         builder.HasIndex(w => w.ProjectId);
         builder.HasOne(w => w.Assignee)
