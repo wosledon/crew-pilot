@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:5101/"
+      "url": "http://127.0.0.1:5102/"
     }
   ],
   "paths": {
@@ -431,6 +431,29 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/agent-runs/{id}/stream": {
+      "get": {
+        "tags": [
+          "AgentRuns"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
