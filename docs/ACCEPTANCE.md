@@ -9,7 +9,7 @@
 | 项 | 命令 | 结果 |
 | --- | --- | --- |
 | 后端构建 | `dotnet build CrewPilot.slnx` | 0 警告 / 0 错误 |
-| 后端测试 | `dotnet test CrewPilot.slnx` | **167 项通过**（50 单测 + 117 集成） |
+| 后端测试 | `dotnet test CrewPilot.slnx` | **168 项通过**（50 单测 + 118 集成） |
 | 前端静态检查 | `npm run lint` / `npm run format:check` | 0 error，格式通过 |
 | 前端单测 | `npm run test:run` | **13 项通过** |
 | 前端构建 | `npm run build` | 通过（tsc + vite） |
@@ -129,7 +129,7 @@ CI：`.github/workflows/ci.yml` 含 backend / frontend / e2e 三个 job。
 - [x] 项目目录隔离 + git worktree 生命周期
 - [x] 沙箱加固（路径逃逸/命令注入/超时/输出截断）与沙箱策略
 - [x] 每次运行留痕：模型、token、耗时、日志步骤、工时、成本
-- [x] 运行状态/日志 SSE 流式推送（Round 38）`n- [~] 逐 token 流式输出、多 Agent 并行协作：P2
+- [x] 运行状态/日志 SSE 流式推送（Round 38）`n- [x] 多 Agent 并行协作：工作流同 Order Parallel 步骤并发（Round 39）`n- [~] 逐 token 流式输出：P2
 
 ### 5.7 MCP 接入（P1）
 
@@ -182,7 +182,7 @@ PRD 第 4 节：P2 = 后续演进，不阻塞 v1 验收。
 
 
 | 逐 token 流式输出（已支持运行状态/日志 SSE 推送） | 引擎能力增强，P2 |
-| 多 Agent 并行协作（顺序交接/评审已支持） | P2 |
+
 
 | CI webhook 自动推送（当前动作触发） | P2 |
 | 完整生成式 API 客户端（当前生成 DTO + 薄 fetch 封装） | P2 工程化 |

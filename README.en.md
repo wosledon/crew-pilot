@@ -36,7 +36,7 @@ npm run dev
 
 ```bash
 dotnet build CrewPilot.slnx        # build solution
-dotnet test                        # backend tests (167)
+dotnet test                        # backend tests (168)
 cd frontend && npm run build       # production build
 cd frontend && npm run lint        # ESLint
 cd frontend && npm run test:run    # Vitest (13)
@@ -79,4 +79,4 @@ docs/PRD.md                 # source of truth
 - Reports: hours, token cost, human cost, estimate deviation, burndown
 - Prototype studio: HTML/URL/image/MCP references, CSP sandbox, image upload, versions
 - Single-user auth (optional), audit log, encrypted secrets, structured JSON logs
-- Tests: 167 backend, 13 Vitest, 2 Playwright E2E; OpenAPI-generated frontend DTOs
+- Tests: 168 backend, 13 Vitest, 2 Playwright E2E; OpenAPI-generated frontend DTOs

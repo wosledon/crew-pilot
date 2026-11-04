@@ -9,7 +9,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 167 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 168 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -228,7 +228,7 @@
 - [x] 项目目录隔离 + git worktree（Round 1 打通 LocalPath）
 - [~] worktree 清理/合并/PR：失败/取消已清理，成功保留待 M4 接 PR
 - [x] 运行详情：日志/工具调用时间线、实时刷新（Round 22）+ SSE 流式日志（Round 38）；逐 token 输出待引擎支持
-- [~] 多 Agent 协作（顺序交接/评审已由工作流支持；并行协作 P2）
+- [x] 多 Agent 协作（顺序交接 + Round 39 并行步骤：同 Order 的 Parallel 步骤并发，全部完成后推进）
 - [x] 沙箱加固（路径逃逸/命令注入/超时，Round 1）
 
 ### 5.7 MCP（P1）
@@ -295,6 +295,12 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 39（2026-11-05，P2 演进 Round 8）
+
+- 多 Agent 并行协作（PRD 5.4/5.6 P2）：WorkflowStep 新增 `Parallel`；同 Order 且 Parallel 的步骤由工作流运行器并发启动，全部成功后才推进下一 Order；起始组同样支持并行
+- 契约/编辑器：步骤 DTO/请求增加 `parallel`（Order 改为可选），前端工作流编辑器新增「并行执行」选择并按上一步 Order 归组
+- 测试：167 → 168（并行步骤启动 2 个 AgentRun、全部完成后推进总计 3 个），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 38（2026-11-05，P2 演进 Round 7）
 
