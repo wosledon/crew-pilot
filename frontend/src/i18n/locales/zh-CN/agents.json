@@ -1,0 +1,41 @@
+{
+  "title": "Agent 数字员工",
+  "description": "为岗位配置模型、系统提示词与工具权限，认领工作项自动执行",
+  "create": "新建 Agent",
+  "createTitle": "新建 Agent",
+  "name": "名称",
+  "namePlaceholder": "如 开发 Agent",
+  "job": "岗位",
+  "jobs": {
+    "product": "产品",
+    "architect": "架构师",
+    "developer": "开发",
+    "qa": "测试",
+    "manager": "项目经理",
+    "ops": "运维"
+  },
+  "provider": "模型供应商",
+  "selectProvider": "选择供应商",
+  "model": "模型",
+  "modelPlaceholder": "先从供应商同步模型目录",
+  "systemPrompt": "系统提示词",
+  "systemPromptPlaceholder": "你是一名资深开发者……",
+  "tools": "工具权限",
+  "toolsHint": "read_file / write_file / list_files / run_command（JSON 数组）",
+  "commandWhitelist": "命令白名单",
+  "commandWhitelistHint": "run_command 仅允许这些命令（JSON 数组，如 [\"git\",\"dotnet\"]）",
+  "preview": "试运行",
+  "previewTitle": "试运行 Agent",
+  "previewPrompt": "提示词",
+  "previewRun": "运行",
+  "runCount": "{{count}} 次执行",
+  "deleteConfirm": {
+    "title": "删除 Agent？",
+    "description": "该 Agent 的执行记录将一并删除，且不可恢复。"
+  },
+  "created": "Agent 已创建",
+  "deleted": "Agent 已删除",
+  "previewStarted": "试运行已入队",
+  "empty": "还没有 Agent，先创建供应商再新建 Agent",
+  "noProviders": "还没有模型供应商，请先到「供应商」页创建"
+}

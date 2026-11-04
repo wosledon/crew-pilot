@@ -10,6 +10,7 @@ import { toast } from "@/components/ui/Toast";
 import { CreateWorkItemDialog } from "./components/CreateWorkItemDialog";
 import { LogWorkDialog } from "./components/LogWorkDialog";
 import { WorkItemCard } from "./components/WorkItemCard";
+import { AssignAgentDialog, AgentRunPanel } from "@/features/agents/components/AgentRunPanel";
 import {
   useAddWorkLog,
   useCreateWorkItem,
@@ -21,7 +22,7 @@ import type { WorkItemListItem } from "@/lib/types";
 
 export function ProjectDetailPage() {
   const { projectId = "" } = useParams();
-  const { t } = useTranslation(["projects", "workitems", "common"]);
+  const { t } = useTranslation(["projects", "workitems", "common", "agentruns"]);
   const project = useProject(projectId);
   const [typeFilter, setTypeFilter] = useState("");
   const workItems = useWorkItems(projectId, typeFilter || undefined);
@@ -31,6 +32,7 @@ export function ProjectDetailPage() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [logTarget, setLogTarget] = useState<WorkItemListItem | null>(null);
+  const [assignTarget, setAssignTarget] = useState<WorkItemListItem | null>(null);
 
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
@@ -123,6 +125,7 @@ export function ProjectDetailPage() {
               item={item}
               onTransition={(id, toStatus) => void handleTransition(id, toStatus)}
               onLogWork={setLogTarget}
+              onAssign={setAssignTarget}
               transitioning={transitionWorkItem.isPending}
             />
           ))}
@@ -154,6 +157,23 @@ export function ProjectDetailPage() {
           onSubmit={handleLogWork}
         />
       ) : null}
+
+      {assignTarget ? (
+        <AssignAgentDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) {
+              setAssignTarget(null);
+            }
+          }}
+          workItemId={assignTarget.id}
+        />
+      ) : null}
+
+      <section className="space-y-3">
+        <h2 className="text-base font-semibold">{t("agentruns:title")}</h2>
+        <AgentRunPanel projectId={projectId} />
+      </section>
     </div>
   );
 }

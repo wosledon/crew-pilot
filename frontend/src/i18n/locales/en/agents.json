@@ -1,0 +1,41 @@
+{
+  "title": "Agents",
+  "description": "Configure model, system prompt and tools per role; agents claim work items and execute",
+  "create": "New agent",
+  "createTitle": "New agent",
+  "name": "Name",
+  "namePlaceholder": "e.g. Dev Agent",
+  "job": "Role",
+  "jobs": {
+    "product": "Product",
+    "architect": "Architect",
+    "developer": "Developer",
+    "qa": "QA",
+    "manager": "Manager",
+    "ops": "Ops"
+  },
+  "provider": "Model provider",
+  "selectProvider": "Select provider",
+  "model": "Model",
+  "modelPlaceholder": "Sync the provider catalog first",
+  "systemPrompt": "System prompt",
+  "systemPromptPlaceholder": "You are a senior developer…",
+  "tools": "Tools",
+  "toolsHint": "read_file / write_file / list_files / run_command (JSON array)",
+  "commandWhitelist": "Command whitelist",
+  "commandWhitelistHint": "Commands allowed for run_command (JSON array, e.g. [\"git\",\"dotnet\"])",
+  "preview": "Preview",
+  "previewTitle": "Preview agent",
+  "previewPrompt": "Prompt",
+  "previewRun": "Run",
+  "runCount": "{{count}} runs",
+  "deleteConfirm": {
+    "title": "Delete agent?",
+    "description": "Its run history will be deleted as well. This cannot be undone."
+  },
+  "created": "Agent created",
+  "deleted": "Agent deleted",
+  "previewStarted": "Preview queued",
+  "empty": "No agents yet — create a provider first",
+  "noProviders": "No model providers yet — create one on the Providers page"
+}

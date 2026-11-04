@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { FolderKanban, LayoutTemplate, Moon, Sun } from "lucide-react";
+import { FolderKanban, LayoutTemplate, Plug, Bot, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { Tooltip } from "@/components/ui/Tooltip";
@@ -11,6 +11,8 @@ import { cn } from "@/lib/cn";
 const navItems = [
   { to: "/projects", icon: FolderKanban, labelKey: "layout:nav.projects" },
   { to: "/prototypes", icon: LayoutTemplate, labelKey: "layout:nav.prototype" },
+  { to: "/providers", icon: Plug, labelKey: "layout:nav.providers" },
+  { to: "/agents", icon: Bot, labelKey: "layout:nav.agents" },
 ];
 
 /** 应用骨架：左侧固定导航 + 主内容区（卡片风格见 tokens.css） */

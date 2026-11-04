@@ -15,11 +15,13 @@ namespace CrewPilot.IntegrationTests;
 /// </summary>
 public sealed class CrewPilotApiFactory : WebApplicationFactory<Program>
 {
-    private const string ConnectionString = "DataSource=file:crewpilot_it?mode=memory&cache=shared";
-    private readonly SqliteConnection _connection = new(ConnectionString);
+    // 每个工厂实例使用独立的内存库，避免 xUnit 并行测试类之间的 SQLite 锁竞争
+    private readonly string _databaseName = "crewpilot_it_" + Guid.NewGuid().ToString("N");
+    private readonly SqliteConnection _connection;
 
     public CrewPilotApiFactory()
     {
+        _connection = new SqliteConnection($"DataSource=file:{_databaseName}?mode=memory&cache=shared");
         // 保持连接打开，共享内存数据库随工厂生命周期存在
         _connection.Open();
     }

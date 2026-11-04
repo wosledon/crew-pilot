@@ -1,7 +1,9 @@
 {
   "nav": {
     "projects": "项目",
-    "prototype": "原型工坊"
+    "prototype": "原型工坊",
+    "providers": "供应商",
+    "agents": "Agent"
   },
   "theme": {
     "toggle": "切换深浅色主题"

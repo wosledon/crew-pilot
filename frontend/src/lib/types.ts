@@ -148,6 +148,105 @@ export interface Activity {
   createdAt: string;
 }
 
+export interface ProviderListItem {
+  id: string;
+  name: string;
+  baseUrl: string;
+  source: string;
+  enabled: boolean;
+  isDefault: boolean;
+  modelCount: number;
+}
+
+export interface ModelDto {
+  id: string;
+  modelId: string;
+  displayName: string;
+  contextLength: number | null;
+  capabilities: string | null;
+  inputPricePerMillion: number | null;
+  outputPricePerMillion: number | null;
+  enabled: boolean;
+}
+
+export interface ProviderDetail {
+  id: string;
+  name: string;
+  baseUrl: string;
+  source: string;
+  enabled: boolean;
+  isDefault: boolean;
+  models: ModelDto[];
+}
+
+export interface AgentListItem {
+  id: string;
+  name: string;
+  job: string;
+  providerName: string;
+  model: string;
+  enabled: boolean;
+  runCount: number;
+}
+
+export interface AgentDetail {
+  id: string;
+  name: string;
+  job: string;
+  providerId: string;
+  providerName: string;
+  model: string;
+  systemPrompt: string;
+  tools: string | null;
+  commandWhitelist: string | null;
+  enabled: boolean;
+}
+
+export type AgentRunStatus = "queued" | "running" | "succeeded" | "failed" | "canceled";
+
+export interface AgentRunListItem {
+  id: string;
+  agentName: string;
+  workItemId: string | null;
+  workItemTitle: string | null;
+  trigger: string;
+  status: AgentRunStatus;
+  error: string | null;
+  createdAt: string;
+  finishedAt: string | null;
+  duration: string | null;
+  promptTokens: number | null;
+  completionTokens: number | null;
+}
+
+export interface AgentRunLog {
+  sequence: number;
+  kind: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface AgentRunDetail {
+  id: string;
+  agentName: string;
+  model: string | null;
+  workItemId: string | null;
+  workItemTitle: string | null;
+  trigger: string;
+  status: AgentRunStatus;
+  workingDirectory: string | null;
+  prompt: string;
+  output: string | null;
+  error: string | null;
+  promptTokens: number | null;
+  completionTokens: number | null;
+  createdAt: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+  duration: string | null;
+  logs: AgentRunLog[];
+}
+
 /** API 错误（携带 ProblemDetails 状态码） */
 export class ApiError extends Error {
   constructor(

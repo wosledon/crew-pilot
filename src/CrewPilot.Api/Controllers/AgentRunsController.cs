@@ -11,9 +11,14 @@ public sealed class AgentRunsController(CrewPilotDbContext db) : ControllerBase
 {
     [HttpGet("api/agent-runs")]
     public async Task<ActionResult<IReadOnlyList<AgentRunListItemDto>>> List(
-        [FromQuery] Guid? workItemId, [FromQuery] Guid? agentId, CancellationToken ct = default)
+        [FromQuery] Guid? projectId, [FromQuery] Guid? workItemId, [FromQuery] Guid? agentId, CancellationToken ct = default)
     {
         var query = db.AgentRuns.AsNoTracking().AsQueryable();
+        if (projectId.HasValue)
+        {
+            query = query.Where(r => r.WorkItem != null && r.WorkItem.ProjectId == projectId);
+        }
+
         if (workItemId.HasValue)
         {
             query = query.Where(r => r.WorkItemId == workItemId);

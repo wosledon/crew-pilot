@@ -10,6 +10,8 @@ import { BoardPage } from "@/features/projects/BoardPage";
 import { IterationsPage } from "@/features/projects/IterationsPage";
 import { GanttPage } from "@/features/projects/GanttPage";
 import { PrototypeStudioPage } from "@/features/prototype/PrototypeStudioPage";
+import { ProvidersPage } from "@/features/agents/ProvidersPage";
+import { AgentsPage } from "@/features/agents/AgentsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,6 +37,8 @@ export default function App() {
                 <Route path="projects/:projectId/board" element={<BoardPage />} />
                 <Route path="projects/:projectId/iterations" element={<IterationsPage />} />
                 <Route path="projects/:projectId/gantt" element={<GanttPage />} />
+                <Route path="providers" element={<ProvidersPage />} />
+                <Route path="agents" element={<AgentsPage />} />
                 <Route path="prototypes" element={<PrototypeStudioPage />} />
               </Route>
             </Routes>

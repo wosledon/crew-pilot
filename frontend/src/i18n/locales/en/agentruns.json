@@ -1,0 +1,36 @@
+{
+  "title": "Runs",
+  "description": "Full AgentRun traceability: logs, artifacts, hours and token cost",
+  "assign": "Assign to agent",
+  "assigned": "Assigned, running",
+  "assignFailed": "Assignment failed",
+  "selectAgent": "Select agent",
+  "statuses": {
+    "queued": "Queued",
+    "running": "Running",
+    "succeeded": "Succeeded",
+    "failed": "Failed",
+    "canceled": "Canceled"
+  },
+  "triggers": {
+    "manual": "Manual",
+    "assigned": "Claimed",
+    "preview": "Preview",
+    "workflow": "Workflow"
+  },
+  "duration": "Duration",
+  "tokens": "Tokens {{prompt}} / {{completion}}",
+  "workItem": "Work item",
+  "workingDirectory": "Working directory",
+  "output": "Output",
+  "logs": "Run logs",
+  "logsEmpty": "No logs yet",
+  "cancel": "Cancel (take over)",
+  "canceled": "Run canceled",
+  "cancelFailed": "Cancel failed",
+  "empty": "No runs yet",
+  "createdAt": "Created at",
+  "finishedAt": "Finished at",
+  "error": "Error",
+  "viewDetail": "View details"
+}

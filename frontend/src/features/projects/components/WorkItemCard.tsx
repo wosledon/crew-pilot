@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Clock } from "lucide-react";
+import { Clock, Bot } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
@@ -10,6 +10,7 @@ export interface WorkItemCardProps {
   item: WorkItemListItem;
   onTransition: (id: string, toStatus: string) => void;
   onLogWork: (item: WorkItemListItem) => void;
+  onAssign: (item: WorkItemListItem) => void;
   transitioning: boolean;
 }
 
@@ -17,9 +18,10 @@ export function WorkItemCard({
   item,
   onTransition,
   onLogWork,
+  onAssign,
   transitioning,
 }: WorkItemCardProps) {
-  const { t } = useTranslation(["workitems", "common"]);
+  const { t } = useTranslation(["workitems", "common", "agentruns"]);
   const options = nextStatuses(item.type, item.status);
 
   return (
@@ -62,8 +64,15 @@ export function WorkItemCard({
           ) : null}
           <Button
             variant="outline"
-            size="icon"
-            aria-label={t("workitems:logWork")}
+            size="icon"            aria-label={t("agentruns:assign")}
+            disabled={transitioning}
+            onClick={() => onAssign(item)}
+          >
+            <Bot className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"            aria-label={t("workitems:logWork")}
             disabled={transitioning}
             onClick={() => onLogWork(item)}
           >

@@ -1,7 +1,9 @@
 {
   "nav": {
     "projects": "Projects",
-    "prototype": "Prototype Studio"
+    "prototype": "Prototype Studio",
+    "providers": "Providers",
+    "agents": "Agents"
   },
   "theme": {
     "toggle": "Toggle light/dark theme"

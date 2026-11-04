@@ -1,0 +1,36 @@
+{
+  "title": "执行记录",
+  "description": "AgentRun 全程留痕：日志、产物、工时与 token 成本",
+  "assign": "指派给 Agent",
+  "assigned": "已指派，执行中",
+  "assignFailed": "指派失败",
+  "selectAgent": "选择 Agent",
+  "statuses": {
+    "queued": "排队中",
+    "running": "执行中",
+    "succeeded": "成功",
+    "failed": "失败",
+    "canceled": "已取消"
+  },
+  "triggers": {
+    "manual": "手动",
+    "assigned": "认领",
+    "preview": "试运行",
+    "workflow": "工作流"
+  },
+  "duration": "耗时",
+  "tokens": "Token {{prompt}} / {{completion}}",
+  "workItem": "工作项",
+  "workingDirectory": "工作目录",
+  "output": "输出",
+  "logs": "执行日志",
+  "logsEmpty": "暂无日志",
+  "cancel": "取消（接管）",
+  "canceled": "已取消执行",
+  "cancelFailed": "取消失败",
+  "empty": "暂无执行记录",
+  "createdAt": "创建于",
+  "finishedAt": "完成于",
+  "error": "错误",
+  "viewDetail": "查看详情"
+}
