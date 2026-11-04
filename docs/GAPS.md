@@ -8,7 +8,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 144 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 146 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -89,7 +89,7 @@
 - [ ] OpenAPI 生成完整客户端（替换手写 fetch 封装）
 - [x] 前端测试：Vitest（13 项）+ Playwright E2E 起步（Round 16，2 条主链路）
 - [ ] 测试补齐：真实 MAF 适配层、取消、沙箱、worktree、安全用例
-- [ ] 文档更新：README 进度、AGENTS 现状、README.en
+- [x] 文档更新：README 进度、AGENTS 现状、README.en
 
 ## 2. PRD 逐节对照
 
@@ -111,7 +111,7 @@
 - [x] 状态流转（状态机 + 非法流转 400）
 - [x] 标签（Round 3）
 - [ ] 富文本描述（当前纯文本）
-- [ ] 关联缺陷
+- [x] 关联缺陷（Round 27：需求详情展示关联缺陷）
 - [x] 关联原型 UI（原型工坊可绑定需求/按需求过滤，Round 11）
 - [x] 详情页 / 编辑 UI / 指派人变更（Round 3）
 - [x] 删除 UI（后端已有，Round 3）
@@ -172,7 +172,7 @@
 - [x] 附件上传/下载/删除（本地存储，文件大小限制）
 - [x] 活动流记录（后端写入）
 - [x] 活动流 UI（项目时间线）
-- [ ] 活动流查询过滤（按工作项/事件类型）
+- [x] 活动流查询过滤（按工作项/事件类型，Round 27）
 
 ### 4.9 权限与审计（P0/P1）
 
@@ -294,6 +294,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 27（2026-11-04）
+
+- 活动流过滤（PRD 4.8）：`GET /api/projects/{id}/activities` 支持 `workItemId` / `eventType`；前端活动流卡新增事件类型下拉（事件类型从当前时间线动态提取）
+- 需求关联缺陷（PRD 4.2/4.3）：工作项列表支持 `relatedRequirementId` 过滤（自动限定缺陷）；需求详情新增「关联缺陷」列表（标题 + 缺陷状态）
+- 文档：新增 `README.en.md`；README/GAPS 勾选与计数同步
+- 测试：144 → 146（关联缺陷过滤、活动流过滤），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 26（2026-11-04）
 
