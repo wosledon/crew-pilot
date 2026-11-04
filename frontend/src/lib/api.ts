@@ -9,6 +9,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
+    if (response.status === 401 && !path.startsWith("/auth")) {
+      window.dispatchEvent(new Event("crewpilot:unauthorized"));
+    }
+
     const problem = (await response.json().catch(() => null)) as {
       detail?: string;
       title?: string;

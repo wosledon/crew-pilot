@@ -16,6 +16,7 @@ import { BlockersPage } from "@/features/workflows/BlockersPage";
 import { SkillsPage } from "@/features/platform/SkillsPage";
 import { McpPage } from "@/features/platform/McpPage";
 import { AuditPage } from "@/features/platform/AuditPage";
+import { AuthGate } from "@/features/auth/AuthGate";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,23 +34,25 @@ export default function App() {
       <TooltipProvider>
         <ConfirmProvider>
           <BrowserRouter>
-            <Routes>
-              <Route element={<AppLayout />}>
-                <Route index element={<Navigate to="/projects" replace />} />
-                <Route path="projects" element={<ProjectsPage />} />
-                <Route path="projects/:projectId" element={<ProjectDetailPage />} />
-                <Route path="projects/:projectId/board" element={<BoardPage />} />
-                <Route path="projects/:projectId/iterations" element={<IterationsPage />} />
-                <Route path="projects/:projectId/gantt" element={<GanttPage />} />
-                <Route path="projects/:projectId/blockers" element={<BlockersPage />} />
-                <Route path="providers" element={<ProvidersPage />} />
-                <Route path="agents" element={<AgentsPage />} />
-                <Route path="skills" element={<SkillsPage />} />
-                <Route path="mcp" element={<McpPage />} />
-                <Route path="audit" element={<AuditPage />} />
-                <Route path="prototypes" element={<PrototypeStudioPage />} />
-              </Route>
-            </Routes>
+            <AuthGate>
+              <Routes>
+                <Route element={<AppLayout />}>
+                  <Route index element={<Navigate to="/projects" replace />} />
+                  <Route path="projects" element={<ProjectsPage />} />
+                  <Route path="projects/:projectId" element={<ProjectDetailPage />} />
+                  <Route path="projects/:projectId/board" element={<BoardPage />} />
+                  <Route path="projects/:projectId/iterations" element={<IterationsPage />} />
+                  <Route path="projects/:projectId/gantt" element={<GanttPage />} />
+                  <Route path="projects/:projectId/blockers" element={<BlockersPage />} />
+                  <Route path="providers" element={<ProvidersPage />} />
+                  <Route path="agents" element={<AgentsPage />} />
+                  <Route path="skills" element={<SkillsPage />} />
+                  <Route path="mcp" element={<McpPage />} />
+                  <Route path="audit" element={<AuditPage />} />
+                  <Route path="prototypes" element={<PrototypeStudioPage />} />
+                </Route>
+              </Routes>
+            </AuthGate>
           </BrowserRouter>
           <Toaster />
         </ConfirmProvider>

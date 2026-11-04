@@ -20,6 +20,7 @@ import integrationsZh from "./locales/zh-CN/integrations.json";
 import skillsZh from "./locales/zh-CN/skills.json";
 import mcpZh from "./locales/zh-CN/mcp.json";
 import auditZh from "./locales/zh-CN/audit.json";
+import authZh from "./locales/zh-CN/auth.json";
 import commonEn from "./locales/en/common.json";
 import layoutEn from "./locales/en/layout.json";
 import projectsEn from "./locales/en/projects.json";
@@ -38,6 +39,7 @@ import integrationsEn from "./locales/en/integrations.json";
 import skillsEn from "./locales/en/skills.json";
 import mcpEn from "./locales/en/mcp.json";
 import auditEn from "./locales/en/audit.json";
+import authEn from "./locales/en/auth.json";
 
 /** 默认语言：简体中文 */
 export const defaultLanguage = "zh-CN";
@@ -71,6 +73,7 @@ void i18n
         skills: skillsZh,
         mcp: mcpZh,
         audit: auditZh,
+        auth: authZh,
       },
       en: {
         common: commonEn,
@@ -91,6 +94,7 @@ void i18n
         skills: skillsEn,
         mcp: mcpEn,
         audit: auditEn,
+        auth: authEn,
       },
     },
     fallbackLng: defaultLanguage,

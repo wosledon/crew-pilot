@@ -11,12 +11,14 @@ import {
   Sparkles,
   Cable,
   ScrollText,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { supportedLanguages } from "@/i18n";
 import { useRealtimeUpdates } from "@/lib/realtime";
+import { useAuthStatus, useLogout } from "@/features/auth/api";
 import { cn } from "@/lib/cn";
 
 const navItems = [
@@ -33,6 +35,8 @@ const navItems = [
 export function AppLayout() {
   const { t, i18n } = useTranslation();
   const [dark, setDark] = useState(() => window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const auth = useAuthStatus();
+  const logout = useLogout();
 
   // 实时事件 → TanStack Query 缓存刷新
   useRealtimeUpdates();
@@ -80,6 +84,18 @@ export function AppLayout() {
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-card/80 px-6 backdrop-blur">
           <span className="text-sm text-muted-foreground">{t("common:appName")}</span>
           <div className="flex items-center gap-2">
+            {auth.data?.enabled ? (
+              <Tooltip content={t("auth:logout")}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  aria-label={t("auth:logout")}
+                  onClick={() => void logout.mutateAsync()}
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </Tooltip>
+            ) : null}
             <Select
               value={currentLanguage}
               onValueChange={(value) => void i18n.changeLanguage(value)}

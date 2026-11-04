@@ -2,6 +2,12 @@
 
 export type ProjectStatus = "active" | "archived";
 
+/** 单用户认证状态 */
+export interface AuthStatus {
+  enabled: boolean;
+  authenticated: boolean;
+}
+
 export interface ProjectSummary {
   id: string;
   key: string;
