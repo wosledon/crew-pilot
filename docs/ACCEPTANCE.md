@@ -9,7 +9,7 @@
 | 项 | 命令 | 结果 |
 | --- | --- | --- |
 | 后端构建 | `dotnet build CrewPilot.slnx` | 0 警告 / 0 错误 |
-| 后端测试 | `dotnet test CrewPilot.slnx` | **162 项通过**（50 单测 + 112 集成） |
+| 后端测试 | `dotnet test CrewPilot.slnx` | **164 项通过**（50 单测 + 114 集成） |
 | 前端静态检查 | `npm run lint` / `npm run format:check` | 0 error，格式通过 |
 | 前端单测 | `npm run test:run` | **13 项通过** |
 | 前端构建 | `npm run build` | 通过（tsc + vite） |
@@ -35,7 +35,7 @@ CI：`.github/workflows/ci.yml` 含 backend / frontend / e2e 三个 job。
 - [x] 状态机流转（非法流转 400）
 - [x] 详情/编辑/删除/指派人变更、Task 父子关系
 - [x] 关联原型、关联缺陷（详情展示）
-- [~] 富文本描述：P2（当前纯文本）
+- [x] 富文本描述：Markdown 渲染（Round 36）
 
 ### 4.3 缺陷管理（P0）
 
@@ -168,7 +168,7 @@ CI：`.github/workflows/ci.yml` 含 backend / frontend / e2e 三个 job。
 ### 9. 非功能需求
 
 - [x] 构建/测试/CI/Docker/compose/部署文档
-- [~] 500+ 卡片性能压力验证：P2
+- [x] 500+ 工作项列表规模化测试（Round 36）
 
 ## 3. P2 后续演进 / 范围外（PRD 定义）
 
@@ -179,8 +179,8 @@ PRD 第 4 节：P2 = 后续演进，不阻塞 v1 验收。
 
 
 
-| 富文本描述 | P2 |
-| 500+ 卡片性能压力验证 | P2 |
+
+
 | 流式 token 输出（当前为一次性输出 + 中间步骤日志） | 引擎能力增强，P2 |
 | 多 Agent 并行协作（顺序交接/评审已支持） | P2 |
 | 设计 MCP 专用链路（Figma → 需求） | P2，通用 MCP 已可用 |

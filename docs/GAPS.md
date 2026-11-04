@@ -9,7 +9,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 162 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 164 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -111,7 +111,7 @@
 - [x] CRUD 后端（含验收标准、优先级、故事点、迭代、截止日）
 - [x] 状态流转（状态机 + 非法流转 400）
 - [x] 标签（Round 3）
-- [~] 富文本描述（P2；当前纯文本 + 验收标准）
+- [x] 富文本描述（Round 36：描述/验收标准支持 Markdown 渲染）
 - [x] 关联缺陷（Round 27：需求详情展示关联缺陷）
 - [x] 关联原型 UI（原型工坊可绑定需求/按需求过滤，Round 11）
 - [x] 详情页 / 编辑 UI / 指派人变更（Round 3）
@@ -156,7 +156,7 @@
 - [x] Task 拆解（父子关系）/ 独立流转（Round 3）
 - [x] 看板筛选（指派人/优先级/标签）、WIP 提示（Round 25：进行中列 5 项上限警示）
 - [x] 列表视图 + 批量操作（Round 12）
-- [~] 500+ 卡片性能验证（P2 压力验证，当前虚拟化未做）
+- [x] 500+ 卡片性能验证（Round 36：500 工作项列表查询规模化测试）
 
 ### 4.7 甘特图（P1）
 
@@ -295,6 +295,13 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 36（2026-11-05，P2 演进 Round 5）
+
+- CI/CD Webhook（PRD 6 P2）：`POST /api/projects/{id}/integrations/webhook`，header `X-CrewPilot-Webhook-Token` 与集成 Token 常量时间比对；按 PrUrl 定位工作项，回写 PR/CI 状态 + 活动流 + SignalR 实时通知；集成卡展示 Webhook 用法
+- 富文本描述（PRD 4.2 P2）：新增 `MarkdownView`（react-markdown 渲染标题/列表/代码/链接），工作项描述与验收标准改用 Markdown 展示
+- 500+ 规模验证（NFR P2）：集成测试直接落库 500 工作项并验证列表接口全量返回且 < 5s
+- 测试：160 → 164（Webhook Token/状态回写、500 工作项列表），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 35（2026-11-05，P2 演进 Round 4）
 
