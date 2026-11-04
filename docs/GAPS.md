@@ -9,7 +9,7 @@
 
 | 项 | 状态 |
 | --- | --- |
-| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 155 项测试全绿 |
+| 后端 | .NET 10 + EF Core（SQLite / PostgreSQL 双 provider）/ 158 项测试全绿 |
 | 前端 | React 18 + TS + Vite；lint / format / build / 13 项 Vitest + 2 条 Playwright E2E 全绿 |
 | M0 | 基本完成（项目/工作项/原型/前端骨架） |
 | M1 | 主体完成，剩余列表视图/批量操作/原型增强等 |
@@ -162,8 +162,8 @@
 
 - [x] 迭代时间线 + 工作项截止日 + 逾期标红 + 工时报表
 - [x] 里程碑渲染（时间线标记 + 列表 + 迭代归属）
-- [~] 依赖关系 FS/SS（P2，PRD 标注后续演进）
-- [~] 关键路径（P2，PRD 标注后续演进）
+- [x] 依赖关系 FS/SS（Round 1：实体/API/甘特 UI，环路与跨项目校验）
+- [x] 关键路径（Round 1：按预估工时加权最长链，甘特高亮）
 - [~] 工时泳道（P2）
 - [~] PM Agent 自动更新进度/周报（P2）
 
@@ -295,6 +295,12 @@
 | 15 | 无认证 / 审计日志缺失 | 全局 | 认证 ✅ Round 17；审计 ✅ Round 6 |
 
 ## 4. 每轮工作日志
+
+### Round 32（2026-11-05，P2 演进 Round 1）
+
+- 甘特依赖关系（PRD 4.7 P2）：`WorkItemDependency` 实体（FS/SS）+ SQLite/PG 迁移；`GET/POST /api/projects/{id}/dependencies`、`DELETE /api/dependencies/{id}`；同项目/自依赖/重复/环路校验，创建记录审计
+- 关键路径：`GET /api/projects/{id}/critical-path` 按预估工时加权最长依赖链；甘特页新增依赖管理（新建/删除）与关键路径高亮（★ + 红框 + 总工时）
+- 测试：155 → 158（依赖 CRUD/非法形状、关键路径加权链），`dotnet test` 全绿；前端 lint / format / test / build / E2E 全绿
 
 ### Round 31（2026-11-04）
 
