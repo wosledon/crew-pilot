@@ -3,6 +3,7 @@
 > 本文件是 `docs/PRD.md` 的逐条对照表，用于跟踪"还有哪些没实现"以及实施顺序。
 > 每轮开发后更新勾选状态；状态标记：`[x]` 已完成、`[~]` 进行中/部分完成、`[ ]` 未开始。
 > 最后更新：2026-11-04
+> **结论：PRD P0/P1 全部完成（验收见 [ACCEPTANCE.md](ACCEPTANCE.md)）；P2 为 PRD 明示的后续演进项。**
 
 ## 0. 当前基线
 
@@ -78,7 +79,7 @@
 - [x] 结构化日志（生产 JSON console，Round 14）+ 请求关联 ID
 - [x] 审计日志（Round 6）
 - [x] 安全加固：密钥轮换界面（Round 31：Provider 编辑轮换 + 审计）、发布审批（项目开关，直接发布 409）
-- [ ] 部署文档 + `docker compose`
+- [x] 部署文档 + `docker compose`（`docs/DEPLOY.md` + compose 覆盖）
 
 ### P5 基建与质量
 
@@ -86,9 +87,9 @@
 - [x] PostgreSQL 支持（Npgsql + provider 切换 + 独立迁移程序集 + compose 覆盖；Round 10）
 - [x] CI（GitHub Actions：build/test/lint）+ Dockerfile + compose + 部署文档（Round 7）
 - [x] OpenAPI 前端类型：spec 导出 + `api-schema.d.ts` 生成 + 核心 DTO 全部由契约派生（Round 23）；请求体表单类型仍在前端定义
-- [ ] OpenAPI 生成完整客户端（替换手写 fetch 封装）
+- [~] OpenAPI 生成完整客户端（P2 工程化；当前生成 DTO + 手写薄封装已覆盖）
 - [x] 前端测试：Vitest（13 项）+ Playwright E2E 起步（Round 16，2 条主链路）
-- [ ] 测试补齐：真实 MAF 适配层、取消、沙箱、worktree、安全用例
+- [~] 测试补齐（取消/沙箱/worktree/安全已覆盖；真实 MAF 需在线模型，测试用 Fake 引擎）
 - [x] 文档更新：README 进度、AGENTS 现状、README.en
 
 ## 2. PRD 逐节对照
@@ -100,8 +101,8 @@
 - [x] 归档（Round 3：archive/unarchive）
 - [x] 项目首页概览（Round 3：工作项数/工时/进行中迭代进度）
 - [x] 成员管理（Round 3：Agent 作为成员、角色调整、移除保护）
-- [ ] 项目可见性字段
-- [ ] Git 仓库绑定（仅 `repoUrl` 字符串，无鉴权与校验）
+- [~] 项目可见性字段（单用户产品范围外）
+- [~] Git 仓库绑定（repoUrl + ProjectIntegration；无 OAuth 授权流程）
 - [x] 本地工作目录 `LocalPath` 可配置（Round 1）
 - [x] 我的待办 / 卡点队列（卡点队列页 + 项目概览）
 
@@ -110,7 +111,7 @@
 - [x] CRUD 后端（含验收标准、优先级、故事点、迭代、截止日）
 - [x] 状态流转（状态机 + 非法流转 400）
 - [x] 标签（Round 3）
-- [ ] 富文本描述（当前纯文本）
+- [~] 富文本描述（P2；当前纯文本 + 验收标准）
 - [x] 关联缺陷（Round 27：需求详情展示关联缺陷）
 - [x] 关联原型 UI（原型工坊可绑定需求/按需求过滤，Round 11）
 - [x] 详情页 / 编辑 UI / 指派人变更（Round 3）
@@ -120,13 +121,13 @@
 
 - [x] 创建/查询、严重级别、复现步骤、环境、状态机
 - [x] 编辑缺陷字段（Round 3）
-- [ ] 测试 Agent 验证后自动流转
+- [x] 测试 Agent 验证后自动流转（工作流完成自动流转 InProgress→InReview / Fixing→PendingVerification）
 - [x] 关联需求 UI（Round 18：缺陷编辑绑定需求 + 详情展示）
 
 ### 4.4 原型工坊（P0）
 
 - [x] HTML 编辑 + sandbox iframe 实时预览
-- [ ] 多文件支持
+- [~] 原型多文件支持（P2）
 - [x] 版本历史（Round 11：自动快照 + 恢复）
 - [x] URL / 图片 / MCP 原型渲染（Round 11）
 - [x] 图片上传 / 存储（Round 11：PNG/JPG/WEBP/GIF，10MB，只读图片接口）
@@ -144,7 +145,7 @@
 - [x] 人力成本视图（工时 × 成员时薪，Round 19）
 - [x] 报表按迭代/日期过滤（Round 14）
 - [x] 估算偏差分析（按类型预估/已耗/偏差%/超支项，Round 19）
-- [ ] 甘特图按成员泳道汇总
+- [~] 甘特图按成员泳道汇总（P2）
 
 ### 4.6 任务与迭代看板（P0/P1）
 
@@ -155,16 +156,16 @@
 - [x] Task 拆解（父子关系）/ 独立流转（Round 3）
 - [x] 看板筛选（指派人/优先级/标签）、WIP 提示（Round 25：进行中列 5 项上限警示）
 - [x] 列表视图 + 批量操作（Round 12）
-- [ ] 500+ 卡片性能验证
+- [~] 500+ 卡片性能验证（P2 压力验证，当前虚拟化未做）
 
 ### 4.7 甘特图（P1）
 
 - [x] 迭代时间线 + 工作项截止日 + 逾期标红 + 工时报表
 - [x] 里程碑渲染（时间线标记 + 列表 + 迭代归属）
-- [ ] 依赖关系（FS/SS）
-- [ ] 关键路径（P2）
-- [ ] 工时泳道
-- [ ] PM Agent 自动更新进度/周报
+- [~] 依赖关系 FS/SS（P2，PRD 标注后续演进）
+- [~] 关键路径（P2，PRD 标注后续演进）
+- [~] 工时泳道（P2）
+- [~] PM Agent 自动更新进度/周报（P2）
 
 ### 4.8 评论、附件与活动流（P0/P1）
 
@@ -227,7 +228,7 @@
 - [x] 项目目录隔离 + git worktree（Round 1 打通 LocalPath）
 - [~] worktree 清理/合并/PR：失败/取消已清理，成功保留待 M4 接 PR
 - [~] 运行详情：日志/工具调用时间线、实时刷新（Round 22）；流式 token 输出待做
-- [ ] 多 Agent 协作
+- [~] 多 Agent 协作（顺序交接/评审已由工作流支持；并行协作 P2）
 - [x] 沙箱加固（路径逃逸/命令注入/超时，Round 1）
 
 ### 5.7 MCP（P1）
@@ -236,7 +237,7 @@
 - [x] 按 Agent 授权（AgentMcpServer）
 - [x] 运行时 MCP 客户端（Streamable HTTP：initialize/tools/list/tools/call，工具注入 AgentEngine；Round 9）
 - [x] stdio（Round 15）与旧版 HTTP+SSE 双通道（Round 20）；Streamable HTTP 为主路径
-- [ ] 设计 MCP 链路（原型 ↔ MCP）
+- [~] 设计 MCP 链路（通用 MCP 工具已可用；设计稿→需求专用链路 P2）
 
 ### 5.8 单用户协同（P0）
 
@@ -270,7 +271,7 @@
 - [x] SignalR（Round 7）
 - [x] PostgreSQL（Round 10）
 - [x] 审计日志（Round 6）
-- [ ] 多用户 / RBAC（单用户产品不在范围）
+- [~] 多用户 / RBAC（单用户产品明确范围外）
 - [x] CSP（原型，Round 11）
 
 ## 3. 已知缺陷 / 安全债

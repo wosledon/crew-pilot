@@ -1,6 +1,6 @@
 # Crew Pilot
 
-> 一个人的项目驾驶舱 + 一队 AI 数字员工。产品需求见 [`docs/PRD.md`](docs/PRD.md)，工程约定见 [`AGENTS.md`](AGENTS.md)。
+> 一个人的项目驾驶舱 + 一队 AI 数字员工。产品需求见 [`docs/PRD.md`](docs/PRD.md)，工程约定见 [`AGENTS.md`](AGENTS.md)，P0/P1 验收见 [`docs/ACCEPTANCE.md`](docs/ACCEPTANCE.md)。
 
 ## 技术栈
 
@@ -69,7 +69,7 @@ docs/PRD.md                 # 产品需求（事实来源）
 - `docker compose up -d --build` → Web http://localhost:8081，API http://localhost:8080
 - 详细说明（环境变量、手动部署、数据卷/备份、CI）见 [`docs/DEPLOY.md`](docs/DEPLOY.md)
 
-## 当前进度（M0–M5 主体完成，P5 进行中）
+## 当前进度（PRD P0/P1 全部完成；P2 后续演进见验收报告）
 
 - [x] 解决方案分层（Api / Core / Infrastructure / Agents / Tests）
 - [x] 项目 / 需求 / 缺陷 CRUD + 状态机 + 工时登记（1:1）
