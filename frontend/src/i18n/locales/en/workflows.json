@@ -1,0 +1,68 @@
+{
+  "title": "Workflows",
+  "description": "Orchestrate Agent steps; ask only on blockers by default",
+  "empty": "No workflows yet — create one from a template",
+  "createFromTemplate": "From template",
+  "createTitle": "Create workflow from template",
+  "template": "Template",
+  "name": "Name (optional)",
+  "created": "Workflow created",
+  "deleted": "Workflow deleted",
+  "deleteConfirm": "Run history will be deleted as well.",
+  "start": "Start workflow",
+  "startTitle": "Start workflow",
+  "selectWorkflow": "Select workflow",
+  "selectWorkItem": "Select work item",
+  "started": "Workflow started",
+  "runs": "Runs",
+  "noRuns": "No runs yet",
+  "runDetail": "Workflow run",
+  "agentRuns": "Agent runs",
+  "blockers": "Blockers",
+  "noBlockers": "No blockers",
+  "cancelRun": "Cancel run",
+  "runCanceled": "Run canceled",
+  "steps": "Steps",
+  "policy": "Approval policy",
+  "policies": {
+    "auto": "Auto",
+    "blockersonly": "Ask on blockers only",
+    "always": "Always ask"
+  },
+  "runStatuses": {
+    "running": "Running",
+    "waitingforhuman": "Waiting for human",
+    "succeeded": "Succeeded",
+    "failed": "Failed",
+    "canceled": "Canceled"
+  },
+  "blockerKinds": {
+    "agentblocked": "Agent blocker",
+    "approval": "Approval",
+    "failure": "Failure"
+  },
+  "blockerStatuses": {
+    "open": "Open",
+    "resolved": "Resolved"
+  },
+  "resolutions": {
+    "continue": "Continue",
+    "redirect": "Redirect",
+    "cancel": "Cancel"
+  },
+  "blockerQueue": "Blocker queue",
+  "blockerQueueHint": "Resolve a blocker and the workflow resumes from that point.",
+  "noOpenBlockers": "No open blockers",
+  "resolve": "Resolve",
+  "resolveTitle": "Resolve blocker",
+  "resolution": "Resolution",
+  "note": "Note / instruction",
+  "notePlaceholder": "Remark for continue, or concrete instruction for redirect",
+  "resolved": "Blocker resolved",
+  "context": "Context snapshot",
+  "workItem": "Work item",
+  "blockerReason": "Reason",
+  "currentStep": "Current step",
+  "openBlockers": "Open blockers",
+  "runStartedAt": "Started at"
+}

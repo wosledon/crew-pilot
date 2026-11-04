@@ -10,7 +10,8 @@
     "running": "Running",
     "succeeded": "Succeeded",
     "failed": "Failed",
-    "canceled": "Canceled"
+    "canceled": "Canceled",
+    "waitingforhuman": "Waiting for human"
   },
   "triggers": {
     "manual": "Manual",

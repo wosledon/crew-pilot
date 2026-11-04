@@ -6,15 +6,16 @@ export interface ProjectSubNavProps {
   projectId: string;
 }
 
-/** 项目内子导航：工作项 / 看板 / 迭代 / 甘特图 */
+/** 项目内子导航：工作项 / 看板 / 迭代 / 甘特图 / 卡点队列 */
 export function ProjectSubNav({ projectId }: ProjectSubNavProps) {
-  const { t } = useTranslation(["projects", "kanban", "iterations", "gantt"]);
+  const { t } = useTranslation(["projects", "kanban", "iterations", "gantt", "workflows"]);
 
   const tabs = [
     { to: `/projects/${projectId}`, label: t("projects:detail.workItems") },
     { to: `/projects/${projectId}/board`, label: t("kanban:title") },
     { to: `/projects/${projectId}/iterations`, label: t("iterations:title") },
     { to: `/projects/${projectId}/gantt`, label: t("gantt:title") },
+    { to: `/projects/${projectId}/blockers`, label: t("workflows:blockerQueue") },
   ];
 
   return (

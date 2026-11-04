@@ -10,6 +10,7 @@
   "create": "Create",
   "language": "Language",
   "empty": "No data",
+  "all": "All",
   "estimatedHours": "Estimated hours",
   "loggedHours": "Logged hours",
   "remainingHours": "Remaining hours"

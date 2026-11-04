@@ -10,7 +10,8 @@
     "running": "执行中",
     "succeeded": "成功",
     "failed": "失败",
-    "canceled": "已取消"
+    "canceled": "已取消",
+    "waitingforhuman": "等待人工"
   },
   "triggers": {
     "manual": "手动",

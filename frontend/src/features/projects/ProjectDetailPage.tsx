@@ -15,6 +15,7 @@ import { ProjectOverview } from "./components/ProjectOverview";
 import { WorkItemCard } from "./components/WorkItemCard";
 import { WorkItemDetailDialog } from "./components/WorkItemDetailDialog";
 import { ActivityFeed } from "./ActivityFeed";
+import { WorkflowPanel } from "@/features/workflows/WorkflowPanel";
 import { AssignAgentDialog, AgentRunPanel } from "@/features/agents/components/AgentRunPanel";
 import {
   useAddWorkLog,
@@ -212,6 +213,8 @@ export function ProjectDetailPage() {
         <ProjectMembersCard projectId={projectId} />
         <ActivityFeed projectId={projectId} />
       </div>
+
+      <WorkflowPanel projectId={projectId} />
 
       <section className="space-y-3">
         <h2 className="text-base font-semibold">{t("agentruns:title")}</h2>

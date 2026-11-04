@@ -247,7 +247,8 @@ export interface AgentDetail {
   enabled: boolean;
 }
 
-export type AgentRunStatus = "queued" | "running" | "succeeded" | "failed" | "canceled";
+export type AgentRunStatus =
+  "queued" | "running" | "succeeded" | "failed" | "canceled" | "waitingforhuman";
 
 export interface AgentRunListItem {
   id: string;
@@ -290,6 +291,104 @@ export interface AgentRunDetail {
   finishedAt: string | null;
   duration: string | null;
   logs: AgentRunLog[];
+}
+
+/** 工作流（M3） */
+export type ApprovalPolicy = "auto" | "blockersonly" | "always";
+export type WorkflowRunStatus = "running" | "waitingforhuman" | "succeeded" | "failed" | "canceled";
+export type BlockerKind = "agentblocked" | "approval" | "failure";
+export type BlockerStatus = "open" | "resolved";
+export type BlockerResolution = "continue" | "redirect" | "cancel";
+
+export interface WorkflowStep {
+  id: string;
+  order: number;
+  name: string;
+  agentId: string | null;
+  agentName: string | null;
+  requiredJob: string | null;
+  instruction: string | null;
+  approvalPolicy: ApprovalPolicy;
+  maxRetries: number;
+  inputContract: string | null;
+  outputContract: string | null;
+}
+
+export interface Workflow {
+  id: string;
+  projectId: string | null;
+  name: string;
+  description: string | null;
+  isTemplate: boolean;
+  enabled: boolean;
+  steps: WorkflowStep[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkflowTemplateStep {
+  name: string;
+  job: string;
+  instruction: string | null;
+  approvalPolicy: ApprovalPolicy;
+  maxRetries: number;
+}
+
+export interface WorkflowTemplate {
+  key: string;
+  name: string;
+  description: string;
+  steps: WorkflowTemplateStep[];
+}
+
+export interface WorkflowRun {
+  id: string;
+  workflowId: string;
+  workflowName: string;
+  workItemId: string;
+  workItemTitle: string;
+  status: WorkflowRunStatus;
+  currentStepOrder: number;
+  currentStepId: string | null;
+  createdAt: string;
+  finishedAt: string | null;
+}
+
+export interface Blocker {
+  id: string;
+  projectId: string;
+  workItemId: string;
+  workItemTitle: string;
+  workflowRunId: string | null;
+  agentRunId: string | null;
+  kind: BlockerKind;
+  reason: string;
+  contextSnapshot: string | null;
+  status: BlockerStatus;
+  resolution: BlockerResolution | null;
+  resolutionNote: string | null;
+  createdAt: string;
+  resolvedAt: string | null;
+}
+
+export interface WorkflowRunDetail {
+  run: WorkflowRun;
+  agentRuns: AgentRunListItem[];
+  blockers: Blocker[];
+}
+
+export interface AgentTeamMember {
+  agentId: string;
+  agentName: string;
+  role: string | null;
+}
+
+export interface AgentTeam {
+  id: string;
+  projectId: string;
+  name: string;
+  goal: string | null;
+  members: AgentTeamMember[];
 }
 
 /** API 错误（携带 ProblemDetails 状态码） */

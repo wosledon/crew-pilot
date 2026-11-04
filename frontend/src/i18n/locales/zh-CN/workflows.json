@@ -1,0 +1,68 @@
+{
+  "title": "工作流",
+  "description": "编排 Agent 步骤；默认仅卡点时询问，其余自动通过",
+  "empty": "还没有工作流，先从模板创建一条",
+  "createFromTemplate": "从模板创建",
+  "createTitle": "从模板创建工作流",
+  "template": "模板",
+  "name": "名称（可选）",
+  "created": "工作流已创建",
+  "deleted": "工作流已删除",
+  "deleteConfirm": "删除后历史运行记录会一并删除。",
+  "start": "启动工作流",
+  "startTitle": "启动工作流",
+  "selectWorkflow": "选择工作流",
+  "selectWorkItem": "选择工作项",
+  "started": "工作流已启动",
+  "runs": "运行记录",
+  "noRuns": "还没有运行记录",
+  "runDetail": "工作流运行",
+  "agentRuns": "Agent 执行",
+  "blockers": "卡点",
+  "noBlockers": "没有卡点",
+  "cancelRun": "取消运行",
+  "runCanceled": "运行已取消",
+  "steps": "步骤",
+  "policy": "审批策略",
+  "policies": {
+    "auto": "自动通过",
+    "blockersonly": "仅卡点时询问",
+    "always": "总是询问"
+  },
+  "runStatuses": {
+    "running": "运行中",
+    "waitingforhuman": "等待人工",
+    "succeeded": "成功",
+    "failed": "失败",
+    "canceled": "已取消"
+  },
+  "blockerKinds": {
+    "agentblocked": "Agent 卡点",
+    "approval": "审批确认",
+    "failure": "执行失败"
+  },
+  "blockerStatuses": {
+    "open": "待处理",
+    "resolved": "已处理"
+  },
+  "resolutions": {
+    "continue": "继续",
+    "redirect": "修改方向",
+    "cancel": "取消"
+  },
+  "blockerQueue": "卡点队列",
+  "blockerQueueHint": "处理一个卡点，工作流会从断点继续。",
+  "noOpenBlockers": "当前没有待处理卡点",
+  "resolve": "处理",
+  "resolveTitle": "处理卡点",
+  "resolution": "处理方式",
+  "note": "说明 / 补充指示",
+  "notePlaceholder": "继续时备注，或修改方向的具体指示",
+  "resolved": "卡点已处理",
+  "context": "上下文快照",
+  "workItem": "工作项",
+  "blockerReason": "原因",
+  "currentStep": "当前步骤",
+  "openBlockers": "待处理卡点",
+  "runStartedAt": "启动于"
+}
