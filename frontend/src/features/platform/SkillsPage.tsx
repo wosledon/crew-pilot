@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Download, Pencil, Plus, Trash2, Upload } from "lucide-react";
+import { Download, Package, Pencil, Plus, Trash2, Upload } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -10,7 +10,14 @@ import { Input, Textarea } from "@/components/ui/Input";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
 import type { Skill } from "@/lib/types";
-import { useCreateSkill, useDeleteSkill, useImportSkill, useSkills, useUpdateSkill } from "./api";
+import {
+  useCreateSkill,
+  useDeleteSkill,
+  useImportSkill,
+  useImportSkillBundle,
+  useSkills,
+  useUpdateSkill,
+} from "./api";
 
 interface SkillForm {
   id?: string;
@@ -38,6 +45,7 @@ export function SkillsPage() {
   const updateSkill = useUpdateSkill();
   const deleteSkill = useDeleteSkill();
   const importSkill = useImportSkill();
+  const importBundle = useImportSkillBundle();
   const confirm = useConfirm();
 
   const [form, setForm] = useState<SkillForm | null>(null);
@@ -131,10 +139,29 @@ export function SkillsPage() {
     anchor.click();
   };
 
+  const handleExportBundle = (skill: Skill) => {
+    const anchor = document.createElement("a");
+    anchor.href = `/api/skills/${skill.id}/bundle`;
+    anchor.download = `${skill.name}.skill.zip`;
+    anchor.click();
+  };
+
   const handleImportFile = async (file: File | undefined) => {
     if (file === undefined) {
       return;
     }
+    if (/\.zip$/i.test(file.name)) {
+      try {
+        const skill = await importBundle.mutateAsync(file);
+        toast.success(t("skills:imported", { name: skill.name }));
+        setImportOpen(false);
+        setImportContent("");
+      } catch (error) {
+        toast.error(errorMessage(error));
+      }
+      return;
+    }
+
     setImportContent(await file.text());
   };
 
@@ -204,6 +231,15 @@ export function SkillsPage() {
                   </Button>
                   <Button
                     size="sm"
+                    variant="outline"
+                    aria-label={t("skills:exportBundle")}
+                    onClick={() => handleExportBundle(skill)}
+                  >
+                    <Package className="h-3.5 w-3.5" />
+                    {t("skills:exportBundle")}
+                  </Button>
+                  <Button
+                    size="sm"
                     variant="ghost"
                     aria-label={t("common:delete")}
                     onClick={() => void handleDelete(skill)}
@@ -233,7 +269,7 @@ export function SkillsPage() {
           <p className="text-sm text-muted-foreground">{t("skills:importHint")}</p>
           <input
             type="file"
-            accept=".md,.markdown,text/markdown"
+            accept=".md,.markdown,.zip,text/markdown,application/zip"
             aria-label={t("skills:importFile")}
             onChange={(event) => void handleImportFile(event.target.files?.[0])}
           />

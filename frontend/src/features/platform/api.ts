@@ -72,6 +72,18 @@ export function useImportSkill() {
   });
 }
 
+export function useImportSkillBundle() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (file: File) => {
+      const form = new FormData();
+      form.append("file", file);
+      return api.postForm<Skill>("/skills/import-bundle", form);
+    },
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: platformKeys.skills }),
+  });
+}
+
 export function useDeleteSkill() {
   const queryClient = useQueryClient();
   return useMutation({
