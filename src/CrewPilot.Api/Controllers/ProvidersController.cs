@@ -216,6 +216,37 @@ public sealed class ProvidersController(
         }
     }
 
+    /// <summary>设为默认供应商（全局唯一；停用的供应商不可设为默认）。</summary>
+    [HttpPut("api/providers/{id:guid}/default")]
+    public async Task<ActionResult<ProviderDetailDto>> SetDefault(Guid id, CancellationToken ct)
+    {
+        var provider = await db.ModelProviders
+            .Include(p => p.Models)
+            .FirstOrDefaultAsync(p => p.Id == id, ct);
+        if (provider is null)
+        {
+            return Problem(detail: "供应商不存在", statusCode: 404);
+        }
+
+        if (!provider.Enabled)
+        {
+            return Problem(detail: "停用的供应商不能设为默认", statusCode: 400);
+        }
+
+        var providers = await db.ModelProviders.ToListAsync(ct);
+        foreach (var item in providers)
+        {
+            item.IsDefault = item.Id == id;
+            if (item.IsDefault)
+            {
+                item.UpdatedAt = DateTimeOffset.UtcNow;
+            }
+        }
+
+        await db.SaveChangesAsync(ct);
+        return Ok(ToDto(provider));
+    }
+
     /// <summary>手动添加模型目录条目（覆盖 models.dev 同步结果）。</summary>
     [HttpPost("api/providers/{id:guid}/models")]
     public async Task<ActionResult<ModelDto>> AddModel(

@@ -49,6 +49,8 @@ public sealed class CrewPilotApiFactory : WebApplicationFactory<Program>
     {
         builder.UseEnvironment("Development");
         builder.UseSetting("Attachments:RootPath", _attachmentRoot);
+        // 测试中关闭 models.dev 定时刷新（避免后台网络任务）
+        builder.UseSetting("Providers:RefreshHours", "0");
 
         builder.ConfigureServices(services =>
         {

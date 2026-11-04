@@ -2,11 +2,13 @@ using CrewPilot.Agents.Abstractions;
 using CrewPilot.Agents.Engine;
 using CrewPilot.Agents.Execution;
 using CrewPilot.Agents.Workflows;
+using CrewPilot.Api.Providers;
 using CrewPilot.Api.Realtime;
 using CrewPilot.Core.Abstractions;
 using CrewPilot.Infrastructure.Audit;
 using CrewPilot.Infrastructure.Cicd;
 using CrewPilot.Infrastructure.Persistence;
+using CrewPilot.Infrastructure.Providers;
 using CrewPilot.Infrastructure.Security;
 using CrewPilot.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +37,7 @@ builder.Services.AddScoped<WorkflowRunner>();
 builder.Services.AddScoped<AuditLogger>();
 builder.Services.AddHttpClient("models.dev");
 builder.Services.AddHttpClient("mcp");
+builder.Services.AddHostedService<ProviderCatalogRefreshService>();
 
 // 附件存储：本地目录（可用 Attachments:RootPath 覆盖）
 var attachmentRoot = builder.Configuration["Attachments:RootPath"];

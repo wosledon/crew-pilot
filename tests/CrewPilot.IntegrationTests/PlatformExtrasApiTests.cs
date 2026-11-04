@@ -199,6 +199,23 @@ public sealed class PlatformExtrasApiTests(CrewPilotApiFactory factory)
     }
 
     [Fact]
+    public async Task SetDefaultProvider_SwitchesSingleDefault()
+    {
+        var client = factory.CreateClient();
+        var first = await ApiTestHelpers.CreateProviderAsync(client);
+        var second = await ApiTestHelpers.CreateProviderAsync(client);
+
+        var response = await client.PutAsync($"/api/providers/{second.Id}/default", null);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var providers = await client.GetFromJsonAsync<List<ProviderListItemDto>>(
+            "/api/providers");
+        providers!.Where(p => p.IsDefault).Should().ContainSingle()
+            .Which.Id.Should().Be(second.Id);
+        providers!.Single(p => p.Id == first.Id).IsDefault.Should().BeFalse();
+    }
+
+    [Fact]
     public async Task Audit_RecordsSensitiveDeletes()
     {
         var client = factory.CreateClient();
