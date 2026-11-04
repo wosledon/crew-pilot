@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/CrewPilot.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Database__AutoMigrate: "true"
+      ConnectionStrings__CrewPilot: "Data Source=/app/App_Data/crewpilot.db"
+      Attachments__RootPath: /app/App_Data/attachments
+    volumes:
+      - crewpilot-data:/app/App_Data
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+
+volumes:
+  crewpilot-data:

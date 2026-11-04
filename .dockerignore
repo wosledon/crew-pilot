@@ -1,0 +1,12 @@
+# 后端构建上下文排除项（Docker 构建只依赖 src/ 与解决方案文件）
+**/bin/
+**/obj/
+**/node_modules/
+frontend/dist/
+frontend/node_modules/
+docs/
+tests/
+.git/
+**/*.db
+**/*.db-shm
+**/*.db-wal
