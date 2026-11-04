@@ -716,6 +716,36 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.ToTable("Prototypes", (string)null);
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.Prototypes.PrototypeFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(300000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PrototypeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PrototypeId", "Path")
+                        .IsUnique();
+
+                    b.ToTable("PrototypeFiles", (string)null);
+                });
+
             modelBuilder.Entity("CrewPilot.Core.Prototypes.PrototypeVersion", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1548,6 +1578,17 @@ namespace CrewPilot.Infrastructure.Migrations
                     b.Navigation("Project");
 
                     b.Navigation("Requirement");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Prototypes.PrototypeFile", b =>
+                {
+                    b.HasOne("CrewPilot.Core.Prototypes.Prototype", "Prototype")
+                        .WithMany()
+                        .HasForeignKey("PrototypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Prototype");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.Prototypes.PrototypeVersion", b =>

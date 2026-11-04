@@ -173,6 +173,75 @@ public sealed class PrototypesApiTests(CrewPilotApiFactory factory) : IClassFixt
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
+    [Fact]
+    public async Task PrototypeFiles_CanBeUpsertedListedAndPreviewed()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var created = await client.PostAsJsonAsync($"/api/projects/{project.Id}/prototypes", new
+        {
+            name = "多文件原型",
+            type = "html",
+            content = "<h1>fallback</h1>",
+        });
+        var prototype = await created.Content.ReadFromJsonAsync<PrototypeDto>();
+
+        var index = await client.PostAsJsonAsync(
+            $"/api/prototypes/{prototype!.Id}/files",
+            new
+            {
+                path = "index.html",
+                content = "<link rel=\"stylesheet\" href=\"styles.css\"><h1>multi</h1>",
+            });
+        index.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var css = await client.PostAsJsonAsync(
+            $"/api/prototypes/{prototype.Id}/files",
+            new { path = "styles.css", content = "h1 { color: red; }" });
+        css.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var files = await client.GetFromJsonAsync<List<PrototypeFileDto>>(
+            $"/api/prototypes/{prototype.Id}/files");
+        files.Should().HaveCount(2);
+        files!.Should().Contain(f => f.Path == "styles.css");
+
+        var html = await client.GetAsync($"/api/prototypes/{prototype.Id}/preview/index.html");
+        html.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await html.Content.ReadAsStringAsync()).Should().Contain("multi");
+
+        var styles = await client.GetAsync($"/api/prototypes/{prototype.Id}/preview/styles.css");
+        styles.StatusCode.Should().Be(HttpStatusCode.OK);
+        styles.Content.Headers.ContentType!.MediaType.Should().Be("text/css");
+        (await styles.Content.ReadAsStringAsync()).Should().Contain("color: red");
+
+        var invalid = await client.PostAsJsonAsync(
+            $"/api/prototypes/{prototype.Id}/files",
+            new { path = "../escape.html", content = "x" });
+        invalid.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var delete = await client.DeleteAsync(
+            $"/api/prototype-files/{files!.First(f => f.Path == "styles.css").Id}");
+        delete.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+
+    [Fact]
+    public async Task SingleFilePrototype_PreviewServesContentAsFallback()
+    {
+        var client = factory.CreateClient();
+        var project = await CreateProjectAsync(client);
+        var created = await client.PostAsJsonAsync($"/api/projects/{project.Id}/prototypes", new
+        {
+            name = "单文件兜底",
+            type = "html",
+            content = "<h1>single</h1>",
+        });
+        var prototype = await created.Content.ReadFromJsonAsync<PrototypeDto>();
+
+        var preview = await client.GetAsync($"/api/prototypes/{prototype!.Id}/preview/index.html");
+        preview.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await preview.Content.ReadAsStringAsync()).Should().Contain("single");
+    }
+
     private static async Task<ProjectDetailDto> CreateProjectAsync(HttpClient client)
     {
         var key = "P" + Guid.NewGuid().ToString("N")[..6].ToUpperInvariant();

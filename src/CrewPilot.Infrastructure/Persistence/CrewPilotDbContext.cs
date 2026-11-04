@@ -48,6 +48,8 @@ public class CrewPilotDbContext(DbContextOptions<CrewPilotDbContext> options) : 
 
     public DbSet<PrototypeVersion> PrototypeVersions => Set<PrototypeVersion>();
 
+    public DbSet<PrototypeFile> PrototypeFiles => Set<PrototypeFile>();
+
     public DbSet<ModelProvider> ModelProviders => Set<ModelProvider>();
 
     public DbSet<ModelCatalogEntry> ModelCatalogEntries => Set<ModelCatalogEntry>();

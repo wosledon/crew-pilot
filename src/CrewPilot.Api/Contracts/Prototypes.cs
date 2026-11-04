@@ -1,5 +1,14 @@
 namespace CrewPilot.Api.Contracts;
 
+public sealed record PrototypeFileDto(
+    Guid Id,
+    Guid PrototypeId,
+    string Path,
+    string Content,
+    DateTimeOffset UpdatedAt);
+
+public sealed record UpsertPrototypeFileRequest(string Path, string Content);
+
 public sealed record PrototypeDto(
     Guid Id,
     Guid ProjectId,

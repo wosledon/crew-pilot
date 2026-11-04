@@ -721,6 +721,36 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                     b.ToTable("Prototypes", (string)null);
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.Prototypes.PrototypeFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(300000)
+                        .HasColumnType("character varying(300000)");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<Guid>("PrototypeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PrototypeId", "Path")
+                        .IsUnique();
+
+                    b.ToTable("PrototypeFiles", (string)null);
+                });
+
             modelBuilder.Entity("CrewPilot.Core.Prototypes.PrototypeVersion", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1553,6 +1583,17 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                     b.Navigation("Project");
 
                     b.Navigation("Requirement");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.Prototypes.PrototypeFile", b =>
+                {
+                    b.HasOne("CrewPilot.Core.Prototypes.Prototype", "Prototype")
+                        .WithMany()
+                        .HasForeignKey("PrototypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Prototype");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.Prototypes.PrototypeVersion", b =>
