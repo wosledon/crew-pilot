@@ -35,7 +35,7 @@ npm run dev
 
 ```bash
 dotnet build CrewPilot.slnx      # 构建解决方案
-dotnet test                      # 运行全部测试（113 项）
+dotnet test                      # 运行全部测试（117 项）
 cd frontend && npm run build     # 前端生产构建（tsc + vite）
 cd frontend && npm run lint      # ESLint
 cd frontend && npm run test:run  # 前端 Vitest（10 项）
@@ -78,7 +78,7 @@ docs/PRD.md                 # 产品需求（事实来源）
 - [x] Agent 数字员工：岗位/模型/提示词/工具权限 CRUD + 试运行
 - [x] AgentEngine：Microsoft Agent Framework（MAF 1.27）落地，工具白名单 + worktree 隔离
 - [x] 认领闭环：指派 → 后台执行 → 日志/产物/token 留痕 → 工时 1:1 折算 → PR 回填 → 可取消接管
-- [x] 测试：113 项后端 + 13 项前端（Vitest），全部绿
+- [x] 测试：117 项后端 + 13 项前端（Vitest），全部绿
 - [x] 硬化：可取消的 AgentRun、工具白名单生效、路径沙箱、命令不经 shell、`LocalPath` 可配置
 - [x] 协作：评论（@Agent 触发执行并回写）、附件上传下载、活动流时间线
 - [x] 里程碑：CRUD + 迭代归属 + 甘特图标记
@@ -88,4 +88,5 @@ docs/PRD.md                 # 产品需求（事实来源）
 - [x] M5 主体：Skills 装配与运行时注入、MCP 配置/授权/连通性 + Streamable HTTP 运行时工具、Token 成本报表、审计日志
 - [x] P5 部分：SignalR 实时推送、GitHub Actions CI、Docker/compose（SQLite/PostgreSQL 双 provider）、前后端测试
 - [x] 原型工坊：HTML 编辑 + 严格 CSP 沙箱预览、URL/图片/MCP 引用、图片上传、版本历史与恢复、需求关联
-- [ ] 剩余：OpenAPI 生成客户端、Playwright E2E、MCP stdio 传输、结构化日志、可视化工作流编辑器、列表视图/批量操作
+- [x] 工作项视图：卡片/列表切换、多选批量流转/指派/删除、看板标签筛选
+- [ ] 剩余：OpenAPI 生成客户端、Playwright E2E、MCP stdio 传输、结构化日志、可视化工作流编辑器、报表迭代/日期过滤
