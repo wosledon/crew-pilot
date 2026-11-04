@@ -91,6 +91,22 @@ export interface Prototype {
   updatedAt: string;
 }
 
+export interface PrototypeVersion {
+  id: string;
+  prototypeId: string;
+  version: number;
+  name: string;
+  content: string;
+  createdByName: string | null;
+  createdAt: string;
+}
+
+export interface PrototypeImage {
+  path: string;
+  url: string;
+  size: number;
+}
+
 export type IterationStatus = "planned" | "active" | "completed";
 
 export interface IterationListItem {
