@@ -11,7 +11,7 @@ public sealed record McpToolInfo(string Name, string? Description, string? Input
 /// <summary>
 /// 最小 MCP 客户端：Streamable HTTP（JSON-RPC over POST）实现 initialize / tools/list / tools/call。
 /// 支持 JSON 与 SSE 两种响应体；认证通过 Bearer Token；不依赖第三方 MCP SDK。
-/// 说明：stdio / 旧版 HTTP+SSE 双通道不在支持范围（配置可保存，运行时跳过）。
+/// 旧版 HTTP+SSE 双向通道见 <see cref="SseMcpClient"/>；stdio 见 <see cref="StdioMcpClient"/>。
 /// </summary>
 public sealed class McpClient : IMcpSession
 {

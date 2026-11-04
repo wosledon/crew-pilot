@@ -2,6 +2,7 @@ using CrewPilot.Api.Contracts;
 using CrewPilot.Core.Abstractions;
 using CrewPilot.Core.Mcp;
 using CrewPilot.Infrastructure.Audit;
+using CrewPilot.Infrastructure.Mcp;
 using CrewPilot.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -126,6 +127,24 @@ public sealed class McpServersController(
         {
             return Ok(new McpTestDto(
                 true, "stdio 配置已记录；运行时会启动该命令作为 MCP Server"));
+        }
+
+        if (string.Equals(server.Transport, "sse", StringComparison.OrdinalIgnoreCase))
+        {
+            try
+            {
+                var token = string.IsNullOrWhiteSpace(server.AuthTokenProtected)
+                    ? null
+                    : secrets.Unprotect(server.AuthTokenProtected);
+                await using var sse = await SseMcpClient.ConnectAsync(
+                    server.Endpoint, token, TimeSpan.FromSeconds(10), ct);
+                return Ok(new McpTestDto(
+                    true, $"SSE 连接成功，发现 {sse.Tools.Count} 个工具"));
+            }
+            catch (Exception ex)
+            {
+                return Ok(new McpTestDto(false, $"SSE 连接失败：{ex.Message}"));
+            }
         }
 
         try

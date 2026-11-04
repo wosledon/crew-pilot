@@ -52,11 +52,16 @@ public sealed class McpToolSession : IAsyncDisposable
                     : secrets.Unprotect(server.AuthTokenProtected);
                 var isStdio = string.Equals(
                     server.Transport, "stdio", StringComparison.OrdinalIgnoreCase);
+                var isLegacySse = string.Equals(
+                    server.Transport, "sse", StringComparison.OrdinalIgnoreCase);
                 IMcpSession client = isStdio
                     ? await StdioMcpClient.ConnectAsync(
                         server.Endpoint, TimeSpan.FromSeconds(30), ct)
-                    : await McpClient.ConnectAsync(
-                        server.Endpoint, token, TimeSpan.FromSeconds(10), ct);
+                    : isLegacySse
+                        ? await SseMcpClient.ConnectAsync(
+                            server.Endpoint, token, TimeSpan.FromSeconds(15), ct)
+                        : await McpClient.ConnectAsync(
+                            server.Endpoint, token, TimeSpan.FromSeconds(10), ct);
                 session._clients.Add(client);
 
                 foreach (var tool in client.Tools)
