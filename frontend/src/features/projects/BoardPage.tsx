@@ -102,6 +102,8 @@ function Column({
 }) {
   const { t } = useTranslation(["workitems", "kanban"]);
   const { setNodeRef, isOver } = useDroppable({ id: status });
+  const wipLimit = 5;
+  const isInProgress = status.toLowerCase().includes("progress");
 
   return (
     <div
@@ -115,7 +117,15 @@ function Column({
         <span className="text-sm font-medium">
           {t(`workitems:statuses.${status.toLowerCase()}`)}
         </span>
-        <span className="text-xs text-muted-foreground">{items.length}</span>
+        {isInProgress && items.length > wipLimit ? (
+          <Badge tone="danger">
+            {t("kanban:wipExceeded", { count: items.length, limit: wipLimit })}
+          </Badge>
+        ) : (
+          <span className="text-xs text-muted-foreground">
+            {isInProgress ? `${items.length} / ${wipLimit}` : items.length}
+          </span>
+        )}
       </div>
       {items.length === 0 ? (
         <p className="px-1 py-4 text-center text-xs text-muted-foreground">
@@ -136,6 +146,8 @@ export function BoardPage() {
   const { t } = useTranslation(["kanban", "workitems", "common"]);
   const [type, setType] = useState<WorkItemType>("requirement");
   const [tag, setTag] = useState("");
+  const [assigneeFilter, setAssigneeFilter] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState("");
   const [activeId, setActiveId] = useState<string | null>(null);
   const allWorkItems = useWorkItems(projectId, type);
   const workItems = useWorkItems(projectId, type, tag || undefined);
@@ -154,7 +166,20 @@ export function BoardPage() {
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
-  const items = workItems.data ?? [];
+  const assignees = [
+    ...new Set(
+      (allWorkItems.data ?? [])
+        .map((item) => item.assigneeName)
+        .filter((value): value is string => value !== null && value !== ""),
+    ),
+  ].sort((a, b) => a.localeCompare(b));
+  const priorityOptions = [...new Set((allWorkItems.data ?? []).map((item) => item.priority))];
+
+  const items = (workItems.data ?? []).filter(
+    (item) =>
+      (assigneeFilter === "" || item.assigneeName === assigneeFilter) &&
+      (priorityFilter === "" || item.priority === priorityFilter),
+  );
   const columns = columnsFor(type);
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -206,10 +231,37 @@ export function BoardPage() {
             className="w-40"
           />
           <Select
+            value={assigneeFilter}
+            onValueChange={setAssigneeFilter}
+            options={[
+              { value: "", label: t("kanban:allAssignees") },
+              ...assignees.map((value) => ({ value, label: `@${value}` })),
+            ]}
+            placeholder={t("kanban:filterAssignee")}
+            ariaLabel={t("kanban:filterAssignee")}
+            className="w-40"
+          />
+          <Select
+            value={priorityFilter}
+            onValueChange={setPriorityFilter}
+            options={[
+              { value: "", label: t("kanban:allPriorities") },
+              ...priorityOptions.map((value) => ({
+                value,
+                label: t(`workitems:priorities.${value}`),
+              })),
+            ]}
+            placeholder={t("kanban:filterPriority")}
+            ariaLabel={t("kanban:filterPriority")}
+            className="w-32"
+          />
+          <Select
             value={type}
             onValueChange={(value) => {
               setType(value as WorkItemType);
               setTag("");
+              setAssigneeFilter("");
+              setPriorityFilter("");
             }}
             options={[
               { value: "requirement", label: t("kanban:types.requirement") },

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { Play, Plus, Square, Trash2 } from "lucide-react";
+import { Pencil, Play, Plus, Square, Trash2 } from "lucide-react";
 import { Badge, type BadgeTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -21,8 +21,9 @@ import {
   useIterations,
   useMilestones,
   useStartIteration,
+  useUpdateIteration,
 } from "./api";
-import type { IterationStatus } from "@/lib/types";
+import type { IterationListItem, IterationStatus } from "@/lib/types";
 
 const statusTones: Record<IterationStatus, BadgeTone> = {
   planned: "neutral",
@@ -37,12 +38,14 @@ export function IterationsPage() {
   const iterations = useIterations(projectId);
   const milestones = useMilestones(projectId);
   const createIteration = useCreateIteration(projectId);
+  const updateIteration = useUpdateIteration(projectId);
   const startIteration = useStartIteration();
   const completeIteration = useCompleteIteration();
   const deleteIteration = useDeleteIteration(projectId);
   const confirm = useConfirm();
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [goal, setGoal] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -57,26 +60,52 @@ export function IterationsPage() {
   );
   const burndown = useBurndown(activeIteration?.id);
 
-  const handleCreate = async () => {
+  const resetForm = () => {
+    setName("");
+    setGoal("");
+    setStartDate("");
+    setEndDate("");
+    setMilestoneId("");
+    setEditingId(null);
+  };
+
+  const openCreate = () => {
+    resetForm();
+    setDialogOpen(true);
+  };
+
+  const openEdit = (iteration: IterationListItem) => {
+    setEditingId(iteration.id);
+    setName(iteration.name);
+    setGoal(iteration.goal ?? "");
+    setStartDate(iteration.startDate);
+    setEndDate(iteration.endDate);
+    setMilestoneId(iteration.milestoneId ?? "");
+    setDialogOpen(true);
+  };
+
+  const handleSubmit = async () => {
     if (endDate !== "" && startDate !== "" && endDate < startDate) {
       toast.error(t("iterations:invalidDates"));
       return;
     }
+    const body = {
+      name: name.trim(),
+      goal: goal.trim() || undefined,
+      startDate,
+      endDate,
+      milestoneId: milestoneId || undefined,
+    };
     try {
-      await createIteration.mutateAsync({
-        name: name.trim(),
-        goal: goal.trim() || undefined,
-        startDate,
-        endDate,
-        milestoneId: milestoneId || undefined,
-      });
-      toast.success(t("iterations:created"));
+      if (editingId === null) {
+        await createIteration.mutateAsync(body);
+        toast.success(t("iterations:created"));
+      } else {
+        await updateIteration.mutateAsync({ id: editingId, body });
+        toast.success(t("iterations:updated"));
+      }
       setDialogOpen(false);
-      setName("");
-      setGoal("");
-      setStartDate("");
-      setEndDate("");
-      setMilestoneId("");
+      resetForm();
     } catch (error) {
       toast.error(errorMessage(error));
     }
@@ -117,7 +146,7 @@ export function IterationsPage() {
           <h1 className="text-xl font-semibold">{t("iterations:title")}</h1>
           <p className="text-sm text-muted-foreground">{t("iterations:description")}</p>
         </div>
-        <Button onClick={() => setDialogOpen(true)}>
+        <Button onClick={openCreate}>
           <Plus className="h-4 w-4" />
           {t("iterations:create")}
         </Button>
@@ -182,6 +211,14 @@ export function IterationsPage() {
                 <Button
                   size="sm"
                   variant="ghost"
+                  aria-label={t("iterations:edit")}
+                  onClick={() => openEdit(iteration)}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
                   aria-label={t("common:delete")}
                   onClick={() => void handleDelete(iteration.id)}
                 >
@@ -205,8 +242,13 @@ export function IterationsPage() {
 
       <Dialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        title={t("iterations:createTitle")}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) {
+            resetForm();
+          }
+        }}
+        title={editingId === null ? t("iterations:createTitle") : t("iterations:editTitle")}
         closeLabel={t("common:cancel")}
       >
         <div className="space-y-4">
@@ -264,15 +306,16 @@ export function IterationsPage() {
               {t("common:cancel")}
             </Button>
             <Button
-              onClick={() => void handleCreate()}
+              onClick={() => void handleSubmit()}
               disabled={
                 createIteration.isPending ||
+                updateIteration.isPending ||
                 name.trim() === "" ||
                 startDate === "" ||
                 endDate === ""
               }
             >
-              {t("common:create")}
+              {editingId === null ? t("common:create") : t("common:save")}
             </Button>
           </div>
         </div>

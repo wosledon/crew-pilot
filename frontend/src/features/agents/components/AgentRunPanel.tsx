@@ -8,7 +8,13 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { toast } from "@/components/ui/Toast";
-import { useAgentRuns, useAgents, useAssignAgent, useCancelAgentRun } from "../api";
+import {
+  useAgentRuns,
+  useAgents,
+  useAssignAgent,
+  useCancelAgentRun,
+  useRetryAgentRun,
+} from "../api";
 import { AgentRunDetailDialog } from "./AgentRunDetailDialog";
 
 const statusTones: Record<string, BadgeTone> = {
@@ -101,12 +107,22 @@ export function AgentRunPanel({
   const { t } = useTranslation(["agentruns", "common"]);
   const runs = useAgentRuns({ workItemId, projectId });
   const cancelRun = useCancelAgentRun();
+  const retryRun = useRetryAgentRun();
   const [detailRunId, setDetailRunId] = useState<string | null>(null);
 
   const handleCancel = async (id: string) => {
     try {
       await cancelRun.mutateAsync(id);
       toast.success(t("agentruns:canceled"));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("common:error"));
+    }
+  };
+
+  const handleRetry = async (id: string) => {
+    try {
+      await retryRun.mutateAsync(id);
+      toast.success(t("agentruns:retried"));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("common:error"));
     }
@@ -155,6 +171,16 @@ export function AgentRunPanel({
                   {run.status === "queued" || run.status === "running" ? (
                     <Button size="sm" variant="outline" onClick={() => void handleCancel(run.id)}>
                       {t("agentruns:cancel")}
+                    </Button>
+                  ) : null}
+                  {run.status === "failed" || run.status === "canceled" ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={retryRun.isPending}
+                      onClick={() => void handleRetry(run.id)}
+                    >
+                      {t("agentruns:retry")}
                     </Button>
                   ) : null}
                 </div>

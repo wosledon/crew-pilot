@@ -35,5 +35,8 @@
   "invalidDates": "End date cannot be earlier than start date",
   "noActive": "No active iteration",
   "milestone": "Milestone",
-  "milestoneNone": "No milestone"
+  "milestoneNone": "No milestone",
+  "edit": "Edit iteration",
+  "editTitle": "Edit iteration",
+  "updated": "Iteration updated"
 }

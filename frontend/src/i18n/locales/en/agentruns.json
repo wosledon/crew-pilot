@@ -17,7 +17,8 @@
     "manual": "Manual",
     "assigned": "Claimed",
     "preview": "Preview",
-    "workflow": "Workflow"
+    "workflow": "Workflow",
+    "retry": "Retry"
   },
   "duration": "Duration",
   "tokens": "Tokens {{prompt}} / {{completion}}",
@@ -37,5 +38,7 @@
   "detailTitle": "Run detail",
   "live": "Live updating",
   "runningNow": "Running…",
-  "prompt": "Prompt"
+  "prompt": "Prompt",
+  "retry": "Retry",
+  "retried": "Retried and queued"
 }

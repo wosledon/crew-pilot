@@ -141,8 +141,9 @@ export function useAgents() {
   });
 }
 
-/** 项目看板：每个工作项最近一次 Agent 活动（5s 轮询 + SignalR 事件刷新）。 */
-export function useAgentActivity(projectId: string | undefined) {
+/** 项目看板：每个工作项最近一次 Agent 活动（5s 轮询 + SignalR 事件刷新）。 */ export function useAgentActivity(
+  projectId: string | undefined,
+) {
   return useQuery({
     queryKey: ["projects", projectId ?? "", "agent-activity"] as const,
     queryFn: () => api.get<WorkItemAgentActivity[]>(`/projects/${projectId}/agent-activity`),
@@ -289,5 +290,16 @@ export function useCancelAgentRun() {
   return useMutation({
     mutationFn: (id: string) => api.post(`/agent-runs/${id}/cancel`),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["agent-runs"] }),
+  });
+}
+
+export function useRetryAgentRun() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.post<AgentRunListItem>(`/agent-runs/${id}/retry`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["agent-runs"] });
+      void queryClient.invalidateQueries({ queryKey: ["workitems"] });
+    },
   });
 }

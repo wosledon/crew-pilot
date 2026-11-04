@@ -35,5 +35,8 @@
   "invalidDates": "结束日期不能早于开始日期",
   "noActive": "暂无进行中的迭代",
   "milestone": "里程碑",
-  "milestoneNone": "不关联里程碑"
+  "milestoneNone": "不关联里程碑",
+  "edit": "编辑迭代",
+  "editTitle": "编辑迭代",
+  "updated": "迭代已更新"
 }

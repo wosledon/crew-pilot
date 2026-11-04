@@ -17,7 +17,8 @@
     "manual": "手动",
     "assigned": "认领",
     "preview": "试运行",
-    "workflow": "工作流"
+    "workflow": "工作流",
+    "retry": "重试"
   },
   "duration": "耗时",
   "tokens": "Token {{prompt}} / {{completion}}",
@@ -37,5 +38,7 @@
   "detailTitle": "运行详情",
   "live": "实时刷新中",
   "runningNow": "执行中…",
-  "prompt": "提示词"
+  "prompt": "提示词",
+  "retry": "重试",
+  "retried": "已重试，执行中"
 }

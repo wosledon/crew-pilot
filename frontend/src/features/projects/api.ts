@@ -334,6 +334,24 @@ export function useCompleteIteration() {
   });
 }
 
+export function useUpdateIteration(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: {
+      id: string;
+      body: {
+        name: string;
+        goal?: string;
+        startDate: string;
+        endDate: string;
+        milestoneId?: string;
+      };
+    }) => api.put<IterationDetail>(`/iterations/${variables.id}`, variables.body),
+    onSuccess: () =>
+      void queryClient.invalidateQueries({ queryKey: projectKeys.iterations(projectId) }),
+  });
+}
+
 export function useCreateIteration(projectId: string) {
   const queryClient = useQueryClient();
   return useMutation({

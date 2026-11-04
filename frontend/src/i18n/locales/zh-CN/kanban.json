@@ -12,5 +12,10 @@
   "dragging": "正在拖动",
   "dropHint": "松手放入「{{status}}」",
   "taskNotSupported": "任务类型暂不支持看板流转",
-  "noItems": "暂无工作项，先去创建工作项"
+  "noItems": "暂无工作项，先去创建工作项",
+  "filterAssignee": "按指派人",
+  "allAssignees": "全部指派人",
+  "filterPriority": "按优先级",
+  "allPriorities": "全部优先级",
+  "wipExceeded": "WIP 超限 {{count}}/{{limit}}"
 }
