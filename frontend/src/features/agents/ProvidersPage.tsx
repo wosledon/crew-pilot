@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plug, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Plug, Plus, RefreshCw, Star, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -12,31 +12,29 @@ import { useConfirm } from "@/components/ui/ConfirmDialog";
 import {
   useCreateProvider,
   useDeleteProvider,
-  useProvider,
   useProviders,
+  useSetDefaultProvider,
   useSyncProviderModels,
   useTestProvider,
 } from "./api";
+import { ProviderModels } from "./ProviderModels";
 
-/** 模型供应商管理：自定义端点 + models.dev 同步 + 连通性测试 */
-export function ProvidersPage() {
+/** 模型供应商管理：自定义端点 + models.dev 同步 + 连通性测试 */ export function ProvidersPage() {
   const { t } = useTranslation(["providers", "common"]);
   const providers = useProviders();
   const createProvider = useCreateProvider();
   const deleteProvider = useDeleteProvider();
   const testProvider = useTestProvider();
   const syncModels = useSyncProviderModels();
+  const setDefault = useSetDefaultProvider();
   const confirm = useConfirm();
-
   const [dialogOpen, setDialogOpen] = useState(false);
   const [name, setName] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
   const errorMessage = (error: unknown) =>
     error instanceof Error ? error.message : t("common:error");
-
   const handleCreate = async () => {
     try {
       await createProvider.mutateAsync({ name: name.trim(), baseUrl: baseUrl.trim(), apiKey });
@@ -49,7 +47,6 @@ export function ProvidersPage() {
       toast.error(errorMessage(error));
     }
   };
-
   const handleTest = async (id: string) => {
     try {
       const result = await testProvider.mutateAsync(id);
@@ -62,7 +59,6 @@ export function ProvidersPage() {
       toast.error(errorMessage(error));
     }
   };
-
   const handleSync = async (id: string) => {
     try {
       const result = await syncModels.mutateAsync({ id });
@@ -71,7 +67,6 @@ export function ProvidersPage() {
       toast.error(t("providers:syncFailed", { message: errorMessage(error) }));
     }
   };
-
   const handleDelete = async (id: string) => {
     const approved = await confirm({
       title: t("providers:deleteConfirm.title"),
@@ -89,133 +84,169 @@ export function ProvidersPage() {
       toast.error(errorMessage(error));
     }
   };
-
+  const handleSetDefault = async (id: string) => {
+    try {
+      await setDefault.mutateAsync(id);
+      toast.success(t("providers:defaultSet"));
+    } catch (error) {
+      toast.error(errorMessage(error));
+    }
+  };
   if (providers.isPending) {
     return <LoadingState />;
   }
-
   if (providers.isError) {
     return <ErrorState onRetry={() => void providers.refetch()} />;
   }
-
   const items = providers.data ?? [];
-
   return (
     <div className="space-y-6">
+      {" "}
       <div className="flex items-center justify-between">
+        {" "}
         <div>
-          <h1 className="text-xl font-semibold">{t("providers:title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("providers:description")}</p>
-        </div>
+          {" "}
+          <h1 className="text-xl font-semibold">{t("providers:title")}</h1>{" "}
+          <p className="text-sm text-muted-foreground">{t("providers:description")}</p>{" "}
+        </div>{" "}
         <Button onClick={() => setDialogOpen(true)}>
-          <Plus className="h-4 w-4" />
-          {t("providers:create")}
-        </Button>
-      </div>
-
+          {" "}
+          <Plus className="h-4 w-4" /> {t("providers:create")}{" "}
+        </Button>{" "}
+      </div>{" "}
       {items.length === 0 ? (
         <EmptyState>{t("providers:empty")}</EmptyState>
       ) : (
         <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
+          {" "}
           {items.map((provider) => (
             <Card key={provider.id}>
+              {" "}
               <CardHeader>
+                {" "}
                 <CardTitle className="flex items-center justify-between gap-2">
-                  <span className="truncate">{provider.name}</span>
+                  {" "}
+                  <span className="truncate">{provider.name}</span>{" "}
                   <div className="flex shrink-0 items-center gap-1.5">
+                    {" "}
                     {provider.isDefault ? (
                       <Badge tone="primary">{t("providers:default")}</Badge>
-                    ) : null}
+                    ) : null}{" "}
                     <Badge tone={provider.enabled ? "success" : "neutral"}>
-                      {provider.enabled ? t("providers:enabled") : t("providers:disabled")}
-                    </Badge>
-                  </div>
-                </CardTitle>
-                <CardDescription className="truncate">{provider.baseUrl}</CardDescription>
-              </CardHeader>
+                      {" "}
+                      {provider.enabled ? t("providers:enabled") : t("providers:disabled")}{" "}
+                    </Badge>{" "}
+                  </div>{" "}
+                </CardTitle>{" "}
+                <CardDescription className="truncate">{provider.baseUrl}</CardDescription>{" "}
+              </CardHeader>{" "}
               <CardContent className="space-y-3">
+                {" "}
                 <p className="text-xs text-muted-foreground">
-                  {t("providers:modelCount", { count: provider.modelCount })}
-                </p>
-                {expandedId === provider.id ? <ProviderModels providerId={provider.id} /> : null}
+                  {" "}
+                  {t("providers:modelCount", { count: provider.modelCount })}{" "}
+                </p>{" "}
+                {expandedId === provider.id ? <ProviderModels providerId={provider.id} /> : null}{" "}
                 <div className="flex flex-wrap gap-2">
+                  {" "}
                   <Button
                     size="sm"
                     variant="outline"
                     disabled={testProvider.isPending}
                     onClick={() => void handleTest(provider.id)}
                   >
-                    <Plug className="h-3.5 w-3.5" />
-                    {testProvider.isPending ? t("providers:testing") : t("providers:test")}
-                  </Button>
+                    {" "}
+                    <Plug className="h-3.5 w-3.5" />{" "}
+                    {testProvider.isPending ? t("providers:testing") : t("providers:test")}{" "}
+                  </Button>{" "}
                   <Button
                     size="sm"
                     variant="outline"
                     disabled={syncModels.isPending}
                     onClick={() => void handleSync(provider.id)}
                   >
-                    <RefreshCw className="h-3.5 w-3.5" />
-                    {syncModels.isPending ? t("providers:syncing") : t("providers:sync")}
-                  </Button>
+                    {" "}
+                    <RefreshCw className="h-3.5 w-3.5" />{" "}
+                    {syncModels.isPending ? t("providers:syncing") : t("providers:sync")}{" "}
+                  </Button>{" "}
+                  {!provider.isDefault ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={!provider.enabled || setDefault.isPending}
+                      onClick={() => void handleSetDefault(provider.id)}
+                    >
+                      {" "}
+                      <Star className="h-3.5 w-3.5" /> {t("providers:setDefault")}{" "}
+                    </Button>
+                  ) : null}{" "}
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => setExpandedId(expandedId === provider.id ? null : provider.id)}
                   >
-                    {t("providers:models")}
-                  </Button>
+                    {" "}
+                    {t("providers:models")}{" "}
+                  </Button>{" "}
                   <Button
                     size="sm"
                     variant="ghost"
                     aria-label={t("common:delete")}
                     onClick={() => void handleDelete(provider.id)}
                   >
-                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                  </Button>
-                </div>
-              </CardContent>
+                    {" "}
+                    <Trash2 className="h-3.5 w-3.5 text-destructive" />{" "}
+                  </Button>{" "}
+                </div>{" "}
+              </CardContent>{" "}
             </Card>
-          ))}
+          ))}{" "}
         </div>
-      )}
-
+      )}{" "}
       <Dialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         title={t("providers:createTitle")}
         closeLabel={t("common:cancel")}
       >
+        {" "}
         <div className="space-y-4">
+          {" "}
           <label className="block space-y-1.5 text-sm">
-            <span className="font-medium">{t("providers:name")}</span>
+            {" "}
+            <span className="font-medium">{t("providers:name")}</span>{" "}
             <Input
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder={t("providers:namePlaceholder")}
-            />
-          </label>
+            />{" "}
+          </label>{" "}
           <label className="block space-y-1.5 text-sm">
-            <span className="font-medium">{t("providers:baseUrl")}</span>
+            {" "}
+            <span className="font-medium">{t("providers:baseUrl")}</span>{" "}
             <Input
               value={baseUrl}
               onChange={(event) => setBaseUrl(event.target.value)}
               placeholder={t("providers:baseUrlPlaceholder")}
-            />
-          </label>
+            />{" "}
+          </label>{" "}
           <label className="block space-y-1.5 text-sm">
-            <span className="font-medium">{t("providers:apiKey")}</span>
+            {" "}
+            <span className="font-medium">{t("providers:apiKey")}</span>{" "}
             <Input
               type="password"
               value={apiKey}
               onChange={(event) => setApiKey(event.target.value)}
               placeholder={t("providers:apiKeyPlaceholder")}
-            />
-            <span className="text-xs text-muted-foreground">{t("providers:apiKeyHint")}</span>
-          </label>
+            />{" "}
+            <span className="text-xs text-muted-foreground">{t("providers:apiKeyHint")}</span>{" "}
+          </label>{" "}
           <div className="flex justify-end gap-2">
+            {" "}
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              {t("common:cancel")}
-            </Button>
+              {" "}
+              {t("common:cancel")}{" "}
+            </Button>{" "}
             <Button
               onClick={() => void handleCreate()}
               disabled={
@@ -225,44 +256,12 @@ export function ProvidersPage() {
                 apiKey.trim() === ""
               }
             >
-              {t("common:create")}
-            </Button>
-          </div>
-        </div>
-      </Dialog>
+              {" "}
+              {t("common:create")}{" "}
+            </Button>{" "}
+          </div>{" "}
+        </div>{" "}
+      </Dialog>{" "}
     </div>
-  );
-}
-
-function ProviderModels({ providerId }: { providerId: string }) {
-  const { t } = useTranslation("providers");
-  const provider = useProvider(providerId);
-
-  if (provider.isPending) {
-    return <LoadingState />;
-  }
-
-  if (provider.isError || provider.data === undefined) {
-    return <ErrorState onRetry={() => void provider.refetch()} />;
-  }
-
-  const models = provider.data.models;
-  if (models.length === 0) {
-    return <p className="text-xs text-muted-foreground">{t("providers:modelsEmpty")}</p>;
-  }
-
-  return (
-    <ul className="max-h-40 space-y-1 overflow-y-auto rounded-md border border-border p-2">
-      {models.map((model) => (
-        <li key={model.id} className="flex items-center justify-between gap-2 text-xs">
-          <span className="truncate font-medium">{model.modelId}</span>
-          <span className="shrink-0 text-muted-foreground">
-            {model.contextLength !== null
-              ? t("providers:contextLength", { length: model.contextLength })
-              : ""}
-          </span>
-        </li>
-      ))}
-    </ul>
   );
 }

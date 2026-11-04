@@ -5,6 +5,7 @@ import type {
   AgentListItem,
   AgentRunDetail,
   AgentRunListItem,
+  ModelDto,
   ProviderDetail,
   ProviderListItem,
 } from "@/lib/types";
@@ -70,6 +71,63 @@ export function useSyncProviderModels() {
       api.post<{ synced: number }>(
         `/providers/${variables.id}/sync-models${variables.catalogKey ? `?catalogKey=${variables.catalogKey}` : ""}`,
       ),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["providers"] }),
+  });
+}
+
+export function useSetDefaultProvider() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.put<ProviderDetail>(`/providers/${id}/default`),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["providers"] }),
+  });
+}
+
+export function useCreateProviderModel(providerId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: {
+      modelId: string;
+      displayName?: string;
+      contextLength?: number;
+      capabilities?: string;
+      inputPricePerMillion?: number;
+      outputPricePerMillion?: number;
+    }) => api.post<ModelDto>(`/providers/${providerId}/models`, body),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["providers"] }),
+  });
+}
+
+export function useUpdateProviderModel() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: {
+      id: string;
+      modelId: string;
+      displayName?: string;
+      contextLength?: number;
+      capabilities?: string;
+      inputPricePerMillion?: number;
+      outputPricePerMillion?: number;
+      enabled: boolean;
+    }) =>
+      api.put<ModelDto>(`/providers/models/${variables.id}`, {
+        modelId: variables.modelId,
+        displayName: variables.displayName,
+        contextLength: variables.contextLength,
+        capabilities: variables.capabilities,
+        inputPricePerMillion: variables.inputPricePerMillion,
+        outputPricePerMillion: variables.outputPricePerMillion,
+        enabled: variables.enabled,
+      }),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["providers"] }),
+  });
+}
+
+export function useDeleteProviderModel() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/providers/models/${id}`),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["providers"] }),
   });
 }
