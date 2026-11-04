@@ -42,6 +42,8 @@ public class CrewPilotDbContext(DbContextOptions<CrewPilotDbContext> options) : 
 
     public DbSet<WorkLog> WorkLogs => Set<WorkLog>();
 
+    public DbSet<WorkItemDependency> WorkItemDependencies => Set<WorkItemDependency>();
+
     public DbSet<Prototype> Prototypes => Set<Prototype>();
 
     public DbSet<PrototypeVersion> PrototypeVersions => Set<PrototypeVersion>();

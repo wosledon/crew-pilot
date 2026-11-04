@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:5097/"
+      "url": "http://127.0.0.1:5098/"
     }
   ],
   "paths": {
@@ -5182,6 +5182,176 @@
         }
       }
     },
+    "/api/projects/{projectId}/dependencies": {
+      "get": {
+        "tags": [
+          "WorkItemDependencies"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkItemDependencyDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkItemDependencyDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkItemDependencyDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "WorkItemDependencies"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkItemDependencyRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkItemDependencyRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkItemDependencyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkItemDependencyDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkItemDependencyDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkItemDependencyDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectId}/critical-path": {
+      "get": {
+        "tags": [
+          "WorkItemDependencies"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CriticalPathDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CriticalPathDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CriticalPathDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dependencies/{id}": {
+      "delete": {
+        "tags": [
+          "WorkItemDependencies"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/projects/{projectId}/workitems": {
       "get": {
         "tags": [
@@ -7045,6 +7215,30 @@
           }
         }
       },
+      "CreateWorkItemDependencyRequest": {
+        "required": [
+          "fromWorkItemId",
+          "toWorkItemId",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "fromWorkItemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "toWorkItemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "CreateWorkItemRequest": {
         "required": [
           "type",
@@ -7203,6 +7397,30 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "CriticalPathDto": {
+        "required": [
+          "totalHours",
+          "itemIds"
+        ],
+        "type": "object",
+        "properties": {
+          "totalHours": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "itemIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       },
@@ -9500,6 +9718,50 @@
           }
         }
       },
+      "WorkItemDependencyDto": {
+        "required": [
+          "id",
+          "projectId",
+          "fromWorkItemId",
+          "fromTitle",
+          "toWorkItemId",
+          "toTitle",
+          "type",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fromWorkItemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fromTitle": {
+            "type": "string"
+          },
+          "toWorkItemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "toTitle": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "WorkItemDetailDto": {
         "required": [
           "id",
@@ -9894,6 +10156,9 @@
     },
     {
       "name": "Workflows"
+    },
+    {
+      "name": "WorkItemDependencies"
     },
     {
       "name": "WorkItems"

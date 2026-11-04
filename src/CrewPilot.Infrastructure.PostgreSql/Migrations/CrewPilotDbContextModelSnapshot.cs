@@ -1006,6 +1006,41 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("CrewPilot.Core.WorkItems.WorkItemDependency", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("FromWorkItemId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ToWorkItemId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("ToWorkItemId");
+
+                    b.HasIndex("FromWorkItemId", "ToWorkItemId")
+                        .IsUnique();
+
+                    b.ToTable("WorkItemDependencies", (string)null);
+                });
+
             modelBuilder.Entity("CrewPilot.Core.WorkLogs.WorkLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1584,6 +1619,25 @@ namespace CrewPilot.Infrastructure.PostgreSql.Migrations
                     b.Navigation("Iteration");
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("CrewPilot.Core.WorkItems.WorkItemDependency", b =>
+                {
+                    b.HasOne("CrewPilot.Core.WorkItems.WorkItem", "FromWorkItem")
+                        .WithMany()
+                        .HasForeignKey("FromWorkItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CrewPilot.Core.WorkItems.WorkItem", "ToWorkItem")
+                        .WithMany()
+                        .HasForeignKey("ToWorkItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FromWorkItem");
+
+                    b.Navigation("ToWorkItem");
                 });
 
             modelBuilder.Entity("CrewPilot.Core.WorkLogs.WorkLog", b =>
